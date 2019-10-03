@@ -1,0 +1,703 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>Carbon.utf8.md</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">O'Neill-PhD</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="index.html">Home</a>
+</li>
+<li>
+  <a href="Carbon.html">Carbon</a>
+</li>
+<li>
+  <a href="EVI.html">EVI</a>
+</li>
+<li>
+  <a href="NDVI.html">NDVI</a>
+</li>
+<li>
+  <a href="Env.html">Environment &amp; Carbon</a>
+</li>
+<li>
+  <a href="Human_C.html">Human &amp; Carbon</a>
+</li>
+<li>
+  <a href="Species-Analysis.html">Species Analysis</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+
+</div>
+
+
+<div id="carbon-stocks-assessment-with-national-forest-inventories-data" class="section level3">
+<h3>Carbon stocks assessment with National Forest Inventories Data</h3>
+<div id="loading-the-required-packages" class="section level6">
+<h6>Loading the required Packages———</h6>
+<pre class="r"><code>library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(stringr)
+library(maps)
+library(mapdata)
+library(maptools)
+library(sp)
+library(raster)
+library(BIOMASS)
+library(ape)
+library(magrittr)</code></pre>
+<p>######load the dataframe</p>
+<pre class="r"><code>Trees &lt;- read.csv(&quot;Data/MainFrame.csv&quot;)</code></pre>
+</div>
+<div id="omitting-the-east-and-nort-with-na-values-and-taxonomy-of-trees-are-corrected-by-using-the-to-correct-typos-in-scientific-names-using-the-taxonomic-name-resolution-service" class="section level6">
+<h6>Omitting the EAST and NORT with NA values and taxonomy of trees are corrected by using the to correct typos in scientific names using the Taxonomic Name Resolution Service</h6>
+<pre class="r"><code>Trees &lt;- Trees[!is.na(Trees$NORTH),]
+sum(is.na(Trees$EAST))</code></pre>
+<pre><code>## [1] 0</code></pre>
+<pre class="r"><code>dim(Trees)</code></pre>
+<pre><code>## [1] 327625     22</code></pre>
+<pre class="r"><code>TreesNA &lt;- Trees[Trees$Species==&quot;NA&quot;,]
+Trees &lt;- Trees[!is.na(Trees$Species),]
+dim(Trees)</code></pre>
+<pre><code>## [1] 305526     22</code></pre>
+<pre class="r"><code>summary(Trees)</code></pre>
+<pre><code>##   Species_Code   Species_Record         District           Township     
+##  Min.   :  1.0   Min.   :     1   Kale      : 47192   Homalin  : 31066  
+##  1st Qu.:121.0   1st Qu.:  7671   Mawlaik   : 46294   Mawlaik  : 23291  
+##  Median :188.0   Median : 19896   Khamti    : 31066   Kalewa   : 23284  
+##  Mean   :217.1   Mean   : 36201   Katha     : 29325   Paungbyin: 23003  
+##  3rd Qu.:357.0   3rd Qu.: 53914   PyinOoLwin: 25469   Mingin   : 20301  
+##  Max.   :503.0   Max.   :136512   Minbu     : 17245   Banmauk  : 10817  
+##                                   (Other)   :108935   (Other)  :173764  
+##          PEF_Status          D_ID            GISID       
+##  Homalin_UCF  : 17589   Min.   :   1.0   Min.   :   1.0  
+##  Paungbyin_UCF: 12061   1st Qu.: 214.0   1st Qu.: 134.0  
+##  Kalewa_UCF   : 10471   Median : 492.0   Median : 414.0  
+##  Patolon      :  8990   Mean   : 773.9   Mean   : 586.6  
+##  Yeyaman      :  7881   3rd Qu.:1153.0   3rd Qu.: 878.0  
+##  Mingin_UCF   :  7403   Max.   :2989.0   Max.   :1973.0  
+##  (Other)      :241131                    NA&#39;s   :86019   
+##       EAST             NORTH              ALT               LC        
+##  Min.   : 185000   Min.   : 181974   430    :  2013   Min.   : 0.000  
+##  1st Qu.: 627099   1st Qu.:2313500   420    :  1702   1st Qu.: 1.000  
+##  Median : 670000   Median :2541500   402    :  1452   Median : 1.000  
+##  Mean   : 702611   Mean   :2355064   350    :  1395   Mean   : 1.423  
+##  3rd Qu.: 714000   3rd Qu.:2653000   320    :  1275   3rd Qu.: 1.000  
+##  Max.   :2199000   Max.   :2824000   220    :  1217   Max.   :14.000  
+##                                      (Other):296472                   
+##        FT             DEN              TNO             DBH_mm      
+##  Min.   : 0.00   Min.   : 0.000   Min.   :  0.00   Min.   :   0.0  
+##  1st Qu.:62.00   1st Qu.: 2.000   1st Qu.:  6.00   1st Qu.: 150.0  
+##  Median :63.00   Median : 2.000   Median : 13.00   Median : 268.0  
+##  Mean   :64.34   Mean   : 1.971   Mean   : 18.21   Mean   : 282.4  
+##  3rd Qu.:63.00   3rd Qu.: 2.000   3rd Qu.: 24.00   3rd Qu.: 375.0  
+##  Max.   :93.00   Max.   :27.000   Max.   :281.00   Max.   :3225.0  
+##                                                                    
+##       Year                Plot_names       Local_names    
+##  Min.   :2010   N2475500E227000:   306   In      : 24619  
+##  1st Qu.:2013   N2490500E210000:   259   Kanyin  : 23980  
+##  Median :2014   N2436500E222000:   252   Pyinkado: 18361  
+##  Mean   :2014   N2491500E211000:   251   Kyun    : 15982  
+##  3rd Qu.:2015   N2467500E225000:   245   Taukkyan: 14990  
+##  Max.   :2017   N2499500E213000:   231   Sagat   : 11398  
+##                 (Other)        :303982   (Other) :196196  
+##            Genus                 Species      
+##  Dipterocarpus: 48655   spp.         : 40456  
+##  Terminalia   : 24113   tuberculatus : 24619  
+##  Xylia        : 18361   grandis      : 20984  
+##  Tectona      : 16654   dolabriformis: 18361  
+##  Quercus      : 13975   tomentosa    : 15913  
+##  Pentacme     : 10395   spicata      : 11615  
+##  (Other)      :173373   (Other)      :173578  
+##                        Binomial          DBH_cm      
+##  Dipterocarpus tuberculatus: 24619   Min.   :  0.00  
+##  Dipterocarpus spp.        : 23980   1st Qu.: 15.00  
+##  Xylia dolabriformis       : 18361   Median : 26.80  
+##  Tectona grandis           : 15982   Mean   : 28.24  
+##  Terminalia tomentosa      : 14976   3rd Qu.: 37.50  
+##  Quercus spicata           : 11398   Max.   :322.50  
+##  (Other)                   :196210</code></pre>
+<pre class="r"><code>sum(!is.na(Trees))</code></pre>
+<pre><code>## [1] 6635553</code></pre>
+<pre class="r"><code>Trees &lt;- drop_na(Trees)
+dim(Trees)</code></pre>
+<pre><code>## [1] 219507     22</code></pre>
+<pre class="r"><code>Taxo &lt;- correctTaxo(genus= Trees$Genus, species = Trees$Species)
+
+Trees$genusCorr &lt;- Taxo$genusCorrected
+Trees$speciesCorr &lt;- Taxo$speciesCorrected
+
+APG &lt;- getTaxonomy(Trees$genusCorr, findOrder =T)
+
+Trees$familyAPG &lt;- APG$family
+
+Trees$orderAPG &lt;- APG$order
+dataWD &lt;- getWoodDensity(genus=Trees$genusCorr,
+                         species=Trees$speciesCorr,
+                         stand=NULL, family = Trees$familyAPG, region = &quot;World&quot;)
+
+Trees &lt;- Trees %&gt;% mutate(DBH_cm=DBH_mm/10) %&gt;% mutate(WD=dataWD$meanWD)</code></pre>
+</div>
+<div id="obtaining-wood-density" class="section level6">
+<h6>Obtaining wood density</h6>
+<p>Obtaining Wood density - getWoodDensity assigns to each taxon a species- or genus-level average if at least one wood density value in the same genus as the focal taxon is available in the reference database. For unidentified trees or if the genus is missing in the reference database, the stand-level mean wood density is assigned to the tree (based on trees for which a value was attributed).</p>
+</div>
+<div id="building-a-diameter-height-model-based-on-the-first-year-data-" class="section level6">
+<h6>Building a Diameter Height Model based on the first year data———-</h6>
+<pre class="r"><code>library(lme4)</code></pre>
+<pre><code>## Loading required package: Matrix</code></pre>
+<pre><code>## 
+## Attaching package: &#39;Matrix&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:tidyr&#39;:
+## 
+##     expand</code></pre>
+<pre class="r"><code>Forests &lt;- read.csv(&quot;Data/All_data_Final.csv&quot;)
+ModelForHeight &lt;- lmer(log(H_m)~log(Dbh_cm)+(1|Plot_id), REML = FALSE, data = Forests)</code></pre>
+<pre class="r"><code>ModelForHeight</code></pre>
+<pre><code>## Linear mixed model fit by maximum likelihood  [&#39;lmerMod&#39;]
+## Formula: log(H_m) ~ log(Dbh_cm) + (1 | Plot_id)
+##    Data: Forests
+##       AIC       BIC    logLik  deviance  df.resid 
+##  5026.250  5051.893 -2509.125  5018.250      4491 
+## Random effects:
+##  Groups   Name        Std.Dev.
+##  Plot_id  (Intercept) 0.5003  
+##  Residual             0.4018  
+## Number of obs: 4495, groups:  Plot_id, 112
+## Fixed Effects:
+## (Intercept)  log(Dbh_cm)  
+##      1.0141       0.6246</code></pre>
+<p>newdata = expand.grid(Dbh_cm = 0:100, Plot_id = unique(Forests<span class="math inline">\(Plot_id)) newdata\)</span>H_pred&lt;-predict(ModelForHeight, newdata) summary(ModelForHeight) ranef(ModelForHeight)</p>
+<p>HDmodels &lt;- modelHD(D=Forests<span class="math inline">\(Dbh_cm,  H = Forests\)</span>H_m, drawGraph=TRUE, useWeight=TRUE) HDmodels</p>
+<p>Best_HDmodel&lt;- modelHD(D=Forests<span class="math inline">\(Dbh_cm,  H=Forests\)</span>H_m, method=“log1”, useWeight =TRUE)</p>
+</div>
+</div>
+<div id="getting-tree-height-based-on-the-best-model" class="section level3">
+<h3>Getting tree Height based on the best model —————————————————————————–</h3>
+<p>dataHlocal &lt;-retrieveH(Trees$DBH_mm, Best_HDmodel)</p>
+<p>Trees<span class="math inline">\(H_m &lt;- dataHlocal\)</span>H Trees<span class="math inline">\(WD_gcm3 &lt;- dataWD\)</span>meanWD</p>
+</div>
+<div id="omitting-trees-having-dbh-less-than-5cm" class="section level1">
+<h1>Omitting trees having DBH less than 5cm—–</h1>
+<p>Trees &lt;- Trees %&gt;% filter(DBH_cm &gt;= 5)</p>
+</div>
+<div id="calculating-the-biomass-of-each-tree-" class="section level1">
+<h1>Calculating the biomass of each tree—-</h1>
+</div>
+<div id="where-d-tree-diameter-in-cm-either-a-vector-or-a-single-value" class="section level1">
+<h1>Where, D = Tree diameter (in cm), either a vector or a single value</h1>
+</div>
+<div id="wood-density-in-gcm3-either-a-vector-or-a-single-value." class="section level1">
+<h1>Wood density (in g/cm3), either a vector or a single value.</h1>
+</div>
+<div id="tree-height-h-in-m-either-a-vector-or-a-single-value." class="section level1">
+<h1>Tree height (H in m), either a vector or a single value.</h1>
+<p>CoordsH &lt;- cbind(Trees<span class="math inline">\(EAST, Trees\)</span>NORTH) Trees &lt;- Trees %&gt;% mutate(AGB=computeAGB(DBH_cm, WD_gcm3, H = H_m, coord = CoordsH, Dlim = NULL)) names(Trees)</p>
+<p>Trees &lt;- Trees %&gt;% mutate(Carbon_Mg= AGB*0.471) class(Trees)</p>
+<p>head(Trees) str(Trees) Trees<span class="math inline">\(genusCorr &lt;- as.character(Trees\)</span>genusCorr)</p>
+<p>write.csv(Trees, file = “Data/Trees_data.csv”)</p>
+</div>
+<div id="carbon_ha-assumed-1ha-sample-plots" class="section level1">
+<h1>Carbon_ha (assumed 1ha sample plots)——–</h1>
+<p>Trees &lt;- read.csv(“Data/Trees_data.csv”) Plot_carbon &lt;- Trees %&gt;% group_by(Plot_names,Year) %&gt;% summarise(Carbon_ha = sum(Carbon_Mg)) summary(Plot_carbon<span class="math inline">\(Carbon_ha) class(Plot_carbon\)</span>Carbon_ha) attach(Plot_carbon) hist(Plot_carbon)</p>
+<p>hist(Trees<span class="math inline">\(DBH_cm, breaks = 50) hist(Trees\)</span>H_m, breaks = 10) plot(Trees<span class="math inline">\(DBH_cm, Trees\)</span>H_m)</p>
+</div>
+<div id="carbon_ha-1-ha-sample-plot-with-different-nested-sampling-method" class="section level1">
+<h1>Carbon_ha (1 ha sample plot) with different nested sampling method——</h1>
+</div>
+<div id="splitting-the-dataframe-for-large-50-m-50m-and-medium-plots-25m25m" class="section level1">
+<h1>Splitting the dataframe for large 50 m* 50m and medium plots 25m*25m—————————————————————————————–</h1>
+<p>Trees_data &lt;- read.csv(“Data/Trees_data.csv”)</p>
+<p>head(Trees_data) str(Trees_data) Trees_1ha &lt;- Trees_data %&gt;% filter(DBH_mm &gt;= 200) Trees_50m &lt;- Trees_data %&gt;% filter(DBH_mm &lt; 200)</p>
+</div>
+<div id="calculating-the-carbon-per-ha-for-the-large-plots" class="section level1">
+<h1>Calculating the carbon per ha for the large plots——</h1>
+<p>Plot_1ha &lt;- Trees_1ha %&gt;% group_by(Plot_names, Year, District,EAST,NORTH, Zone) %&gt;% dplyr::summarise(C_Tree_total = sum(Carbon_Mg)) %&gt;% mutate(C_ha=C_Tree_total)</p>
+</div>
+<div id="calculating-the-carbon-per-ha-for-the-medium-plots-" class="section level1">
+<h1>Calculating the carbon per ha for the medium plots———-</h1>
+<p>Plot_50M_Cha &lt;- Trees_50m %&gt;% group_by(Plot_names, Year, District, EAST, NORTH, Zone) %&gt;% dplyr::summarise(C_Tree_total = sum(Carbon_Mg)) %&gt;% mutate(C_ha=C_Tree_total/0.25)</p>
+</div>
+<div id="combining-dataframes-of-different-plot-size-into-one-by-replacing-the-nas-values-with-0-so-as-to-combine" class="section level1">
+<h1>Combining dataframes of different plot size into one by replacing the NAs values with 0 so as to combine—–</h1>
+<p>Plot_Cha &lt;- full_join(Plot_1ha_Cha,Plot_50M_Cha, by= “Plot_names”)</p>
+<p>Plot_Cha<span class="math inline">\(Plot_names &lt;- as.character(Plot_Cha\)</span>Plot_names) Plot_Cha<span class="math inline">\(District.x &lt;- as.character(Plot_Cha\)</span>District.x) Plot_Cha<span class="math inline">\(District.y &lt;- as.character(Plot_Cha\)</span>District.y)</p>
+<p>is.na(Plot_Cha) str(Plot_Cha) Plot_Cha[is.na(Plot_Cha)] &lt;- 0</p>
+</div>
+<div id="as-total-trees-number-is-for-1-ha-plot." class="section level1">
+<h1>As total trees number is for 1 ha plot.</h1>
+</div>
+<div id="to-get-the-mean-carbon-per-ha" class="section level1">
+<h1>to get the mean carbon per ha</h1>
+<p>Plot_Cha &lt;- Plot_Cha %&gt;% mutate(Total_C_ha = C_ha.x+C_ha.y)</p>
+<p>hist(Plot_Cha$Total_C_ha, breaks=100)</p>
+</div>
+<div id="upper-1-of-the-data-was-omitted-due-to-uncertainities-associated" class="section level1">
+<h1>upper 1% of the data was omitted due to uncertainities associated—–</h1>
+<p>Cut_Out &lt;- Plot_Cha %&gt;% filter(Total_C_ha &lt;= 625.2924)</p>
+</div>
+<div id="filling-out-missing-districts-years-north-and-east" class="section level1">
+<h1>Filling out missing Districts, Years, NORTH and EAST—–</h1>
+<p>names(Cut_Out) str(Cut_Out)</p>
+<p>x &lt;- which(Cut_Out<span class="math inline">\(District.x==0) Cut_Out\)</span>District.x[x]&lt;- Cut_Out$District.y[x]</p>
+<p>y &lt;- which(Cut_Out<span class="math inline">\(District.y==0) Cut_Out\)</span>District.y[y] &lt;- Cut_Out$District.x[y]</p>
+<p>Missing_Year_X &lt;- which(Cut_Out<span class="math inline">\(Year.x==0) Cut_Out\)</span>Year.x[Missing_Year_X] &lt;- Cut_Out$Year.y[Missing_Year_X]</p>
+<p>Missing_Year_Y &lt;- which(Cut_Out<span class="math inline">\(Year.y==0) Cut_Out\)</span>Year.y[Missing_Year_Y] &lt;- Cut_Out$Year.x[Missing_Year_Y]</p>
+<p>y &lt;- which(Cut_Out<span class="math inline">\(District.y==0) Cut_Out\)</span>District.y[y] &lt;- Cut_Out$District.x[y]</p>
+<p>Missing_EAST_X &lt;- which(Cut_Out<span class="math inline">\(EAST.x==0) Cut_Out\)</span>EAST.x[Missing_EAST_X] &lt;- Cut_Out$EAST.y[Missing_EAST_X]</p>
+<p>Missing_EAST_Y &lt;- which(Cut_Out<span class="math inline">\(EAST.y==0) Cut_Out\)</span>EAST.y[Missing_EAST_Y] &lt;- Cut_Out$EAST.x[Missing_EAST_Y]</p>
+<p>Missing_NORTH_X &lt;- which(Cut_Out<span class="math inline">\(NORTH.x==0) Cut_Out\)</span>NORTH.x[Missing_NORTH_X] &lt;- Cut_Out$NORTH.y[Missing_NORTH_X]</p>
+<p>Missing_NORTH_Y &lt;- which(Cut_Out<span class="math inline">\(NORTH.y==0) Cut_Out\)</span>NORTH.y[Missing_NORTH_Y] &lt;- Cut_Out$NORTH.x[Missing_NORTH_Y]</p>
+<p>Missing_Zone_X &lt;- which(Cut_Out<span class="math inline">\(Zone.x==0) Cut_Out\)</span>Zone.x[Missing_Zone_X] &lt;- Cut_Out$Zone.y[Missing_Zone_X]</p>
+<p>Missing_Zone_Y &lt;- which(Cut_Out<span class="math inline">\(Zone.y==0) Cut_Out\)</span>Zone.y[Missing_Zone_Y] &lt;- Cut_Out$Zone.x[Missing_Zone_Y]</p>
+<p>PYAY &lt;- which(Cut_Out<span class="math inline">\(District.x == &quot;PYAY&quot;) Cut_Out\)</span>District.x[PYAY] &lt;- “Pyay”</p>
+<p>PYAY2 &lt;- which(Cut_Out<span class="math inline">\(District.y == &quot;PYAY&quot;) Cut_Out\)</span>District.y[PYAY2] &lt;- “Pyay”</p>
+<p>names(Cut_Out)</p>
+</div>
+<div id="producing-a-clean-dataframe-" class="section level1">
+<h1>Producing a clean dataframe—-</h1>
+<p>Cleaned_Dataframe &lt;- Cut_Out %&gt;% dplyr::select(Plot_names, Year.x, District.x, Total_C_ha, EAST.x, NORTH.x, Zone.x)</p>
+<p>Cleaned_Dataframe &lt;- Cleaned_Dataframe %&gt;% rename(Year = Year.x) %&gt;% rename(District = District.x) %&gt;% rename(EAST = EAST.x) %&gt;% rename(NORTH = NORTH.x) %&gt;% rename(Zone = Zone.x)</p>
+<p>which(Cleaned_Dataframe$EAST==512000) Wrong_Plot &lt;- Cleaned_Dataframe %&gt;% filter(Plot_names==“N512000E2077000”)</p>
+<p>Cleaned_Dataframe[7289, 5] = 215000</p>
+<p>write.csv(Cleaned_Dataframe,file = “Data_Output/Cleaned_Data.csv”,row.names = FALSE)</p>
+<p>Final_Dataframe &lt;- read.csv(“Data_Output/Cleaned_Data.csv”)</p>
+</div>
+<div id="loading-the-ndvi-data-for-7-years-" class="section level1">
+<h1>Loading the NDVI data for 7 years—-</h1>
+<p>NDVI2018_values &lt;- read.csv(“Data_Output/NDVI2018.csv”) NDVI2017_values &lt;- read.csv(“Data_Output/NDVI2017.csv”) NDVI2016_values &lt;- read.csv(“Data_Output/NDVI2016.csv”) NDVI2015_values &lt;- read.csv(“Data_Output/NDVI2015.csv”) NDVI2014_values &lt;- read.csv(“Data_Output/NDVI2014.csv”) NDVI2013_values &lt;- read.csv(“Data_Output/NDVI2013.csv”) NDVI2012_values &lt;- read.csv(“Data_Output/NDVI2012.csv”) NDVI2011_values &lt;- read.csv(“Data_Output/NDVI2011.csv”) NDVI2010_N_values &lt;- read.csv(“Data_Output/NDVI2010.csv”)</p>
+</div>
+<div id="attached-ndvi-values-to-the-data-frame-" class="section level1">
+<h1>Attached NDVI values to the Data Frame—-</h1>
+<p>Final_Dataframe &lt;- read.csv(“Data_Output/Cleaned_Data.csv”) Final_Dataframe<span class="math inline">\(NDVI2018 &lt;- NDVI2018_values\)</span>NDVI Final_Dataframe<span class="math inline">\(NDVI2017 &lt;- NDVI2017_values\)</span>NDVI2017 Final_Dataframe<span class="math inline">\(NDVI2016 &lt;- NDVI2016_values\)</span>NDVI2016 Final_Dataframe<span class="math inline">\(NDVI2015 &lt;- NDVI2015_values\)</span>NDVI2015 Final_Dataframe<span class="math inline">\(NDVI2014 &lt;- NDVI2014_values\)</span>NDVI2014 Final_Dataframe<span class="math inline">\(NDVI2013 &lt;- NDVI2013_values\)</span>NDVI2013 Final_Dataframe<span class="math inline">\(NDVI2012 &lt;- NDVI2012_values\)</span>NDVI2012 Final_Dataframe<span class="math inline">\(NDVI2011 &lt;- NDVI2011_values\)</span>NDVI2011 Final_Dataframe<span class="math inline">\(NDVI2010 &lt;- NDVI2010_values\)</span>NDVI2010 Final_Dataframe &lt;- Final_Dataframe</p>
+</div>
+<div id="histrograms-of-ndvi-and-carbon-for-7-years" class="section level1">
+<h1>Histrograms of NDVI and Carbon for 7 years——</h1>
+<p>hist(Final_Dataframe<span class="math inline">\(Total_C_ha, breaks = 100) hist(Final_Dataframe\)</span>NDVI2018, breaks = 100) hist(Final_Dataframe<span class="math inline">\(NDVI2017, breaks = 100) hist(Final_Dataframe\)</span>NDVI2016, breaks = 100) hist(Final_Dataframe<span class="math inline">\(NDVI2015, breaks = 100) hist(Final_Dataframe\)</span>NDVI2014, breaks = 100) hist(Final_Dataframe<span class="math inline">\(NDVI2013, breaks = 100) hist(Final_Dataframe\)</span>NDVI2012, breaks = 100) hist(Final_Dataframe<span class="math inline">\(NDVI2011, breaks = 100) hist(Final_Dataframe\)</span>NDVI2010, breaks = 100)</p>
+</div>
+<div id="nfi-carbon-data-and-ndvi-relationship" class="section level1">
+<h1>NFI Carbon data and NDVI relationship—–</h1>
+</div>
+<div id="year2017" class="section level1">
+<h1>Year2017—————</h1>
+<p>NFI_2017 &lt;- Final_Dataframe %&gt;% filter(Year==2017) plot(NFI_2017<span class="math inline">\(Total_C_ha, (NFI_2017\)</span>NDVI2017)/10000)</p>
+</div>
+<div id="year-2016" class="section level1">
+<h1>Year 2016———</h1>
+<p>NFI_2016 &lt;- Final_Dataframe %&gt;% filter(Year==2016) plot(NFI_2016<span class="math inline">\(Total_C_ha, (NFI_2016\)</span>NDVI2016)/10000)</p>
+</div>
+<div id="year-2015-" class="section level1">
+<h1>Year 2015—-</h1>
+<p>NFI_2015 &lt;- Final_Dataframe %&gt;% filter(Year==2015) plot(NFI_2016<span class="math inline">\(Total_C_ha, (NFI_2016\)</span>NDVI2015)/10000)</p>
+</div>
+<div id="year-2014-" class="section level1">
+<h1>Year 2014—-</h1>
+<p>NFI_2014 &lt;- Final_Dataframe %&gt;% filter(Year==2014) plot(NFI_2014<span class="math inline">\(Total_C_ha, (NFI_2014\)</span>NDVI2014)/10000)</p>
+</div>
+<div id="year-2013-" class="section level1">
+<h1>Year 2013—-</h1>
+<p>NFI_2013 &lt;- Final_Dataframe %&gt;% filter(Year==2013) plot(NFI_2013<span class="math inline">\(Total_C_ha, (NFI_2013\)</span>NDVI2013)/10000)</p>
+</div>
+<div id="year-2012-" class="section level1">
+<h1>Year 2012—-</h1>
+<p>NFI_2012 &lt;- Final_Dataframe %&gt;% filter(Year==2012) plot(NFI_2012<span class="math inline">\(Total_C_ha, (NFI_2012\)</span>NDVI2012)/10000)</p>
+</div>
+<div id="year-2011-" class="section level1">
+<h1>Year 2011—-</h1>
+<p>NFI_2011 &lt;- Final_Dataframe %&gt;% filter(Year==2011) plot(NFI_2011<span class="math inline">\(Total_C_ha, (NFI_2011\)</span>NDVI2011)/10000)</p>
+</div>
+<div id="year-2010-" class="section level1">
+<h1>Year 2010—-</h1>
+<p>NFI_2010 &lt;- Final_Dataframe %&gt;% filter(Year==2010) plot(NFI_2010<span class="math inline">\(Total_C_ha, (NFI_2010\)</span>NDVI2010)/10000)</p>
+</div>
+<div id="year-nfi-carbon-and-ndvi-" class="section level1">
+<h1>7 Year NFI carbon and NDVI—-</h1>
+<p>plot(Final_Dataframe<span class="math inline">\(Total_C_ha,Final_Dataframe\)</span>NDVI2018) plot(Final_Dataframe<span class="math inline">\(Total_C_ha,Final_Dataframe\)</span>NDVI2017) plot(Final_Dataframe<span class="math inline">\(Total_C_ha,Final_Dataframe\)</span>NDVI2016) plot(Final_Dataframe<span class="math inline">\(Total_C_ha,Final_Dataframe\)</span>NDVI2015) plot(Final_Dataframe<span class="math inline">\(Total_C_ha,Final_Dataframe\)</span>NDVI2014) plot(Final_Dataframe<span class="math inline">\(Total_C_ha,Final_Dataframe\)</span>NDVI2013) plot(Final_Dataframe<span class="math inline">\(Total_C_ha,Final_Dataframe\)</span>NDVI2012) plot(Final_Dataframe<span class="math inline">\(Total_C_ha,Final_Dataframe\)</span>NDVI2011) plot(Final_Dataframe<span class="math inline">\(Total_C_ha,Final_Dataframe\)</span>NDVI2010)</p>
+<p>Final_Dataframe<span class="math inline">\(NDVI_cyr&lt;-NA Final_Dataframe\)</span>NDVI_cyr[Final_Dataframe$Year==2010]&lt;-Final_Dataframe<span class="math inline">\(NDVI2010[Final_Dataframe\)</span>Year==2010] Final_Dataframe<span class="math inline">\(NDVI_cyr[Final_Dataframe\)</span>Year==2011]&lt;-Final_Dataframe<span class="math inline">\(NDVI2011[Final_Dataframe\)</span>Year==2011] Final_Dataframe<span class="math inline">\(NDVI_cyr[Final_Dataframe\)</span>Year==2012]&lt;-Final_Dataframe<span class="math inline">\(NDVI2012[Final_Dataframe\)</span>Year==2012] Final_Dataframe<span class="math inline">\(NDVI_cyr[Final_Dataframe\)</span>Year==2013]&lt;-Final_Dataframe<span class="math inline">\(NDVI2013[Final_Dataframe\)</span>Year==2013] Final_Dataframe<span class="math inline">\(NDVI_cyr[Final_Dataframe\)</span>Year==2014]&lt;-Final_Dataframe<span class="math inline">\(NDVI2014[Final_Dataframe\)</span>Year==2014] Final_Dataframe<span class="math inline">\(NDVI_cyr[Final_Dataframe\)</span>Year==2015]&lt;-Final_Dataframe<span class="math inline">\(NDVI2015[Final_Dataframe\)</span>Year==2015] Final_Dataframe<span class="math inline">\(NDVI_cyr[Final_Dataframe\)</span>Year==2016]&lt;-Final_Dataframe<span class="math inline">\(NDVI2016[Final_Dataframe\)</span>Year==2016] Final_Dataframe<span class="math inline">\(NDVI_cyr[Final_Dataframe\)</span>Year==2017]&lt;-Final_Dataframe<span class="math inline">\(NDVI2017[Final_Dataframe\)</span>Year==2017] Final_Dataframe<span class="math inline">\(NDVI_cyr[Final_Dataframe\)</span>Year==2018]&lt;-Final_Dataframe<span class="math inline">\(NDVI2018[Final_Dataframe\)</span>Year==2018]</p>
+<p>Final_Dataframe %&gt;% ggplot(aes(x = log(Total_C_ha), y = NDVI_cyr, color = Year)) + geom_point() + geom_smooth(method = ‘lm’)</p>
+<p>lm1 &lt;- lm(log(Total_C_ha)~NDVI_cyr,data = Final_Dataframe) summary(lm1)</p>
+</div>
+<div id="year-avitabile-and-ndvi-as-avitabile-used-2011-and-2012-agb-maps-to-produce-his-map" class="section level1">
+<h1>2 Year Avitabile and NDVI as Avitabile used 2011 and 2012 AGB maps to produce his map———————————–</h1>
+<p>Data_AVT &lt;- read.csv(“Data/AGB_AVT_plots.csv”) Data_AVT &lt;- Data_AVT %&gt;% mutate(AVT_Carbon= 0.47*(Data_AVT<span class="math inline">\(mean)) Data_AVT\)</span>NDVI2012 &lt;- NDVI2012_values<span class="math inline">\(NDVI2012 Data_AVT\)</span>NDVI2011 &lt;- NDVI2011_values$NDVI2011</p>
+<p>Data_AVT &lt;- Data_AVT plot(Data_AVT<span class="math inline">\(Total_C_ha, Data_AVT\)</span>AVT_Carbon)</p>
+</div>
+<div id="year-2012--1" class="section level1">
+<h1>Year 2012—-</h1>
+<p>AVT_2012 &lt;- Data_AVT %&gt;% filter(Year==2012) plot(AVT_2012<span class="math inline">\(AVT_Carbon, (AVT_2012\)</span>NDVI2012)/10000)</p>
+</div>
+<div id="year-2011--1" class="section level1">
+<h1>Year 2011—-</h1>
+<p>AVT_2011 &lt;- Data_AVT %&gt;% filter(Year==2011) plot(AVT_2011<span class="math inline">\(AVT_Carbon, (AVT_2011\)</span>NDVI2011)/10000)</p>
+</div>
+<div id="year-avt-carbon-and-ndvi-" class="section level1">
+<h1>2 Year AVT carbon and NDVI—-</h1>
+<p>plot(Data_AVT<span class="math inline">\(AVT_Carbon,Data_AVT\)</span>NDVI2012) plot(Data_AVT<span class="math inline">\(AVT_Carbon,Data_AVT\)</span>NDVI2011)</p>
+<p>Data_AVT<span class="math inline">\(NDVI_cyr&lt;-NA Data_AVT\)</span>NDVI_cyr[Data_AVT$Year==2011]&lt;-Data_AVT<span class="math inline">\(NDVI2011[Data_AVT\)</span>Year==2011] Data_AVT<span class="math inline">\(NDVI_cyr[Data_AVT\)</span>Year==2012]&lt;-Data_AVT<span class="math inline">\(NDVI2012[Data_AVT\)</span>Year==2012]</p>
+<p>Data_AVT %&gt;% ggplot(aes(x = log(AVT_Carbon), y = NDVI_cyr, color = Year)) + geom_point() + geom_smooth(method = ‘lm’)</p>
+<p>lm1 &lt;- lm(log(AVT_Carbon)~NDVI_cyr,data = Data_AVT) summary(lm1)</p>
+</div>
+<div id="summary-observations.." class="section level1">
+<h1>summary observations..</h1>
+<p>unique(Final_Dataframe<span class="math inline">\(District) table(Final_Dataframe\)</span>District) table(Final_Dataframe$Year)</p>
+<p>PlotNumber_by_District &lt;- Final_Dataframe %&gt;% group_by(District) %&gt;% summarise(count = n())</p>
+</div>
+<div id="load-up-the-values-extracted-from-the-avitabile-agb-map-" class="section level1">
+<h1>Load up the values extracted from the AVitabile AGB Map—-</h1>
+<p>Data_AVT &lt;- read.csv(“Data/AGB_AVT_plots.csv”) Data_AVT &lt;- Data_AVT %&gt;% mutate(AVT_Carbon= 0.47*(Data_AVT$mean))</p>
+</div>
+<div id="calculating-the-average-abg-value-for-each-district-for-aviatabile-and-nfi" class="section level1">
+<h1>calculating the Average ABG value for each district for Aviatabile and NFI</h1>
+<p>Data_AVT_Dist &lt;- Data_AVT %&gt;% group_by(District) %&gt;% summarise(mean_C_AVT = mean(AVT_Carbon, na.rm = T, n= n()))</p>
+<p>mean_DistC_Total &lt;- Data_AVT %&gt;% group_by(District) %&gt;% summarise(mean_C_Total = mean(Total_C_ha, na.rm = T, n= n()))</p>
+<p>Data_AVT_Dist<span class="math inline">\(Mean_C_Field &lt;- mean_DistC_Total\)</span>mean_C_Total</p>
+</div>
+<div id="writing-the-csv-file-of-avitabile-avearage-carbon-for-each-district" class="section level1">
+<h1>Writing the csv file of Avitabile avearage carbon for each district</h1>
+<p>write.csv(Data_AVT_Dist, file = “Data_Output/CarbonDistrictL.csv”, row.names = FALSE)</p>
+<p>CarbonDistrictL &lt;- read.csv(“Data_Output/CarbonDistrictL.csv”)</p>
+<p>plot(CarbonDistrictL<span class="math inline">\(mean_C_AVT, CarbonDistrictL\)</span>Mean_C_Field,col= “red”, main= “Correlation between Avitabile Map Data and NFI Data”) %&gt;% abline()</p>
+<p>CarbonDistrictL %&gt;% ggplot(aes(x = District , y = mean_C_AVT, fill = District)) + geom_bar(stat = “identity”) + theme_classic() + labs( x = “District”, y = “Average Carbon Storage (Mg)”, title = paste( “Average Carbon Storage by Avitabile Map” ) )+theme(axis.text.x = element_text(size=9, angle=90, vjust=0.5), axis.text.y = element_text(size=9))</p>
+<p>CarbonDistrictL %&gt;% ggplot(aes(x = District , y = Mean_C_Field, fill = District)) + geom_bar(stat = “identity”) + theme_classic() + labs( x = “District”, y = “Average Carbon Storage (Mg)”, title = paste( “Average Carbon Storage by NFI” ) )+theme(axis.text.x = element_text(size=9, angle=90, vjust=0.5), axis.text.y = element_text(size=9))</p>
+<p>ggplot(data = CarbonDistrictL, aes(x=mean_C_AVT, y=Mean_C_Field))+ geom_point(aes(colour = District))+ labs(xlab=“Avitabile(ton/ha)”, ylab = “NFI_Carbon(ton/ha)”, title = “NFI carbon and Avitabile Carbon Relationship”)</p>
+</div>
+<div id="testing-based-on-the-training-lessons" class="section level1">
+<h1>Testing based on the training lessons</h1>
+<p>Test_Data &lt;- read.csv(“data/distance_to_cities.csv”) EX2Plot &lt;- Test_Data %&gt;% filter(year==2011) %&gt;% ggplot(mapping = aes(x=Total_C_ha, y=mean))+ geom_point(color=“red”)+ geom_smooth(color= “green”)+theme_bw()</p>
+<p>Survey_2012 &lt;- Test_Data %&gt;% select(Year, Total_C_ha, mean, District) %&gt;% filter(Year == 2012)</p>
+<p>ggplot(Survey_2012, aes(x= Total_C_ha, y = mean))+ geom_point()+theme_bw()</p>
+<p>ggplot(data = Test_Data, aes(x=Total_C_ha, y=mean))+ geom_point(aes(colour = District))+ geom_density_2d(data = Survey_2012, colour= “navyblue”)</p>
+<div id="including-plots" class="section level2">
+<h2>Including Plots</h2>
+<p>You can also embed plots, for example:</p>
+<p><img src="Carbon_files/figure-html/pressure-1.png" width="672" /></p>
+<p>Note that the <code>echo = FALSE</code> parameter was added to the code chunk to prevent printing of the R code that generated the plot.</p>
+</div>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>
