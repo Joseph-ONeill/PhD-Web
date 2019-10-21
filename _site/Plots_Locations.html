@@ -1,0 +1,451 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+<meta name="author" content="ONEILL" />
+
+<meta name="date" content="2019-10-14" />
+
+<title>Plots’ Locations</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">O'Neill-PhD</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="Carbon.html">Carbon</a>
+</li>
+<li>
+  <a href="Plots_Locations.html">Plots Locations</a>
+</li>
+<li>
+  <a href="EVI.html">EVI</a>
+</li>
+<li>
+  <a href="NDVI.html">NDVI</a>
+</li>
+<li>
+  <a href="Env.html">Environment &amp; Carbon</a>
+</li>
+<li>
+  <a href="Human_C.html">Human &amp; Carbon</a>
+</li>
+<li>
+  <a href="Species-Analysis.html">Species Analysis</a>
+</li>
+<li>
+  <a href="Fieldwork.html">Fieldwork Analysis</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">Plots’ Locations</h1>
+<h4 class="author">ONEILL</h4>
+<h4 class="date">10/14/2019</h4>
+
+</div>
+
+
+<pre class="r"><code>library(mapdata)
+library(maptools)
+library(sp)
+library(raster)</code></pre>
+<pre class="r"><code>world2HiresMapEnv</code></pre>
+<pre><code>## [1] &quot;R_MAPDATA_DATA_DIR&quot;</code></pre>
+<pre class="r"><code>data(wrld_simpl)
+myanmar &lt;- wrld_simpl[wrld_simpl$NAME==&quot;Burma&quot;,]
+plot(myanmar)</code></pre>
+<p><img src="Plots_Locations_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
+<pre class="r"><code>myanmar_utm46 &lt;- spTransform(myanmar, &quot;+init=epsg:32646&quot;)
+myanmar_utm47 &lt;- spTransform(myanmar, &quot;+init=epsg:32647&quot;)
+plot(myanmar_utm47)</code></pre>
+<p><img src="Plots_Locations_files/figure-html/unnamed-chunk-2-2.png" width="672" /></p>
+<p>MainFrame &lt;- MainFrame[!is.na(MainFrame$EAST),]</p>
+<p>plot_coords &lt;- MainFrame %&gt;% dplyr:: select(Plot_names, EAST, NORTH, District, Township,Year) %&gt;% group_by(Plot_names) %&gt;% summarise(EAST = mean(EAST), NORTH = mean(NORTH), Year= mean(Year), District = District[1], Township= Township[1]) write.csv(plot_coords, file = “Data/plot_coords.csv”)</p>
+<div id="points-from-scratch-by-creating-for-47-and-46-qs-by-changing-the-dataframe-into-spatial-class" class="section level1">
+<h1>points from scratch by creating for 47 and 46 Qs by changing the dataframe into spatial class—–</h1>
+<p>coords = cbind(plot_coords<span class="math inline">\(EAST, plot_coords\)</span>NORTH) sp_46 &lt;- SpatialPoints(coords) sp_47 &lt;- SpatialPoints(coords)</p>
+</div>
+<div id="changing-the-projection-for-different-utm-zones-" class="section level1">
+<h1>Changing the projection for different UTM Zones—-</h1>
+<p>proj4string(sp_46) = CRS(“+init=epsg:32646”) proj4string(sp_47) = CRS(“+init=epsg:32647”)</p>
+</div>
+<div id="set-the-graph-layout" class="section level1">
+<h1>set the graph layout——</h1>
+<p>par(mar=c(4,4,2,2), mfrow =c(2,2)) plot(sp_46, cex = 0.1, col = “blue”) plot(myanmar_utm46, add = TRUE, border = “red”) plot(sp_47, cex = 0.1, col = “green”) plot(myanmar_utm47, add = TRUE, border = “red”) hist(plot_coords<span class="math inline">\(EAST, breaks = 100); abline(v = 500000, col = &quot;red&quot;); abline(v = 1500000, col = &quot;red&quot;) hist(plot_coords\)</span>NORTH, breaks = 100); abline(v = 1500000, col = “red”)</p>
+<p>plot_coords %&gt;% filter(EAST &gt; 500000 &amp; EAST &lt; 1500000) %&gt;% filter(NORTH &gt;1500000) %&gt;% summarise(EAST_min = min(EAST), EAST_max = max(EAST), NORTH_min = min(NORTH), NORTH_max = max(NORTH) )</p>
+<p>coords46 &lt;- plot_coords %&gt;% filter(EAST &gt; 500000 &amp; EAST &lt; 1500000) %&gt;% filter(NORTH &gt;1500000)</p>
+<p>coords47&lt;-plot_coords %&gt;% filter(EAST &lt; 500000) %&gt;% filter(NORTH &gt;1500000)</p>
+</div>
+<div id="loading-the-known-plots-and-add-a-colum-called-zone-4647-" class="section level1">
+<h1>Loading the known plots and add a colum called Zone (46/47)—-</h1>
+<p>coords46 &lt;- plot_coords %&gt;% filter(EAST &gt; 500000 &amp; EAST &lt; 1500000) %&gt;% filter(NORTH &gt;1500000) %&gt;% mutate(Zone = paste(“46”))</p>
+<p>coords47&lt;-plot_coords %&gt;% filter(EAST &lt; 500000) %&gt;% filter(NORTH &gt;1500000) %&gt;% mutate(Zone = paste(“47”))</p>
+<p>coords46 = SpatialPoints(cbind(coords46<span class="math inline">\(EAST, coords46\)</span>NORTH)) proj4string(coords46) = CRS(“+init=epsg:32646”) coords46&lt;-spTransform(coords46, “+init=epsg:4326”)</p>
+<p>coords47 = SpatialPoints(cbind(coords47<span class="math inline">\(EAST, coords47\)</span>NORTH)) proj4string(coords47) = CRS(“+init=epsg:32647”) coords47&lt;-spTransform(coords47, “+init=epsg:4326”)</p>
+<p>par(mar=c(4,4,2,2), mfrow =c(2,2)) plot(myanmar, border = “red”) plot(coords46, add = TRUE, cex = 0.1, col = “blue”) plot(coords47, add= TRUE, cex = 0.1, col = “green”)</p>
+</div>
+<div id="finding-the-error-plots" class="section level1">
+<h1>Finding the error plots————</h1>
+<p>Error_PlotA &lt;- plot_coords %&gt;% filter(EAST &gt; 1500000 &amp; NORTH &lt; 500000)</p>
+<p>Error_PlotB &lt;- plot_coords %&gt;% filter(EAST &lt; 500000 &amp; NORTH &lt; 500000)</p>
+<p>Error_Plot &lt;- rbind(Error_PlotA, Error_PlotB)</p>
+</div>
+<div id="loading-the-fixed-plots" class="section level1">
+<h1>Loading the fixed plots—————</h1>
+<p>Error_plots_B &lt;- read.csv(“Data/Fixed_ErrorPlots.csv” )</p>
+<p>data(wrld_simpl)</p>
+<p>myanmar &lt;- wrld_simpl[wrld_simpl$NAME==“Burma”,] plot(myanmar) myanmar_utm46 &lt;- spTransform(myanmar, “+init=epsg:32646”) myanmar_utm47 &lt;- spTransform(myanmar, “+init=epsg:32647”)</p>
+<p>plot(myanmar_utm47) Error_plots_B &lt;- Error_plots_B[!is.na(Error_plots_B$EAST),]</p>
+<p>plot_coords_B &lt;- Error_plots_B %&gt;% dplyr:: select(Plot_names, EAST, NORTH, District, Township,Year) %&gt;% group_by(Plot_names) %&gt;% summarise(EAST = mean(EAST), NORTH = mean(NORTH), Year= mean(Year), District = District[1], Township= Township[1])</p>
+<p>coords_B = cbind(Error_plots_B<span class="math inline">\(EAST, Error_plots_B\)</span>NORTH)</p>
+<p>sp_46_B &lt;- SpatialPoints(coords_B) sp_47_B &lt;- SpatialPoints(coords_B)</p>
+</div>
+<div id="changing-the-projection-for-different-utm-zones" class="section level1">
+<h1>Changing the projection for different UTM Zones</h1>
+<p>proj4string(sp_46_B) = CRS(“+init=epsg:32646”) proj4string(sp_47_B) = CRS(“+init=epsg:32647”)</p>
+</div>
+<div id="set-the-graph-layout-1" class="section level1">
+<h1>set the graph layout———</h1>
+<p>par(mar=c(4,4,2,2), mfrow =c(2,2)) plot(sp_46_B, cex = 0.1, col = “blue”) plot(myanmar_utm46, add = TRUE, border = “red”) plot(sp_47_B, cex = 0.1, col = “green”) plot(myanmar_utm47, add = TRUE, border = “red”) hist(plot_coords_B<span class="math inline">\(EAST, breaks = 100); abline(v = 600000, col = &quot;red&quot;); abline(v = 1500000, col = &quot;red&quot;) hist(plot_coords_B\)</span>NORTH, breaks = 100); abline(v = 600000, col = “red”)</p>
+<p>coords46_B &lt;- Error_plots_B %&gt;% filter(EAST &gt; 600000) %&gt;% mutate(Zone = paste(“46”))</p>
+<p>coords47_B &lt;- Error_plots_B %&gt;% filter(EAST &lt; 600000) %&gt;% mutate(Zone = paste(“47”))</p>
+<p>Fixed_Plots &lt;- rbind(coords46_B, coords47_B)</p>
+</div>
+<div id="creating-a-goeoposition-fixed-main_dataframe" class="section level1">
+<h1>Creating a goeoposition fixed main_dataframe———</h1>
+<p>Mainframe_Plots &lt;- rbind(coords46, coords47) %&gt;% rbind (Fixed_Plots) Plots_46_M &lt;- Mainframe_Plots %&gt;% filter(Zone == 46) Plots_47_M &lt;- Mainframe_Plots %&gt;% filter(Zone == 47)</p>
+</div>
+<div id="putting-the-plots-on-the-map" class="section level1">
+<h1>Putting the plots on the map</h1>
+<p>coords46_M = SpatialPoints(cbind(Plots_46_M<span class="math inline">\(EAST, Plots_46_M\)</span>NORTH)) proj4string(coords46_M) = CRS(“+init=epsg:32646”) coords46_M &lt;-spTransform(coords46, “+init=epsg:4326”)</p>
+<p>coords47_M= SpatialPoints(cbind(Plots_47_M<span class="math inline">\(EAST, Plots_47_M\)</span>NORTH)) proj4string(coords47_M) = CRS(“+init=epsg:32647”) coords47_M&lt;- spTransform(coords47, “+init=epsg:4326”)</p>
+<p>par(mar=c(4,4,2,2), mfrow =c(2,2)) plot(myanmar, border = “red”) plot(coords46_M, add = TRUE, cex = 0.1, col = “blue”) plot(coords47_M, add= TRUE, cex = 0.1, col = “green”)</p>
+</div>
+<div id="joining-the-tree-level-and-plot-level-dataframes-" class="section level1">
+<h1>Joining the tree level and plot level dataframes——-</h1>
+<p>Mainframe_Plots &lt;- Mainframe_Plots %&gt;% dplyr::select(-c(Year,District,Township)) Main_DataFrame &lt;- merge(x = MainFrame_Tree, y = Mainframe_Plots, by = “Plot_names”, all.x = TRUE)</p>
+</div>
+<div id="writing-a-final-csv-file." class="section level1">
+<h1>Writing a final csv file.</h1>
+<p>write.csv(Main_DataFrame, file = “Data_Output/Main_DataFrame.csv”, row.names = F)</p>
+</div>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

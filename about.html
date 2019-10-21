@@ -1,0 +1,413 @@
+<!DOCTYPE html>
+
+<html xmlns="http://www.w3.org/1999/xhtml">
+
+<head>
+
+<meta charset="utf-8" />
+<meta http-equiv="Content-Type" content="text/html; charset=utf-8" />
+<meta name="generator" content="pandoc" />
+<meta http-equiv="X-UA-Compatible" content="IE=EDGE" />
+
+
+
+
+<title>About This Website</title>
+
+<script src="site_libs/jquery-1.11.3/jquery.min.js"></script>
+<meta name="viewport" content="width=device-width, initial-scale=1" />
+<link href="site_libs/bootstrap-3.3.5/css/bootstrap.min.css" rel="stylesheet" />
+<script src="site_libs/bootstrap-3.3.5/js/bootstrap.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/html5shiv.min.js"></script>
+<script src="site_libs/bootstrap-3.3.5/shim/respond.min.js"></script>
+<script src="site_libs/navigation-1.1/tabsets.js"></script>
+<link href="site_libs/highlightjs-9.12.0/default.css" rel="stylesheet" />
+<script src="site_libs/highlightjs-9.12.0/highlight.js"></script>
+
+<style type="text/css">code{white-space: pre;}</style>
+<style type="text/css">
+  pre:not([class]) {
+    background-color: white;
+  }
+</style>
+<script type="text/javascript">
+if (window.hljs) {
+  hljs.configure({languages: []});
+  hljs.initHighlightingOnLoad();
+  if (document.readyState && document.readyState === "complete") {
+    window.setTimeout(function() { hljs.initHighlighting(); }, 0);
+  }
+}
+</script>
+
+
+
+<style type="text/css">
+h1 {
+  font-size: 34px;
+}
+h1.title {
+  font-size: 38px;
+}
+h2 {
+  font-size: 30px;
+}
+h3 {
+  font-size: 24px;
+}
+h4 {
+  font-size: 18px;
+}
+h5 {
+  font-size: 16px;
+}
+h6 {
+  font-size: 12px;
+}
+.table th:not([align]) {
+  text-align: left;
+}
+</style>
+
+
+
+
+<style type = "text/css">
+.main-container {
+  max-width: 940px;
+  margin-left: auto;
+  margin-right: auto;
+}
+code {
+  color: inherit;
+  background-color: rgba(0, 0, 0, 0.04);
+}
+img {
+  max-width:100%;
+  height: auto;
+}
+.tabbed-pane {
+  padding-top: 12px;
+}
+.html-widget {
+  margin-bottom: 20px;
+}
+button.code-folding-btn:focus {
+  outline: none;
+}
+summary {
+  display: list-item;
+}
+</style>
+
+
+<style type="text/css">
+/* padding for bootstrap navbar */
+body {
+  padding-top: 51px;
+  padding-bottom: 40px;
+}
+/* offset scroll position for anchor links (for fixed navbar)  */
+.section h1 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h2 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h3 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h4 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h5 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.section h6 {
+  padding-top: 56px;
+  margin-top: -56px;
+}
+.dropdown-submenu {
+  position: relative;
+}
+.dropdown-submenu>.dropdown-menu {
+  top: 0;
+  left: 100%;
+  margin-top: -6px;
+  margin-left: -1px;
+  border-radius: 0 6px 6px 6px;
+}
+.dropdown-submenu:hover>.dropdown-menu {
+  display: block;
+}
+.dropdown-submenu>a:after {
+  display: block;
+  content: " ";
+  float: right;
+  width: 0;
+  height: 0;
+  border-color: transparent;
+  border-style: solid;
+  border-width: 5px 0 5px 5px;
+  border-left-color: #cccccc;
+  margin-top: 5px;
+  margin-right: -10px;
+}
+.dropdown-submenu:hover>a:after {
+  border-left-color: #ffffff;
+}
+.dropdown-submenu.pull-left {
+  float: none;
+}
+.dropdown-submenu.pull-left>.dropdown-menu {
+  left: -100%;
+  margin-left: 10px;
+  border-radius: 6px 0 6px 6px;
+}
+</style>
+
+<script>
+// manage active state of menu based on current page
+$(document).ready(function () {
+  // active menu anchor
+  href = window.location.pathname
+  href = href.substr(href.lastIndexOf('/') + 1)
+  if (href === "")
+    href = "index.html";
+  var menuAnchor = $('a[href="' + href + '"]');
+
+  // mark it active
+  menuAnchor.parent().addClass('active');
+
+  // if it's got a parent navbar menu mark it active as well
+  menuAnchor.closest('li.dropdown').addClass('active');
+});
+</script>
+
+<!-- tabsets -->
+
+<style type="text/css">
+.tabset-dropdown > .nav-tabs {
+  display: inline-table;
+  max-height: 500px;
+  min-height: 44px;
+  overflow-y: auto;
+  background: white;
+  border: 1px solid #ddd;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs > li.active:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li.active:before {
+  content: "&#xe258;";
+  border: none;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open:before {
+  content: "";
+  font-family: 'Glyphicons Halflings';
+  display: inline-block;
+  padding: 10px;
+  border-right: 1px solid #ddd;
+}
+
+.tabset-dropdown > .nav-tabs > li.active {
+  display: block;
+}
+
+.tabset-dropdown > .nav-tabs > li > a,
+.tabset-dropdown > .nav-tabs > li > a:focus,
+.tabset-dropdown > .nav-tabs > li > a:hover {
+  border: none;
+  display: inline-block;
+  border-radius: 4px;
+}
+
+.tabset-dropdown > .nav-tabs.nav-tabs-open > li {
+  display: block;
+  float: none;
+}
+
+.tabset-dropdown > .nav-tabs > li {
+  display: none;
+}
+</style>
+
+<!-- code folding -->
+
+
+
+
+</head>
+
+<body>
+
+
+<div class="container-fluid main-container">
+
+
+
+
+<div class="navbar navbar-default  navbar-fixed-top" role="navigation">
+  <div class="container">
+    <div class="navbar-header">
+      <button type="button" class="navbar-toggle collapsed" data-toggle="collapse" data-target="#navbar">
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+        <span class="icon-bar"></span>
+      </button>
+      <a class="navbar-brand" href="index.html">O'Neill-PhD</a>
+    </div>
+    <div id="navbar" class="navbar-collapse collapse">
+      <ul class="nav navbar-nav">
+        <li>
+  <a href="Carbon.html">Carbon</a>
+</li>
+<li>
+  <a href="Plots_Locations.html">Plots_Locations</a>
+</li>
+<li>
+  <a href="EVI.html">EVI</a>
+</li>
+<li>
+  <a href="NDVI.html">NDVI</a>
+</li>
+<li>
+  <a href="Env.html">Environment &amp; Carbon</a>
+</li>
+<li>
+  <a href="Human_C.html">Human &amp; Carbon</a>
+</li>
+<li>
+  <a href="Species-Analysis.html">Species Analysis</a>
+</li>
+<li>
+  <a href="Fieldwork.html">Fieldwork Analysis</a>
+</li>
+      </ul>
+      <ul class="nav navbar-nav navbar-right">
+        
+      </ul>
+    </div><!--/.nav-collapse -->
+  </div><!--/.container -->
+</div><!--/.navbar -->
+
+<div class="fluid-row" id="header">
+
+
+
+<h1 class="title toc-ignore">About This Website</h1>
+
+</div>
+
+
+<pre class="r"><code>Ecoregions &lt;- read.csv(&quot;Data/Plots_Ecoregions.csv&quot;)
+summary(Ecoregions)</code></pre>
+<pre><code>##            Plot_names        Year          District      Total_C_ha      
+##  N2666000E652000:   4   Min.   :2010   Taunggoo: 957   Min.   :  0.7495  
+##  N2724000E662000:   4   1st Qu.:2013   Mawlaik : 954   1st Qu.: 78.0189  
+##  N181974E1971996:   1   Median :2014   Khamti  : 945   Median :129.4981  
+##  N182002E1970008:   1   Mean   :2014   Kale    : 839   Mean   :158.1575  
+##  N182004E1962006:   1   3rd Qu.:2015   Katha   : 661   3rd Qu.:213.8336  
+##  N182009E1964004:   1   Max.   :2017   Bago    : 566   Max.   :624.2701  
+##  (Other)        :8075                  (Other) :3165                     
+##       EAST            NORTH              Zone          ECO_ID_U    
+##  Min.   :181974   Min.   :1897000   Min.   :46.00   Min.   :10206  
+##  1st Qu.:237000   1st Qu.:2107000   1st Qu.:46.00   1st Qu.:10215  
+##  Median :661000   Median :2468000   Median :46.00   Median :10215  
+##  Mean   :564267   Mean   :2399745   Mean   :46.28   Mean   :10222  
+##  3rd Qu.:716000   3rd Qu.:2646000   3rd Qu.:47.00   3rd Qu.:10229  
+##  Max.   :817813   Max.   :2824000   Max.   :47.00   Max.   :10274  
+##                                                                    
+##    ECO_CODE                                      ECO_NAME       ECO_NUM  
+##  IM0109: 704   Chin Hills-Arakan Yoma Montane Forests: 704   Min.   : 5  
+##  IM0117:3794   Irrawaddy Dry Forests                 : 252   1st Qu.:17  
+##  IM0119: 105   Irrawaddy Moist Deciduous Forests     :3794   Median :17  
+##  IM0131:1927   Kayah-Karen Montane Rain Forests      : 105   Mean   :22  
+##  IM0132: 838   Mizoram-Manipur-Kachin Rain Forests   :1927   3rd Qu.:31  
+##  IM0137: 467   Myanmar Coastal Rain Forests          : 838   Max.   :37  
+##  IM0205: 252   Northern Indochina Subtropical Forests: 467               
+##                                           ECODE_NAME  
+##  IM0109. Chin Hills-Arakan Yoma montane forests: 704  
+##  IM0117. Irrawaddy moist deciduous forests     :3794  
+##  IM0119. Kayah-Karen montane rain forests      : 105  
+##  IM0131. Mizoram-Manipur-Kachin rain forests   :1927  
+##  IM0132. Myanmar coastal rain forests          : 838  
+##  IM0137. Northern Indochina subtropical forests: 467  
+##  IM0205. Irrawaddy dry forests                 : 252  
+##                                             WWF_MHTNAM   RealmMHT  
+##  Tropical and Subtropical Dry Broadleaf Forests  : 252   IM1:7835  
+##  Tropical and Subtropical Moist Broadleaf Forests:7835   IM2: 252  
+##                                                                    
+##                                                                    
+##                                                                    
+##                                                                    
+##                                                                    
+##        SOURCEDATA  
+##  Olson, 2001:8087  
+##                    
+##                    
+##                    
+##                    
+##                    
+## </code></pre>
+
+
+
+
+</div>
+
+<script>
+
+// add bootstrap table styles to pandoc tables
+function bootstrapStylePandocTables() {
+  $('tr.header').parent('thead').parent('table').addClass('table table-condensed');
+}
+$(document).ready(function () {
+  bootstrapStylePandocTables();
+});
+
+
+</script>
+
+<!-- tabsets -->
+
+<script>
+$(document).ready(function () {
+  window.buildTabsets("TOC");
+});
+
+$(document).ready(function () {
+  $('.tabset-dropdown > .nav-tabs > li').click(function () {
+    $(this).parent().toggleClass('nav-tabs-open')
+  });
+});
+</script>
+
+<!-- code folding -->
+
+
+<!-- dynamically load mathjax for compatibility with self-contained -->
+<script>
+  (function () {
+    var script = document.createElement("script");
+    script.type = "text/javascript";
+    script.src  = "https://mathjax.rstudio.com/latest/MathJax.js?config=TeX-AMS-MML_HTMLorMML";
+    document.getElementsByTagName("head")[0].appendChild(script);
+  })();
+</script>
+
+</body>
+</html>

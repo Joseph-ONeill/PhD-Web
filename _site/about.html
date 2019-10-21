@@ -273,10 +273,10 @@ $(document).ready(function () {
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="index.html">Home</a>
+  <a href="Carbon.html">Carbon</a>
 </li>
 <li>
-  <a href="Carbon.html">Carbon</a>
+  <a href="Plots_Locations.html">Plots_Locations</a>
 </li>
 <li>
   <a href="EVI.html">EVI</a>
@@ -292,6 +292,9 @@ $(document).ready(function () {
 </li>
 <li>
   <a href="Species-Analysis.html">Species Analysis</a>
+</li>
+<li>
+  <a href="Fieldwork.html">Fieldwork Analysis</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -310,7 +313,56 @@ $(document).ready(function () {
 </div>
 
 
-<p>More about this website.</p>
+<pre class="r"><code>Ecoregions &lt;- read.csv(&quot;Data/Plots_Ecoregions.csv&quot;)
+summary(Ecoregions)</code></pre>
+<pre><code>##            Plot_names        Year          District      Total_C_ha      
+##  N2666000E652000:   4   Min.   :2010   Taunggoo: 957   Min.   :  0.7495  
+##  N2724000E662000:   4   1st Qu.:2013   Mawlaik : 954   1st Qu.: 78.0189  
+##  N181974E1971996:   1   Median :2014   Khamti  : 945   Median :129.4981  
+##  N182002E1970008:   1   Mean   :2014   Kale    : 839   Mean   :158.1575  
+##  N182004E1962006:   1   3rd Qu.:2015   Katha   : 661   3rd Qu.:213.8336  
+##  N182009E1964004:   1   Max.   :2017   Bago    : 566   Max.   :624.2701  
+##  (Other)        :8075                  (Other) :3165                     
+##       EAST            NORTH              Zone          ECO_ID_U    
+##  Min.   :181974   Min.   :1897000   Min.   :46.00   Min.   :10206  
+##  1st Qu.:237000   1st Qu.:2107000   1st Qu.:46.00   1st Qu.:10215  
+##  Median :661000   Median :2468000   Median :46.00   Median :10215  
+##  Mean   :564267   Mean   :2399745   Mean   :46.28   Mean   :10222  
+##  3rd Qu.:716000   3rd Qu.:2646000   3rd Qu.:47.00   3rd Qu.:10229  
+##  Max.   :817813   Max.   :2824000   Max.   :47.00   Max.   :10274  
+##                                                                    
+##    ECO_CODE                                      ECO_NAME       ECO_NUM  
+##  IM0109: 704   Chin Hills-Arakan Yoma Montane Forests: 704   Min.   : 5  
+##  IM0117:3794   Irrawaddy Dry Forests                 : 252   1st Qu.:17  
+##  IM0119: 105   Irrawaddy Moist Deciduous Forests     :3794   Median :17  
+##  IM0131:1927   Kayah-Karen Montane Rain Forests      : 105   Mean   :22  
+##  IM0132: 838   Mizoram-Manipur-Kachin Rain Forests   :1927   3rd Qu.:31  
+##  IM0137: 467   Myanmar Coastal Rain Forests          : 838   Max.   :37  
+##  IM0205: 252   Northern Indochina Subtropical Forests: 467               
+##                                           ECODE_NAME  
+##  IM0109. Chin Hills-Arakan Yoma montane forests: 704  
+##  IM0117. Irrawaddy moist deciduous forests     :3794  
+##  IM0119. Kayah-Karen montane rain forests      : 105  
+##  IM0131. Mizoram-Manipur-Kachin rain forests   :1927  
+##  IM0132. Myanmar coastal rain forests          : 838  
+##  IM0137. Northern Indochina subtropical forests: 467  
+##  IM0205. Irrawaddy dry forests                 : 252  
+##                                             WWF_MHTNAM   RealmMHT  
+##  Tropical and Subtropical Dry Broadleaf Forests  : 252   IM1:7835  
+##  Tropical and Subtropical Moist Broadleaf Forests:7835   IM2: 252  
+##                                                                    
+##                                                                    
+##                                                                    
+##                                                                    
+##                                                                    
+##        SOURCEDATA  
+##  Olson, 2001:8087  
+##                    
+##                    
+##                    
+##                    
+##                    
+## </code></pre>
 
 
 

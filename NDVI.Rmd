@@ -1,30 +1,89 @@
 ---
-title: "NDVI"
-author: "ONEILL"
-date: "10/2/2019"
-output: html_document
+output:
+  html_document: default
 ---
 
 ```{r setup, include=FALSE}
+rm(list=ls())
 knitr::opts_chunk$set(echo = TRUE)
 ```
+2010 NDVI Values----
 
-## R Markdown
+```{r}
+library(raster)
+library("sp")
+library("sf")
+library("rgdal")
+library(ggplot2)
+library(tidyverse)
 
-This is an R Markdown document. Markdown is a simple formatting syntax for authoring HTML, PDF, and MS Word documents. For more details on using R Markdown see <http://rmarkdown.rstudio.com>.
-
-When you click the **Knit** button a document will be generated that includes both content as well as the output of any embedded R code chunks within the document. You can embed an R code chunk like this:
-
-```{r cars}
-summary(cars)
 ```
 
-## Including Plots
+```{r}
+NFI2010_PLT <-raster("Data/NDVI2010_NFI.tif")
+mypts <-readOGR("Plots_Locations/locations_WGS84.shp")
+NDVI2010 <- crop(NFI2010_PLT, mypts)
+plot(NFI2010_PLT)
+mydata <- raster::extract(NFI2010_PLT, mypts)
+plot(mypts, add = TRUE, cex=0.1)
+class(mydata)
+NDVI2010_values <- as.data.frame(mydata)
+NDVI2010 <- NDVI2010_values %>% rename(NDVI2010=mydata)
 
-You can also embed plots, for example:
-
-```{r pressure, echo=FALSE}
-plot(pressure)
 ```
 
-Note that the `echo = FALSE` parameter was added to the code chunk to prevent printing of the R code that generated the plot.
+joining the NDVI value to the Carbon-dataframe
+
+```{r}
+Plots_Carbon <- read.csv("Data_Output/Plots_Carbon.csv")
+Plots_Carbon$NDVI2010 <- NDVI2010$NDVI2010
+C_NDVI2010 <- Plots_Carbon
+
+C_NDVI2010 <- C_NDVI2010 %>% drop_na(NDVI2010) %>% dplyr::select(-X)
+write.csv(C_NDVI2010, file = "Data_Output/NDVI_2010.csv",row.names= FALSE)
+
+
+ggplot(data=C_NDVI2010, aes(x=New_Carbon, y = NDVI2010, color=Year))+ geom_point()+
+  labs(title = "Carbon storage & NDVI2010", 
+       x= "MaxCarbon(t/ha)",
+       y= "NDVI 2010")+
+  theme(axis.text.x = element_text(size=7, angle = 45, vjust = 0.5),
+        axis.text.y = element_text(size = 7))
+```
+
+
+** EVI and Carbon storage relationship for 2010 EVI**
+
+```{r}
+NFI2010_EVI <-raster("Data/EVI2010_NFI.tif")
+mypts <-readOGR("Plots_Locations/locations_WGS84.shp")
+EVI2010 <- crop(NFI2010_EVI, mypts)
+plot(NFI2010_EVI)
+mydata <- raster::extract(NFI2010_EVI, mypts)
+plot(mypts, add = TRUE, cex=0.1)
+class(mydata)
+EVI2010_values <- as.data.frame(mydata)
+EVI2010 <- EVI2010_values %>% rename(EVI2010=mydata)
+
+```
+
+joining the EVI value to the Carbon-dataframe
+
+```{r}
+Plots_Carbon <- read.csv("Data_Output/Plots_Carbon.csv")
+Plots_Carbon$EVI2010 <- EVI2010$EVI2010
+C_EVI2010 <- Plots_Carbon
+
+C_EVI2010 <- C_EVI2010 %>% drop_na(EVI2010) # %>% filter(Year==2010)
+
+C_EVI2010 <- C_EVI2010 %>% drop_na(EVI2010)
+write.csv(C_EVI2010, file = "Data_Output/EVI_2010.csv",row.names= FALSE)
+
+
+ggplot(data=C_EVI2010, aes(x=New_Carbon, y = EVI2010, color=Year))+ geom_point()+
+  labs(title = "Carbon storage & EVI2010", 
+       x= "MaxCarbon(t/ha)",
+       y= "EVI 2010")+
+  theme(axis.text.x = element_text(size=7, angle = 45, vjust = 0.5),
+        axis.text.y = element_text(size = 7))
+```
