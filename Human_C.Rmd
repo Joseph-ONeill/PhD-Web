@@ -18,17 +18,18 @@ library("sf")
 library("rgdal")
 library(ggplot2)
 library(tidyverse)
-
 ```
 ```{r}
-C_Cities <- read.csv("Data/distance_to_cities.csv")
-C_Cities <- C_Cities %>% rename(Time_min=mean) 
+C_Cities <- read.csv("Data_Output/distance_to_cities.csv", stringsAsFactors = F) %>% rename(Time_min = Travel_Time_min)
 
-lm.CarbonCities <- lm(New_Carbon~Time_min, data = C_Cities)
+Carbon <- read.csv("Data_Output/Carbon_Per_Plots.csv", stringsAsFactors = F)
+Carbon_Cities <- Carbon %>% left_join(C_Cities,by.x = Plot_names) %>% dplyr::select(-EAST,-NORTH) %>% drop_na(Time_min)
+
+lm.CarbonCities <- lm(Sum_CHa~Time_min, data = Carbon_Cities)
 anova(lm.CarbonCities)
 plot(lm.CarbonCities)
 
-ggplot(data=C_Cities, aes(x=Time_min, y = New_Carbon, color=District))+ geom_line()+ 
+ggplot(data=Carbon_Cities, aes(x=Time_min, y = Sum_CHa, color=District))+ geom_line()+ 
   labs(title = "Carbon storage and Travel time to nearest city", 
        x= "Travel Time (min)",
        y= "MaxCarbon(t/ha)")+
@@ -36,7 +37,7 @@ ggplot(data=C_Cities, aes(x=Time_min, y = New_Carbon, color=District))+ geom_lin
         axis.text.y = element_text(size = 7))
 
 
-ggplot(data = C_Cities, mapping=aes(x=Time_min,y=New_Carbon, color=District))+geom_line()+
+ggplot(data = Carbon_Cities, mapping=aes(x=Time_min,y=Sum_CHa, color=District))+geom_line()+
   facet_wrap(facets = vars(District))+
   labs(title = "Carbon storage and Travel time to nearest city", 
        x= "Travel Time (min)",

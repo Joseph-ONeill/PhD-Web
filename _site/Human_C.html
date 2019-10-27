@@ -273,7 +273,7 @@ $(document).ready(function () {
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="Carbon.html">Carbon and Environmental Variables</a>
+  <a href="Carbon.html">Carbon and Environment</a>
 </li>
 <li>
   <a href="NDVI.html">Carbon,NDVI and EVI</a>
@@ -282,10 +282,13 @@ $(document).ready(function () {
   <a href="Human_C.html">Carbon and cities proximity</a>
 </li>
 <li>
-  <a href="Species-Analysis.html">Species Analysis</a>
+  <a href="NFI-Avitabile.html">NFI and Avitabile Comparison</a>
 </li>
 <li>
   <a href="Fieldwork.html">Fieldwork Analysis</a>
+</li>
+<li>
+  <a href="Species-Analysis.html">Species Analysis</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -325,33 +328,48 @@ library(&quot;sf&quot;)</code></pre>
 ##  Linking to sp version: 1.3-1</code></pre>
 <pre class="r"><code>library(ggplot2)
 library(tidyverse)</code></pre>
-<pre><code>## -- Attaching packages ---------------------------------------------------------------------------------------------------------------- tidyverse 1.2.1 --</code></pre>
+<pre><code>## -- Attaching packages ---------------------------------------------------------------------------------------------------------------------- tidyverse 1.2.1 --</code></pre>
 <pre><code>## v tibble  2.1.3     v purrr   0.3.2
 ## v tidyr   0.8.3     v dplyr   0.8.3
 ## v readr   1.3.1     v stringr 1.4.0
 ## v tibble  2.1.3     v forcats 0.4.0</code></pre>
-<pre><code>## -- Conflicts ------------------------------------------------------------------------------------------------------------------- tidyverse_conflicts() --
+<pre><code>## -- Conflicts ------------------------------------------------------------------------------------------------------------------------- tidyverse_conflicts() --
 ## x tidyr::extract() masks raster::extract()
 ## x dplyr::filter()  masks stats::filter()
 ## x dplyr::lag()     masks stats::lag()
 ## x dplyr::select()  masks raster::select()</code></pre>
-<pre class="r"><code>C_Cities &lt;- read.csv(&quot;Data/distance_to_cities.csv&quot;)
-C_Cities &lt;- C_Cities %&gt;% rename(Time_min=mean)
-ggplot(data=C_Cities, aes(x=Time_min, y = New_Carbon, color=District))+ geom_point()+ 
+<pre class="r"><code>C_Cities &lt;- read.csv(&quot;Data_Output/distance_to_cities.csv&quot;, stringsAsFactors = F) %&gt;% rename(Time_min = Travel_Time_min)
+
+Carbon &lt;- read.csv(&quot;Data_Output/Carbon_Per_Plots.csv&quot;, stringsAsFactors = F)
+Carbon_Cities &lt;- Carbon %&gt;% left_join(C_Cities,by.x = Plot_names) %&gt;% dplyr::select(-EAST,-NORTH) %&gt;% drop_na(Time_min)</code></pre>
+<pre><code>## Joining, by = c(&quot;Plot_names&quot;, &quot;District&quot;, &quot;Year&quot;)</code></pre>
+<pre class="r"><code>lm.CarbonCities &lt;- lm(Sum_CHa~Time_min, data = Carbon_Cities)
+anova(lm.CarbonCities)</code></pre>
+<pre><code>## Analysis of Variance Table
+## 
+## Response: Sum_CHa
+##             Df  Sum Sq Mean Sq F value    Pr(&gt;F)    
+## Time_min     1   26681 26680.7  193.87 &lt; 2.2e-16 ***
+## Residuals 8080 1111971   137.6                      
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>plot(lm.CarbonCities)</code></pre>
+<p><img src="Human_C_files/figure-html/unnamed-chunk-2-1.png" width="672" /><img src="Human_C_files/figure-html/unnamed-chunk-2-2.png" width="672" /><img src="Human_C_files/figure-html/unnamed-chunk-2-3.png" width="672" /><img src="Human_C_files/figure-html/unnamed-chunk-2-4.png" width="672" /></p>
+<pre class="r"><code>ggplot(data=Carbon_Cities, aes(x=Time_min, y = Sum_CHa, color=District))+ geom_line()+ 
   labs(title = &quot;Carbon storage and Travel time to nearest city&quot;, 
        x= &quot;Travel Time (min)&quot;,
        y= &quot;MaxCarbon(t/ha)&quot;)+
   theme(axis.text.x = element_text(size=7, angle = 45, vjust = 0.5),
         axis.text.y = element_text(size = 7))</code></pre>
-<p><img src="Human_C_files/figure-html/unnamed-chunk-2-1.png" width="672" /></p>
-<pre class="r"><code>ggplot(data = C_Cities, mapping=aes(x=Time_min,y=New_Carbon, color=District))+geom_point()+
-  facet_wrap(facets = vars(District), scales = &quot;free&quot;)+
+<p><img src="Human_C_files/figure-html/unnamed-chunk-2-5.png" width="672" /></p>
+<pre class="r"><code>ggplot(data = Carbon_Cities, mapping=aes(x=Time_min,y=Sum_CHa, color=District))+geom_line()+
+  facet_wrap(facets = vars(District))+
   labs(title = &quot;Carbon storage and Travel time to nearest city&quot;, 
        x= &quot;Travel Time (min)&quot;,
        y= &quot;MaxCarbon(t/ha)&quot;)+
   theme(axis.text.x = element_text(size=7, angle = 45, vjust = 0.5),
         axis.text.y = element_text(size = 7))</code></pre>
-<p><img src="Human_C_files/figure-html/unnamed-chunk-2-2.png" width="672" /></p>
+<p><img src="Human_C_files/figure-html/unnamed-chunk-2-6.png" width="672" /></p>
 
 
 

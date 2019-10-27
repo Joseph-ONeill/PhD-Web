@@ -273,7 +273,7 @@ $(document).ready(function () {
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="Carbon.html">Carbon and Environmental Variables</a>
+  <a href="Carbon.html">Carbon and Environment</a>
 </li>
 <li>
   <a href="NDVI.html">Carbon,NDVI and EVI</a>
@@ -282,10 +282,13 @@ $(document).ready(function () {
   <a href="Human_C.html">Carbon and cities proximity</a>
 </li>
 <li>
-  <a href="Species-Analysis.html">Species Analysis</a>
+  <a href="NFI-Avitabile.html">NFI and Avitabile Comparison</a>
 </li>
 <li>
   <a href="Fieldwork.html">Fieldwork Analysis</a>
+</li>
+<li>
+  <a href="Species-Analysis.html">Species Analysis</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -318,26 +321,20 @@ library(raster)
 library(BIOMASS)
 library(ape)
 library(magrittr)
-# tinytex::install_tinytex()
-library(tinytex)</code></pre>
+library(tinytex)
+library(raster)
+library(rgdal)</code></pre>
 <p><strong>load the dataframe</strong></p>
 <pre class="r"><code>Trees &lt;- read.csv(&quot;Data_Output/MainFrame.csv&quot;)
 Trees$District &lt;- str_replace(Trees$District,&quot;PYAY&quot;,&quot;Pyay&quot;)
 str(Trees)</code></pre>
-<pre><code>## &#39;data.frame&#39;:    305526 obs. of  28 variables:
-##  $ X.5           : int  1 2 3 4 5 6 7 8 9 10 ...
-##  $ X.4           : int  1 2 3 4 5 6 7 8 9 10 ...
-##  $ X.3           : int  1 2 3 4 5 6 7 8 9 10 ...
-##  $ X.2           : int  1 2 3 4 5 6 7 8 9 10 ...
-##  $ X.1           : int  1 2 3 4 5 6 7 8 9 10 ...
-##  $ X             : int  1 2 3 4 5 6 7 8 9 10 ...
+<pre><code>## &#39;data.frame&#39;:    305526 obs. of  21 variables:
 ##  $ Species_Code  : int  1 1 1 1 1 1 1 1 1 1 ...
 ##  $ Species_Record: int  26 27 28 80 81 82 143 157 172 178 ...
 ##  $ District      : chr  &quot;Pyay&quot; &quot;Pyay&quot; &quot;Pyay&quot; &quot;Pyay&quot; ...
 ##  $ Township      : Factor w/ 65 levels &quot;Aunglan&quot;,&quot;Bago&quot;,..: 38 38 38 38 38 38 38 38 38 38 ...
 ##  $ PEF_Status    : Factor w/ 314 levels &quot;Ahlaw&quot;,&quot;Aik_Ext_1&quot;,..: 176 176 176 176 176 176 176 176 176 176 ...
 ##  $ D_ID          : int  4 4 4 7 7 7 16 16 16 17 ...
-##  $ GISID         : int  1038 1038 1038 1041 1041 1041 1050 1050 1050 1051 ...
 ##  $ EAST          : int  791564 791564 791564 789521 789521 789521 797766 797766 797766 799825 ...
 ##  $ NORTH         : num  2121421 2121421 2121421 2119348 2119348 ...
 ##  $ ALT           : Factor w/ 1427 levels &quot;0&quot;,&quot;10&quot;,&quot;100&quot;,..: 561 561 561 680 680 680 839 839 839 879 ...
@@ -353,54 +350,22 @@ str(Trees)</code></pre>
 ##  $ Species       : Factor w/ 359 levels &quot;acerifolium&quot;,..: 118 118 118 118 118 118 118 118 118 118 ...
 ##  $ Binomial      : Factor w/ 468 levels &quot;Acacia arabica&quot;,..: 426 426 426 426 426 426 426 426 426 426 ...
 ##  $ DBH_cm        : num  23 22 21 16 19 12 35 70 61 26 ...</code></pre>
-<pre class="r"><code>unique(Trees$District)</code></pre>
-<pre><code>##  [1] &quot;Pyay&quot;        &quot;PyinOoLwin&quot;  &quot;Meiktila&quot;    &quot;Mandalay&quot;    &quot;Kyaukse&quot;    
-##  [6] &quot;Katha&quot;       &quot;Shwebo&quot;      &quot;Monywa&quot;      &quot;Tamu&quot;        &quot;Kale&quot;       
-## [11] &quot;Mawlaik&quot;     &quot;Khamti&quot;      &quot;Gangaw&quot;      &quot;Pakokku&quot;     &quot;Minbu&quot;      
-## [16] &quot;Magway&quot;      &quot;Thayet&quot;      &quot;Bago&quot;        &quot;Thayarwaddy&quot; &quot;Taunggoo&quot;   
-## [21] &quot;Yamethin&quot;</code></pre>
-<pre class="r"><code>unique(Trees$Township)</code></pre>
-<pre><code>##  [1] Paukkaung    Padaung      Paungde      Thabeikkyin  Mogok       
-##  [6] Singu        Madaya       PyinOoLwin   Thazi        Patheingyi  
-## [11] Kyaukse      Myittha      Banmauk      Htigyaing    Indaw       
-## [16] Katha        Kawlin       Pinlebu      Wuntho       Kyunhla     
-## [21] Ye_U         Taze         Khin-U       Kani         Pale        
-## [26] Tamu         Kale         Kalewa       Mingin       Mawlaik     
-## [31] Paungbyin    Homalin      Gangaw       Htilin       Pauk        
-## [36] Saw          Seikpyu      Setottaya    Ngaphe       Taungtwingyi
-## [41] Minhla       Mindon       Aunglan      Kamma        Bago        
-## [46] Kyauktaga    Gyobingauk   Letpadan     Nattalin     Okpo        
-## [51] Tharrawaddy  Taunggoo     Phyu         Yedashe      Oktwin      
-## [56] Pyay         Thegon       Pyawbwe      Yamethin     Wundwin     
-## [61] Daik U       Kantbalu     Salin        Wetlet       Shwebo      
-## 65 Levels: Aunglan Bago Banmauk Daik U Gangaw Gyobingauk ... Yedashe</code></pre>
-<pre class="r"><code>table(Trees$Year)</code></pre>
-<pre><code>## 
-##   2010   2011   2012   2013   2014   2015   2016   2017 
-##  14673   7996  10031  44573 126174  47651  41252  13176</code></pre>
 <p>Omitting the EAST and NORT with NA values and taxonomy of trees are corrected by using the to correct typos in scientific names using the Taxonomic Name Resolution Service</p>
 <pre class="r"><code>Trees &lt;- Trees[!is.na(Trees$NORTH),]
 sum(is.na(Trees$EAST))</code></pre>
 <pre><code>## [1] 0</code></pre>
 <pre class="r"><code>dim(Trees)</code></pre>
-<pre><code>## [1] 305526     28</code></pre>
+<pre><code>## [1] 305526     21</code></pre>
 <pre class="r"><code>TreesNA &lt;- Trees[Trees$Species==&quot;NA&quot;,]
 Trees &lt;- Trees[!is.na(Trees$Species),]
 str(Trees)</code></pre>
-<pre><code>## &#39;data.frame&#39;:    305526 obs. of  28 variables:
-##  $ X.5           : int  1 2 3 4 5 6 7 8 9 10 ...
-##  $ X.4           : int  1 2 3 4 5 6 7 8 9 10 ...
-##  $ X.3           : int  1 2 3 4 5 6 7 8 9 10 ...
-##  $ X.2           : int  1 2 3 4 5 6 7 8 9 10 ...
-##  $ X.1           : int  1 2 3 4 5 6 7 8 9 10 ...
-##  $ X             : int  1 2 3 4 5 6 7 8 9 10 ...
+<pre><code>## &#39;data.frame&#39;:    305526 obs. of  21 variables:
 ##  $ Species_Code  : int  1 1 1 1 1 1 1 1 1 1 ...
 ##  $ Species_Record: int  26 27 28 80 81 82 143 157 172 178 ...
 ##  $ District      : chr  &quot;Pyay&quot; &quot;Pyay&quot; &quot;Pyay&quot; &quot;Pyay&quot; ...
 ##  $ Township      : Factor w/ 65 levels &quot;Aunglan&quot;,&quot;Bago&quot;,..: 38 38 38 38 38 38 38 38 38 38 ...
 ##  $ PEF_Status    : Factor w/ 314 levels &quot;Ahlaw&quot;,&quot;Aik_Ext_1&quot;,..: 176 176 176 176 176 176 176 176 176 176 ...
 ##  $ D_ID          : int  4 4 4 7 7 7 16 16 16 17 ...
-##  $ GISID         : int  1038 1038 1038 1041 1041 1041 1050 1050 1050 1051 ...
 ##  $ EAST          : int  791564 791564 791564 789521 789521 789521 797766 797766 797766 799825 ...
 ##  $ NORTH         : num  2121421 2121421 2121421 2119348 2119348 ...
 ##  $ ALT           : Factor w/ 1427 levels &quot;0&quot;,&quot;10&quot;,&quot;100&quot;,..: 561 561 561 680 680 680 839 839 839 879 ...
@@ -417,76 +382,69 @@ str(Trees)</code></pre>
 ##  $ Binomial      : Factor w/ 468 levels &quot;Acacia arabica&quot;,..: 426 426 426 426 426 426 426 426 426 426 ...
 ##  $ DBH_cm        : num  23 22 21 16 19 12 35 70 61 26 ...</code></pre>
 <pre class="r"><code>summary(Trees)</code></pre>
-<pre><code>##       X.5              X.4              X.3              X.2        
-##  Min.   :     1   Min.   :     1   Min.   :     1   Min.   :     1  
-##  1st Qu.: 76382   1st Qu.: 76382   1st Qu.: 76382   1st Qu.: 76382  
-##  Median :152764   Median :152764   Median :152764   Median :152764  
-##  Mean   :152764   Mean   :152764   Mean   :152764   Mean   :152764  
-##  3rd Qu.:229145   3rd Qu.:229145   3rd Qu.:229145   3rd Qu.:229145  
-##  Max.   :305526   Max.   :305526   Max.   :305526   Max.   :305526  
-##                                                                     
-##       X.1               X           Species_Code   Species_Record  
-##  Min.   :     1   Min.   :     1   Min.   :  1.0   Min.   :     1  
-##  1st Qu.: 76386   1st Qu.: 76386   1st Qu.:121.0   1st Qu.:  7671  
-##  Median :152768   Median :152768   Median :188.0   Median : 19896  
-##  Mean   :152785   Mean   :152785   Mean   :217.1   Mean   : 36201  
-##  3rd Qu.:229202   3rd Qu.:229202   3rd Qu.:357.0   3rd Qu.: 53914  
-##  Max.   :305607   Max.   :305607   Max.   :503.0   Max.   :136512  
-##                                                                    
-##    District              Township              PEF_Status    
-##  Length:305526      Homalin  : 31066   Homalin_UCF  : 17589  
-##  Class :character   Mawlaik  : 23291   Paungbyin_UCF: 12061  
-##  Mode  :character   Kalewa   : 23284   Kalewa_UCF   : 10471  
-##                     Paungbyin: 23003   Patolon      :  8990  
-##                     Mingin   : 20301   Yeyaman      :  7881  
-##                     Banmauk  : 10817   Mingin_UCF   :  7403  
-##                     (Other)  :173764   (Other)      :241131  
-##       D_ID            GISID             EAST             NORTH        
-##  Min.   :   1.0   Min.   :   1.0   Min.   : 185000   Min.   : 181974  
-##  1st Qu.: 214.0   1st Qu.: 134.0   1st Qu.: 627099   1st Qu.:2313500  
-##  Median : 492.0   Median : 414.0   Median : 670000   Median :2541500  
-##  Mean   : 773.9   Mean   : 586.6   Mean   : 702611   Mean   :2355058  
-##  3rd Qu.:1153.0   3rd Qu.: 878.0   3rd Qu.: 714000   3rd Qu.:2653000  
-##  Max.   :2989.0   Max.   :1973.0   Max.   :2199000   Max.   :2824000  
-##                   NA&#39;s   :86019                                       
-##       ALT               LC               FT             DEN        
-##  430    :  2013   Min.   : 0.000   Min.   : 0.00   Min.   : 0.000  
-##  420    :  1702   1st Qu.: 1.000   1st Qu.:62.00   1st Qu.: 2.000  
-##  402    :  1452   Median : 1.000   Median :63.00   Median : 2.000  
-##  350    :  1395   Mean   : 1.423   Mean   :64.34   Mean   : 1.971  
-##  320    :  1275   3rd Qu.: 1.000   3rd Qu.:63.00   3rd Qu.: 2.000  
-##  220    :  1217   Max.   :14.000   Max.   :93.00   Max.   :27.000  
-##  (Other):296472                                                    
-##       TNO             DBH_mm            Year                Plot_names    
-##  Min.   :  0.00   Min.   :   0.0   Min.   :2010   N2475500E227000:   306  
-##  1st Qu.:  6.00   1st Qu.: 150.0   1st Qu.:2013   N2490500E210000:   259  
-##  Median : 13.00   Median : 268.0   Median :2014   N2436500E222000:   252  
-##  Mean   : 18.21   Mean   : 282.4   Mean   :2014   N2491500E211000:   251  
-##  3rd Qu.: 24.00   3rd Qu.: 375.0   3rd Qu.:2015   N2467500E225000:   245  
-##  Max.   :281.00   Max.   :3225.0   Max.   :2017   N2499500E213000:   231  
-##                                                   (Other)        :303982  
-##    Local_names               Genus                 Species      
-##  In      : 24619   Dipterocarpus: 48655   spp.         : 40456  
-##  Kanyin  : 23980   Terminalia   : 24113   tuberculatus : 24619  
-##  Pyinkado: 18361   Xylia        : 18361   grandis      : 20984  
-##  Kyun    : 15982   Tectona      : 16654   dolabriformis: 18361  
-##  Taukkyan: 14990   Quercus      : 13975   tomentosa    : 15913  
-##  Sagat   : 11398   Pentacme     : 10395   spicata      : 11615  
-##  (Other) :196196   (Other)      :173373   (Other)      :173578  
-##                        Binomial          DBH_cm      
-##  Dipterocarpus tuberculatus: 24619   Min.   :  0.00  
-##  Dipterocarpus spp.        : 23980   1st Qu.: 15.00  
-##  Xylia dolabriformis       : 18361   Median : 26.80  
-##  Tectona grandis           : 15982   Mean   : 28.24  
-##  Terminalia tomentosa      : 14976   3rd Qu.: 37.50  
-##  Quercus spicata           : 11398   Max.   :322.50  
-##  (Other)                   :196210</code></pre>
+<pre><code>##   Species_Code   Species_Record     District              Township     
+##  Min.   :  1.0   Min.   :     1   Length:305526      Homalin  : 31066  
+##  1st Qu.:121.0   1st Qu.:  7671   Class :character   Mawlaik  : 23291  
+##  Median :188.0   Median : 19896   Mode  :character   Kalewa   : 23284  
+##  Mean   :217.1   Mean   : 36201                      Paungbyin: 23003  
+##  3rd Qu.:357.0   3rd Qu.: 53914                      Mingin   : 20301  
+##  Max.   :503.0   Max.   :136512                      Banmauk  : 10817  
+##                                                      (Other)  :173764  
+##          PEF_Status          D_ID             EAST        
+##  Homalin_UCF  : 17589   Min.   :   1.0   Min.   : 185000  
+##  Paungbyin_UCF: 12061   1st Qu.: 214.0   1st Qu.: 627099  
+##  Kalewa_UCF   : 10471   Median : 492.0   Median : 670000  
+##  Patolon      :  8990   Mean   : 773.9   Mean   : 702611  
+##  Yeyaman      :  7881   3rd Qu.:1153.0   3rd Qu.: 714000  
+##  Mingin_UCF   :  7403   Max.   :2989.0   Max.   :2199000  
+##  (Other)      :241131                                     
+##      NORTH              ALT               LC               FT       
+##  Min.   : 181974   430    :  2013   Min.   : 0.000   Min.   : 0.00  
+##  1st Qu.:2313500   420    :  1702   1st Qu.: 1.000   1st Qu.:62.00  
+##  Median :2541500   402    :  1452   Median : 1.000   Median :63.00  
+##  Mean   :2355058   350    :  1395   Mean   : 1.423   Mean   :64.34  
+##  3rd Qu.:2653000   320    :  1275   3rd Qu.: 1.000   3rd Qu.:63.00  
+##  Max.   :2824000   220    :  1217   Max.   :14.000   Max.   :93.00  
+##                    (Other):296472                                   
+##       DEN              TNO             DBH_mm            Year     
+##  Min.   : 0.000   Min.   :  0.00   Min.   :   0.0   Min.   :2010  
+##  1st Qu.: 2.000   1st Qu.:  6.00   1st Qu.: 150.0   1st Qu.:2013  
+##  Median : 2.000   Median : 13.00   Median : 268.0   Median :2014  
+##  Mean   : 1.971   Mean   : 18.21   Mean   : 282.4   Mean   :2014  
+##  3rd Qu.: 2.000   3rd Qu.: 24.00   3rd Qu.: 375.0   3rd Qu.:2015  
+##  Max.   :27.000   Max.   :281.00   Max.   :3225.0   Max.   :2017  
+##                                                                   
+##            Plot_names       Local_names               Genus       
+##  N2475500E227000:   306   In      : 24619   Dipterocarpus: 48655  
+##  N2490500E210000:   259   Kanyin  : 23980   Terminalia   : 24113  
+##  N2436500E222000:   252   Pyinkado: 18361   Xylia        : 18361  
+##  N2491500E211000:   251   Kyun    : 15982   Tectona      : 16654  
+##  N2467500E225000:   245   Taukkyan: 14990   Quercus      : 13975  
+##  N2499500E213000:   231   Sagat   : 11398   Pentacme     : 10395  
+##  (Other)        :303982   (Other) :196196   (Other)      :173373  
+##           Species                             Binomial     
+##  spp.         : 40456   Dipterocarpus tuberculatus: 24619  
+##  tuberculatus : 24619   Dipterocarpus spp.        : 23980  
+##  grandis      : 20984   Xylia dolabriformis       : 18361  
+##  dolabriformis: 18361   Tectona grandis           : 15982  
+##  tomentosa    : 15913   Terminalia tomentosa      : 14976  
+##  spicata      : 11615   Quercus spicata           : 11398  
+##  (Other)      :173578   (Other)                   :196210  
+##      DBH_cm      
+##  Min.   :  0.00  
+##  1st Qu.: 15.00  
+##  Median : 26.80  
+##  Mean   : 28.24  
+##  3rd Qu.: 37.50  
+##  Max.   :322.50  
+## </code></pre>
 <pre class="r"><code>unique(Trees$District)</code></pre>
 <pre><code>##  [1] &quot;Pyay&quot;        &quot;PyinOoLwin&quot;  &quot;Meiktila&quot;    &quot;Mandalay&quot;    &quot;Kyaukse&quot;    
 ##  [6] &quot;Katha&quot;       &quot;Shwebo&quot;      &quot;Monywa&quot;      &quot;Tamu&quot;        &quot;Kale&quot;       
 ## [11] &quot;Mawlaik&quot;     &quot;Khamti&quot;      &quot;Gangaw&quot;      &quot;Pakokku&quot;     &quot;Minbu&quot;      
 ## [16] &quot;Magway&quot;      &quot;Thayet&quot;      &quot;Bago&quot;        &quot;Thayarwaddy&quot; &quot;Taunggoo&quot;   
 ## [21] &quot;Yamethin&quot;</code></pre>
+<pre class="r"><code>Trees &lt;- droplevels(Trees)</code></pre>
 <p><strong>Obtaining wood density</strong></p>
 <p>Obtaining Wood density - getWoodDensity assigns to each taxon a species- or genus-level average if at least one wood density value in the same genus as the focal taxon is available in the reference database. For unidentified trees or if the genus is missing in the reference database, the stand-level mean wood density is assigned to the tree (based on trees for which a value was attributed).</p>
 <pre class="r"><code>Taxo &lt;- correctTaxo(genus= Trees$Genus, species = Trees$Species)
@@ -637,15 +595,13 @@ Trees &lt;- Trees %&gt;%
   mutate(AdjustH_Pred=exp(H_pred-0.0007450583))</code></pre>
 <p>Testing the DBH and Height relationship for trees—–</p>
 <pre class="r"><code>names(Trees)</code></pre>
-<pre><code>##  [1] &quot;X.5&quot;            &quot;X.4&quot;            &quot;X.3&quot;            &quot;X.2&quot;           
-##  [5] &quot;X.1&quot;            &quot;X&quot;              &quot;Species_Code&quot;   &quot;Species_Record&quot;
-##  [9] &quot;District&quot;       &quot;Township&quot;       &quot;PEF_Status&quot;     &quot;D_ID&quot;          
-## [13] &quot;GISID&quot;          &quot;EAST&quot;           &quot;NORTH&quot;          &quot;ALT&quot;           
-## [17] &quot;LC&quot;             &quot;FT&quot;             &quot;DEN&quot;            &quot;TNO&quot;           
-## [21] &quot;DBH_mm&quot;         &quot;Year&quot;           &quot;Plot_names&quot;     &quot;Local_names&quot;   
-## [25] &quot;Genus&quot;          &quot;Species&quot;        &quot;Binomial&quot;       &quot;DBH_cm&quot;        
-## [29] &quot;genusCorr&quot;      &quot;speciesCorr&quot;    &quot;familyAPG&quot;      &quot;orderAPG&quot;      
-## [33] &quot;WD&quot;             &quot;H_pred&quot;         &quot;AdjustH_Pred&quot;</code></pre>
+<pre><code>##  [1] &quot;Species_Code&quot;   &quot;Species_Record&quot; &quot;District&quot;       &quot;Township&quot;      
+##  [5] &quot;PEF_Status&quot;     &quot;D_ID&quot;           &quot;EAST&quot;           &quot;NORTH&quot;         
+##  [9] &quot;ALT&quot;            &quot;LC&quot;             &quot;FT&quot;             &quot;DEN&quot;           
+## [13] &quot;TNO&quot;            &quot;DBH_mm&quot;         &quot;Year&quot;           &quot;Plot_names&quot;    
+## [17] &quot;Local_names&quot;    &quot;Genus&quot;          &quot;Species&quot;        &quot;Binomial&quot;      
+## [21] &quot;DBH_cm&quot;         &quot;genusCorr&quot;      &quot;speciesCorr&quot;    &quot;familyAPG&quot;     
+## [25] &quot;orderAPG&quot;       &quot;WD&quot;             &quot;H_pred&quot;         &quot;AdjustH_Pred&quot;</code></pre>
 <pre class="r"><code>ggplot(data = Trees, aes(DBH_cm, AdjustH_Pred, color=District) )+ geom_point()</code></pre>
 <p><img src="Carbon_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
 <p><strong><em>Calculating the biomass of each tree</em></strong></p>
@@ -656,83 +612,60 @@ Trees &lt;- Trees %&gt;% mutate(Carbon_Mg= AGB*0.471)
 write.csv(Trees, file = &quot;Data_Output/Trees.csv&quot;, row.names = F)</code></pre>
 <p><strong>Sampling Method</strong></p>
 <p>image: <img src="Figures/Sampling%20Design.PNG" /></p>
-<p>1 ha sample plot with a 50m * 50 m nested plot. Therefore, the big dataframe was splitted into two. <em>(100m x 100m and 50m x 50m)</em></p>
-<pre class="r"><code>Trees_1ha &lt;- Trees %&gt;% filter(DBH_mm &gt;= 200)
+<p>1 ha sample plot with a 50m * 50 m nested plot. Therefore, the big dataframe was splitted into two according to the DBH limit measured in the 50m * 50m subplot. <em>(100m x 100m and 50m x 50m)</em></p>
+<pre class="r"><code>Trees &lt;- read.csv(&quot;Data_Output/Trees.csv&quot;)
+Trees &lt;- droplevels(Trees)
+Trees_1ha &lt;- Trees %&gt;% filter(DBH_mm &gt;= 200)
 Trees_50m &lt;- Trees %&gt;% filter(DBH_mm &lt; 200)</code></pre>
 <p>** Calculating the carbon per ha for two different size plots**</p>
 <pre class="r"><code>Plot_1ha &lt;- Trees_1ha %&gt;%
-  group_by(Plot_names,District,Year,NORTH,EAST) %&gt;%
+  group_by(Plot_names,District,Year, EAST, NORTH) %&gt;%
   dplyr::summarise(C_ha = sum(Carbon_Mg))
 
 Plot_50M &lt;- Trees_50m %&gt;%
-  group_by(Plot_names,District,Year) %&gt;%
+  group_by(Plot_names,District,Year, EAST, NORTH) %&gt;%
   dplyr::summarise(C_Tree_total = sum(Carbon_Mg)) %&gt;%
-  mutate(C_ha=C_Tree_total/0.25)</code></pre>
-<p>Combining two dataframes of different plot size according to Plot names.In this process, <em>NA</em> values- generated were replaced with zero in order to add carbon per ha of different plot size together.</p>
-<pre class="r"><code>All_Plots &lt;- full_join(Plot_1ha,Plot_50M, by= &quot;Plot_names&quot;)
-Missing_DistrictX &lt;- is.na(All_Plots$District.x)
-All_Plots$District.x[Missing_DistrictX] &lt;- All_Plots$District.y[Missing_DistrictX]
-
-
-Missing_DistrictY &lt;- is.na(All_Plots$District.y)
-All_Plots$District.y[Missing_DistrictY]&lt;- All_Plots$District.x[Missing_DistrictY]
-
-
-
-Missing_YearX &lt;- is.na(All_Plots$Year.x)
-All_Plots$Year.x[Missing_YearX] &lt;- All_Plots$Year.y[Missing_DistrictX]
-
-
-Missing_YearY &lt;- is.na(All_Plots$Year.y)
-All_Plots$Year.y[Missing_YearY]&lt;- All_Plots$Year.x[Missing_YearY]
-
-
-Missing_50 &lt;- is.na(All_Plots$C_ha.y)
-All_Plots$C_ha.y[Missing_50] &lt;- 0
-
-Missing_100 &lt;- is.na(All_Plots$C_ha.x)
-All_Plots$C_ha.x[Missing_100] &lt;- 0
-
-Missing_CT_total &lt;- is.na(All_Plots$C_Tree_total)
-All_Plots$C_Tree_total[Missing_CT_total] &lt;- 0</code></pre>
-<p>Carbon per hectare columns of the two dataframes were added together to obtain total carbon of each plot in hectare scale.</p>
-<pre class="r"><code>All_Plots_Carbon &lt;- All_Plots %&gt;% mutate(Carbon_THa = C_ha.x+ C_ha.y) %&gt;% dplyr::select(-C_Tree_total,-District.y,-Year.y)
-hist(All_Plots_Carbon$Carbon_THa, breaks=100)</code></pre>
+  mutate(C_ha=C_Tree_total/0.25) %&gt;% dplyr::select(-C_Tree_total)</code></pre>
+<p>Combining two dataframes of different plot size according to Plot names.In this process, <em>NA</em> values- generated were replaced with zero in order to add carbon per ha of different plot size together. Carbon per hectare columns of the two dataframes were added together to obtain total carbon of each plot in hectare scale.</p>
+<pre class="r"><code>All_Plots &lt;- bind_rows(Plot_1ha,Plot_50M) %&gt;% group_by(Plot_names,District,Year, EAST, NORTH) %&gt;% summarise(Sum_CHa=sum(C_ha))
+droplevels(All_Plots)</code></pre>
+<pre><code>## # A tibble: 8,168 x 6
+## # Groups:   Plot_names, District, Year, EAST [8,168]
+##    Plot_names      District     Year    EAST  NORTH Sum_CHa
+##    &lt;fct&gt;           &lt;fct&gt;       &lt;int&gt;   &lt;int&gt;  &lt;dbl&gt;   &lt;dbl&gt;
+##  1 N181974E1971996 Thayarwaddy  2011 1971996 181974   3.89 
+##  2 N182002E1970008 Thayarwaddy  2011 1970008 182002   4.68 
+##  3 N182004E1962006 Thayarwaddy  2011 1962006 182004   3.93 
+##  4 N182009E1964004 Thayarwaddy  2011 1964004 182009   0.639
+##  5 N182232E1974110 Thayarwaddy  2011 1974110 182232   1.80 
+##  6 N182246E1977268 Thayarwaddy  2011 1977268 182246  14.8  
+##  7 N183934E1999962 Thayarwaddy  2011 1999962 183934   7.75 
+##  8 N183938E2028020 Thayarwaddy  2011 2028020 183938   8.02 
+##  9 N183948E2022059 Thayarwaddy  2011 2022059 183948  16.2  
+## 10 N183955E1988182 Thayarwaddy  2011 1988182 183955   3.92 
+## # ... with 8,158 more rows</code></pre>
+<pre class="r"><code>hist(All_Plots$Sum_CHa, breaks=100)</code></pre>
 <p><img src="Carbon_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
 <p><strong>Producing a clean dataframe</strong></p>
-<pre class="r"><code>names(All_Plots_Carbon)[2] &lt;- paste(&quot;Districts&quot;)
-names(All_Plots_Carbon)[3] &lt;- paste(&quot;Year&quot;)
-names(All_Plots_Carbon)[6] &lt;- paste(&quot;Carbon_100m&quot;)
-names(All_Plots_Carbon)[7] &lt;- paste(&quot;Carbon_50m&quot;)
-All_Plots_Carbon &lt;- na.omit(All_Plots_Carbon)
-
-All_Plots_Carbon$Year &lt;- as.factor(All_Plots_Carbon$Year)
-summary(All_Plots_Carbon)</code></pre>
-<pre><code>##            Plot_names    Districts              Year     
-##  N2666000E652000:   4   Length:7946        2014   :2823  
-##  N2724000E662000:   4   Class :character   2013   :1081  
-##  N181974E1971996:   1   Mode  :character   2015   :1012  
-##  N182002E1970008:   1                      2010   : 956  
-##  N182004E1962006:   1                      2016   : 749  
-##  N182009E1964004:   1                      2012   : 527  
-##  (Other)        :7934                      (Other): 798  
-##      NORTH              EAST          Carbon_100m         Carbon_50m     
-##  Min.   : 181974   Min.   : 185000   Min.   :  0.0643   Min.   : 0.0000  
-##  1st Qu.:2055349   1st Qu.: 630000   1st Qu.:  4.9108   1st Qu.: 0.3769  
-##  Median :2481996   Median : 681134   Median :  9.0409   Median : 1.2860  
-##  Mean   :2127073   Mean   : 845629   Mean   : 13.2349   Mean   : 1.5471  
-##  3rd Qu.:2650000   3rd Qu.: 766000   3rd Qu.: 16.9790   3rd Qu.: 2.2779  
-##  Max.   :2824000   Max.   :2199000   Max.   :225.6067   Max.   :20.5097  
-##                                                                          
-##    Carbon_THa       
-##  Min.   :  0.07938  
-##  1st Qu.:  6.14820  
-##  Median : 10.51130  
-##  Mean   : 14.78200  
-##  3rd Qu.: 18.93314  
-##  Max.   :228.40692  
+<pre class="r"><code>All_Plots$Year &lt;- as.factor(All_Plots$Year)
+summary(All_Plots)</code></pre>
+<pre><code>##            Plot_names       District         Year           EAST        
+##  N2666000E652000:   2   Mawlaik : 964   2014   :2824   Min.   : 185000  
+##  N2724000E662000:   2   Taunggoo: 957   2013   :1098   1st Qu.: 629000  
+##  N181974E1971996:   1   Khamti  : 948   2015   :1024   Median : 680002  
+##  N182002E1970008:   1   Kale    : 867   2010   : 957   Mean   : 840048  
+##  N182004E1962006:   1   Katha   : 663   2016   : 821   3rd Qu.: 766000  
+##  N182009E1964004:   1   Bago    : 567   2012   : 567   Max.   :2199000  
+##  (Other)        :8160   (Other) :3202   (Other): 877                    
+##      NORTH            Sum_CHa       
+##  Min.   : 181974   Min.   :  0.000  
+##  1st Qu.:2051971   1st Qu.:  5.745  
+##  Median :2470006   Median : 10.201  
+##  Mean   :2124600   Mean   : 14.408  
+##  3rd Qu.:2646000   3rd Qu.: 18.650  
+##  Max.   :2824000   Max.   :228.407  
 ## </code></pre>
-<pre class="r"><code>ggplot(data = All_Plots_Carbon, aes(x = Districts, y= Carbon_THa, color= Year))+ 
+<pre class="r"><code>ggplot(data = All_Plots, aes(x = District, y= Sum_CHa, color= Year))+ 
   geom_boxplot()+
   labs(title = &quot;Carbon storage per ha in 21 disctricts from 2010 to 2017&quot;, 
        x= &quot;District name&quot;,
@@ -740,136 +673,141 @@ summary(All_Plots_Carbon)</code></pre>
   theme(axis.text.x = element_text(size=7, angle = 90, vjust = 0.5),
         axis.text.y = element_text(size = 7))</code></pre>
 <p><img src="Carbon_files/figure-html/unnamed-chunk-15-1.png" width="672" /></p>
+<p><strong>remove duplicated rows</strong></p>
+<pre class="r"><code>All_Plots &lt;- distinct(All_Plots) 
+All_Plots &lt;- droplevels(All_Plots)</code></pre>
 <p><strong>Produce a cleaned data frame for per ha carbon for each plot</strong></p>
-<pre class="r"><code>write.csv(All_Plots_Carbon,file = &quot;Data_Output/Carbon_Per_Plots.csv&quot;,row.names = FALSE)</code></pre>
+<pre class="r"><code>write.csv(All_Plots,file = &quot;Data_Output/Carbon_Per_Plots.csv&quot;,row.names = FALSE)</code></pre>
 <p>** comparing Carbon with new model and old model for height prediction**</p>
 <pre class="r"><code>Comparison &lt;- read.csv(&quot;Data_Output/Plots_Carbon.csv&quot;)
 attach(Comparison)
 ggplot(data=Comparison, aes(x=New_Carbon, y = Old_Carbon, color=District))+ geom_point()</code></pre>
-<p><img src="Carbon_files/figure-html/unnamed-chunk-17-1.png" width="672" /></p>
+<p><img src="Carbon_files/figure-html/unnamed-chunk-18-1.png" width="672" /></p>
 <pre class="r"><code>detach(Comparison)</code></pre>
-<p><strong>Carbon according to WWF’s ecoregions</strong></p>
-<pre class="r"><code>Ecoregions &lt;- read.csv(&quot;Data_Output/Plots_WWFecoregions.csv&quot;)
-Eco_Carbon &lt;- Ecoregions %&gt;% group_by(ECO_NAME) %&gt;% summarise(MaxCarbon=max(New_Carbon), Count=n())
-attach(Eco_Carbon)
+<p><strong>Carbon according to WWF’s ecoregions. Use the original shape file of plots Locations to extract values</strong></p>
+<pre class="r"><code>Ecoregions &lt;- read.csv(&quot;Data_Output/WWFEcoregions-Plots(23-10-2019).csv&quot;, stringsAsFactors = F)
+Carbon &lt;- read.csv(&quot;Data_Output/Carbon_Per_Plots.csv&quot;, stringsAsFactors = F)
+Eco_Carbon &lt;- Carbon %&gt;% left_join(dplyr::select(Ecoregions, -Year, -District),by.x = &quot;Plot_names&quot;) %&gt;% dplyr::select(-EAST,-NORTH) %&gt;% drop_na(ECO_NAME)</code></pre>
+<pre><code>## Joining, by = &quot;Plot_names&quot;</code></pre>
+<pre class="r"><code>attach(Eco_Carbon)
 
-lm.CarbonEcoregions &lt;- lm(New_Carbon~ECO_NAME, data = Ecoregions)
+lm.CarbonEcoregions &lt;- lm(Sum_CHa~ECO_NAME, data = Eco_Carbon)
 anova(lm.CarbonEcoregions)</code></pre>
 <pre><code>## Analysis of Variance Table
 ## 
-## Response: New_Carbon
+## Response: Sum_CHa
 ##             Df  Sum Sq Mean Sq F value    Pr(&gt;F)    
-## ECO_NAME     6   59983  9997.2  75.464 &lt; 2.2e-16 ***
-## Residuals 7874 1043115   132.5                      
+## ECO_NAME     6   56195  9365.8  69.913 &lt; 2.2e-16 ***
+## Residuals 8083 1082823   134.0                      
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <pre class="r"><code>plot(lm.CarbonEcoregions)</code></pre>
-<p><img src="Carbon_files/figure-html/unnamed-chunk-18-1.png" width="672" /><img src="Carbon_files/figure-html/unnamed-chunk-18-2.png" width="672" /><img src="Carbon_files/figure-html/unnamed-chunk-18-3.png" width="672" /><img src="Carbon_files/figure-html/unnamed-chunk-18-4.png" width="672" /></p>
-<pre class="r"><code>boxplot(New_Carbon~ECO_NAME, data=Ecoregions)</code></pre>
-<p><img src="Carbon_files/figure-html/unnamed-chunk-18-5.png" width="672" /></p>
-<pre class="r"><code>aov.CarbonEcoregions &lt;- aov(New_Carbon~ECO_NAME,data=Ecoregions)
+<p><img src="Carbon_files/figure-html/unnamed-chunk-19-1.png" width="672" /><img src="Carbon_files/figure-html/unnamed-chunk-19-2.png" width="672" /><img src="Carbon_files/figure-html/unnamed-chunk-19-3.png" width="672" /><img src="Carbon_files/figure-html/unnamed-chunk-19-4.png" width="672" /></p>
+<pre class="r"><code>boxplot(Sum_CHa~ECO_NAME, data = Eco_Carbon)</code></pre>
+<p><img src="Carbon_files/figure-html/unnamed-chunk-19-5.png" width="672" /></p>
+<pre class="r"><code>aov.CarbonEcoregions &lt;- aov(Sum_CHa~ECO_NAME, data = Eco_Carbon)
 TukeyHSD(aov.CarbonEcoregions)</code></pre>
 <pre><code>##   Tukey multiple comparisons of means
 ##     95% family-wise confidence level
 ## 
-## Fit: aov(formula = New_Carbon ~ ECO_NAME, data = Ecoregions)
+## Fit: aov(formula = Sum_CHa ~ ECO_NAME, data = Eco_Carbon)
 ## 
 ## $ECO_NAME
-##                                                                                     diff
-## Irrawaddy Dry Forests-Chin Hills-Arakan Yoma Montane Forests                   1.4654315
-## Irrawaddy Moist Deciduous Forests-Chin Hills-Arakan Yoma Montane Forests       4.8825416
-## Kayah-Karen Montane Rain Forests-Chin Hills-Arakan Yoma Montane Forests        1.1121808
-## Mizoram-Manipur-Kachin Rain Forests-Chin Hills-Arakan Yoma Montane Forests     8.8220339
-## Myanmar Coastal Rain Forests-Chin Hills-Arakan Yoma Montane Forests            3.7521947
-## Northern Indochina Subtropical Forests-Chin Hills-Arakan Yoma Montane Forests  0.5409353
-## Irrawaddy Moist Deciduous Forests-Irrawaddy Dry Forests                        3.4171101
-## Kayah-Karen Montane Rain Forests-Irrawaddy Dry Forests                        -0.3532507
-## Mizoram-Manipur-Kachin Rain Forests-Irrawaddy Dry Forests                      7.3566024
-## Myanmar Coastal Rain Forests-Irrawaddy Dry Forests                             2.2867632
-## Northern Indochina Subtropical Forests-Irrawaddy Dry Forests                  -0.9244962
-## Kayah-Karen Montane Rain Forests-Irrawaddy Moist Deciduous Forests            -3.7703608
-## Mizoram-Manipur-Kachin Rain Forests-Irrawaddy Moist Deciduous Forests          3.9394923
-## Myanmar Coastal Rain Forests-Irrawaddy Moist Deciduous Forests                -1.1303469
-## Northern Indochina Subtropical Forests-Irrawaddy Moist Deciduous Forests      -4.3416063
-## Mizoram-Manipur-Kachin Rain Forests-Kayah-Karen Montane Rain Forests           7.7098530
-## Myanmar Coastal Rain Forests-Kayah-Karen Montane Rain Forests                  2.6400139
-## Northern Indochina Subtropical Forests-Kayah-Karen Montane Rain Forests       -0.5712455
-## Myanmar Coastal Rain Forests-Mizoram-Manipur-Kachin Rain Forests              -5.0698392
-## Northern Indochina Subtropical Forests-Mizoram-Manipur-Kachin Rain Forests    -8.2810985
-## Northern Indochina Subtropical Forests-Myanmar Coastal Rain Forests           -3.2112594
-##                                                                                       lwr
-## Irrawaddy Dry Forests-Chin Hills-Arakan Yoma Montane Forests                   -1.0824394
-## Irrawaddy Moist Deciduous Forests-Chin Hills-Arakan Yoma Montane Forests        3.4812067
-## Kayah-Karen Montane Rain Forests-Chin Hills-Arakan Yoma Montane Forests        -2.5014241
-## Mizoram-Manipur-Kachin Rain Forests-Chin Hills-Arakan Yoma Montane Forests      7.3247677
-## Myanmar Coastal Rain Forests-Chin Hills-Arakan Yoma Montane Forests             1.9925726
-## Northern Indochina Subtropical Forests-Chin Hills-Arakan Yoma Montane Forests  -1.5583522
-## Irrawaddy Moist Deciduous Forests-Irrawaddy Dry Forests                         1.1468506
-## Kayah-Karen Montane Rain Forests-Irrawaddy Dry Forests                         -4.3841910
-## Mizoram-Manipur-Kachin Rain Forests-Irrawaddy Dry Forests                       5.0259061
-## Myanmar Coastal Rain Forests-Irrawaddy Dry Forests                             -0.2205479
-## Northern Indochina Subtropical Forests-Irrawaddy Dry Forests                   -3.6808247
-## Kayah-Karen Montane Rain Forests-Irrawaddy Moist Deciduous Forests             -7.1938930
-## Mizoram-Manipur-Kachin Rain Forests-Irrawaddy Moist Deciduous Forests           2.9885777
-## Myanmar Coastal Rain Forests-Irrawaddy Moist Deciduous Forests                 -2.4565076
-## Northern Indochina Subtropical Forests-Irrawaddy Moist Deciduous Forests       -6.0935882
-## Mizoram-Manipur-Kachin Rain Forests-Kayah-Karen Montane Rain Forests            4.2459478
-## Myanmar Coastal Rain Forests-Kayah-Karen Montane Rain Forests                  -0.9451086
-## Northern Indochina Subtropical Forests-Kayah-Karen Montane Rain Forests        -4.3347335
-## Myanmar Coastal Rain Forests-Mizoram-Manipur-Kachin Rain Forests               -6.4969933
-## Northern Indochina Subtropical Forests-Mizoram-Manipur-Kachin Rain Forests    -10.1107179
-## Northern Indochina Subtropical Forests-Myanmar Coastal Rain Forests            -5.2611303
+##                                                                                      diff
+## Irrawaddy Dry Forests-Chin Hills-Arakan Yoma Montane Forests                   1.34680216
+## Irrawaddy Moist Deciduous Forests-Chin Hills-Arakan Yoma Montane Forests       4.74612932
+## Kayah-Karen Montane Rain Forests-Chin Hills-Arakan Yoma Montane Forests       -0.06513581
+## Mizoram-Manipur-Kachin Rain Forests-Chin Hills-Arakan Yoma Montane Forests     8.26014636
+## Myanmar Coastal Rain Forests-Chin Hills-Arakan Yoma Montane Forests            2.70390248
+## Northern Indochina Subtropical Forests-Chin Hills-Arakan Yoma Montane Forests  0.59682947
+## Irrawaddy Moist Deciduous Forests-Irrawaddy Dry Forests                        3.39932716
+## Kayah-Karen Montane Rain Forests-Irrawaddy Dry Forests                        -1.41193797
+## Mizoram-Manipur-Kachin Rain Forests-Irrawaddy Dry Forests                      6.91334420
+## Myanmar Coastal Rain Forests-Irrawaddy Dry Forests                             1.35710032
+## Northern Indochina Subtropical Forests-Irrawaddy Dry Forests                  -0.74997269
+## Kayah-Karen Montane Rain Forests-Irrawaddy Moist Deciduous Forests            -4.81126513
+## Mizoram-Manipur-Kachin Rain Forests-Irrawaddy Moist Deciduous Forests          3.51401704
+## Myanmar Coastal Rain Forests-Irrawaddy Moist Deciduous Forests                -2.04222684
+## Northern Indochina Subtropical Forests-Irrawaddy Moist Deciduous Forests      -4.14929985
+## Mizoram-Manipur-Kachin Rain Forests-Kayah-Karen Montane Rain Forests           8.32528217
+## Myanmar Coastal Rain Forests-Kayah-Karen Montane Rain Forests                  2.76903829
+## Northern Indochina Subtropical Forests-Kayah-Karen Montane Rain Forests        0.66196528
+## Myanmar Coastal Rain Forests-Mizoram-Manipur-Kachin Rain Forests              -5.55624388
+## Northern Indochina Subtropical Forests-Mizoram-Manipur-Kachin Rain Forests    -7.66331689
+## Northern Indochina Subtropical Forests-Myanmar Coastal Rain Forests           -2.10707301
+##                                                                                      lwr
+## Irrawaddy Dry Forests-Chin Hills-Arakan Yoma Montane Forests                  -1.1588402
+## Irrawaddy Moist Deciduous Forests-Chin Hills-Arakan Yoma Montane Forests       3.3454666
+## Kayah-Karen Montane Rain Forests-Chin Hills-Arakan Yoma Montane Forests       -3.6359727
+## Mizoram-Manipur-Kachin Rain Forests-Chin Hills-Arakan Yoma Montane Forests     6.7566563
+## Myanmar Coastal Rain Forests-Chin Hills-Arakan Yoma Montane Forests            0.9607350
+## Northern Indochina Subtropical Forests-Chin Hills-Arakan Yoma Montane Forests -1.4402614
+## Irrawaddy Moist Deciduous Forests-Irrawaddy Dry Forests                        1.1789149
+## Kayah-Karen Montane Rain Forests-Irrawaddy Dry Forests                        -5.3766890
+## Mizoram-Manipur-Kachin Rain Forests-Irrawaddy Dry Forests                      4.6266748
+## Myanmar Coastal Rain Forests-Irrawaddy Dry Forests                            -1.0938194
+## Northern Indochina Subtropical Forests-Irrawaddy Dry Forests                  -3.4179521
+## Kayah-Karen Montane Rain Forests-Irrawaddy Moist Deciduous Forests            -8.1880777
+## Mizoram-Manipur-Kachin Rain Forests-Irrawaddy Moist Deciduous Forests          2.5587845
+## Myanmar Coastal Rain Forests-Irrawaddy Moist Deciduous Forests                -3.3424652
+## Northern Indochina Subtropical Forests-Irrawaddy Moist Deciduous Forests      -5.8231357
+## Mizoram-Manipur-Kachin Rain Forests-Kayah-Karen Montane Rain Forests           4.9045382
+## Myanmar Coastal Rain Forests-Kayah-Karen Montane Rain Forests                 -0.7636151
+## Northern Indochina Subtropical Forests-Kayah-Karen Montane Rain Forests       -3.0245977
+## Myanmar Coastal Rain Forests-Mizoram-Manipur-Kachin Rain Forests              -6.9666502
+## Northern Indochina Subtropical Forests-Mizoram-Manipur-Kachin Rain Forests    -9.4240987
+## Northern Indochina Subtropical Forests-Myanmar Coastal Rain Forests           -4.0764646
 ##                                                                                      upr
-## Irrawaddy Dry Forests-Chin Hills-Arakan Yoma Montane Forests                   4.0133024
-## Irrawaddy Moist Deciduous Forests-Chin Hills-Arakan Yoma Montane Forests       6.2838765
-## Kayah-Karen Montane Rain Forests-Chin Hills-Arakan Yoma Montane Forests        4.7257858
-## Mizoram-Manipur-Kachin Rain Forests-Chin Hills-Arakan Yoma Montane Forests    10.3193001
-## Myanmar Coastal Rain Forests-Chin Hills-Arakan Yoma Montane Forests            5.5118168
-## Northern Indochina Subtropical Forests-Chin Hills-Arakan Yoma Montane Forests  2.6402228
-## Irrawaddy Moist Deciduous Forests-Irrawaddy Dry Forests                        5.6873696
-## Kayah-Karen Montane Rain Forests-Irrawaddy Dry Forests                         3.6776896
-## Mizoram-Manipur-Kachin Rain Forests-Irrawaddy Dry Forests                      9.6872986
-## Myanmar Coastal Rain Forests-Irrawaddy Dry Forests                             4.7940742
-## Northern Indochina Subtropical Forests-Irrawaddy Dry Forests                   1.8318323
-## Kayah-Karen Montane Rain Forests-Irrawaddy Moist Deciduous Forests            -0.3468285
-## Mizoram-Manipur-Kachin Rain Forests-Irrawaddy Moist Deciduous Forests          4.8904068
-## Myanmar Coastal Rain Forests-Irrawaddy Moist Deciduous Forests                 0.1958138
-## Northern Indochina Subtropical Forests-Irrawaddy Moist Deciduous Forests      -2.5896244
-## Mizoram-Manipur-Kachin Rain Forests-Kayah-Karen Montane Rain Forests          11.1737583
-## Myanmar Coastal Rain Forests-Kayah-Karen Montane Rain Forests                  6.2251364
-## Northern Indochina Subtropical Forests-Kayah-Karen Montane Rain Forests        3.1922425
-## Myanmar Coastal Rain Forests-Mizoram-Manipur-Kachin Rain Forests              -3.6426851
-## Northern Indochina Subtropical Forests-Mizoram-Manipur-Kachin Rain Forests    -6.4514792
-## Northern Indochina Subtropical Forests-Myanmar Coastal Rain Forests           -1.1613884
+## Irrawaddy Dry Forests-Chin Hills-Arakan Yoma Montane Forests                   3.8524445
+## Irrawaddy Moist Deciduous Forests-Chin Hills-Arakan Yoma Montane Forests       6.1467920
+## Kayah-Karen Montane Rain Forests-Chin Hills-Arakan Yoma Montane Forests        3.5057011
+## Mizoram-Manipur-Kachin Rain Forests-Chin Hills-Arakan Yoma Montane Forests     9.7636364
+## Myanmar Coastal Rain Forests-Chin Hills-Arakan Yoma Montane Forests            4.4470699
+## Northern Indochina Subtropical Forests-Chin Hills-Arakan Yoma Montane Forests  2.6339204
+## Irrawaddy Moist Deciduous Forests-Irrawaddy Dry Forests                        5.6197394
+## Kayah-Karen Montane Rain Forests-Irrawaddy Dry Forests                         2.5528131
+## Mizoram-Manipur-Kachin Rain Forests-Irrawaddy Dry Forests                      9.2000136
+## Myanmar Coastal Rain Forests-Irrawaddy Dry Forests                             3.8080200
+## Northern Indochina Subtropical Forests-Irrawaddy Dry Forests                   1.9180067
+## Kayah-Karen Montane Rain Forests-Irrawaddy Moist Deciduous Forests            -1.4344525
+## Mizoram-Manipur-Kachin Rain Forests-Irrawaddy Moist Deciduous Forests          4.4692496
+## Myanmar Coastal Rain Forests-Irrawaddy Moist Deciduous Forests                -0.7419885
+## Northern Indochina Subtropical Forests-Irrawaddy Moist Deciduous Forests      -2.4754640
+## Mizoram-Manipur-Kachin Rain Forests-Kayah-Karen Montane Rain Forests          11.7460262
+## Myanmar Coastal Rain Forests-Kayah-Karen Montane Rain Forests                  6.3016917
+## Northern Indochina Subtropical Forests-Kayah-Karen Montane Rain Forests        4.3485283
+## Myanmar Coastal Rain Forests-Mizoram-Manipur-Kachin Rain Forests              -4.1458376
+## Northern Indochina Subtropical Forests-Mizoram-Manipur-Kachin Rain Forests    -5.9025351
+## Northern Indochina Subtropical Forests-Myanmar Coastal Rain Forests           -0.1376815
 ##                                                                                   p adj
-## Irrawaddy Dry Forests-Chin Hills-Arakan Yoma Montane Forests                  0.6186490
+## Irrawaddy Dry Forests-Chin Hills-Arakan Yoma Montane Forests                  0.6919756
 ## Irrawaddy Moist Deciduous Forests-Chin Hills-Arakan Yoma Montane Forests      0.0000000
-## Kayah-Karen Montane Rain Forests-Chin Hills-Arakan Yoma Montane Forests       0.9714798
+## Kayah-Karen Montane Rain Forests-Chin Hills-Arakan Yoma Montane Forests       1.0000000
 ## Mizoram-Manipur-Kachin Rain Forests-Chin Hills-Arakan Yoma Montane Forests    0.0000000
-## Myanmar Coastal Rain Forests-Chin Hills-Arakan Yoma Montane Forests           0.0000000
-## Northern Indochina Subtropical Forests-Chin Hills-Arakan Yoma Montane Forests 0.9885769
-## Irrawaddy Moist Deciduous Forests-Irrawaddy Dry Forests                       0.0001856
-## Kayah-Karen Montane Rain Forests-Irrawaddy Dry Forests                        0.9999756
+## Myanmar Coastal Rain Forests-Chin Hills-Arakan Yoma Montane Forests           0.0000988
+## Northern Indochina Subtropical Forests-Chin Hills-Arakan Yoma Montane Forests 0.9777555
+## Irrawaddy Moist Deciduous Forests-Irrawaddy Dry Forests                       0.0001307
+## Kayah-Karen Montane Rain Forests-Irrawaddy Dry Forests                        0.9421416
 ## Mizoram-Manipur-Kachin Rain Forests-Irrawaddy Dry Forests                     0.0000000
-## Myanmar Coastal Rain Forests-Irrawaddy Dry Forests                            0.1009183
-## Northern Indochina Subtropical Forests-Irrawaddy Dry Forests                  0.9564877
-## Kayah-Karen Montane Rain Forests-Irrawaddy Moist Deciduous Forests            0.0200120
+## Myanmar Coastal Rain Forests-Irrawaddy Dry Forests                            0.6608716
+## Northern Indochina Subtropical Forests-Irrawaddy Dry Forests                  0.9820056
+## Kayah-Karen Montane Rain Forests-Irrawaddy Moist Deciduous Forests            0.0005330
 ## Mizoram-Manipur-Kachin Rain Forests-Irrawaddy Moist Deciduous Forests         0.0000000
-## Myanmar Coastal Rain Forests-Irrawaddy Moist Deciduous Forests                0.1543749
+## Myanmar Coastal Rain Forests-Irrawaddy Moist Deciduous Forests                0.0000752
 ## Northern Indochina Subtropical Forests-Irrawaddy Moist Deciduous Forests      0.0000000
 ## Mizoram-Manipur-Kachin Rain Forests-Kayah-Karen Montane Rain Forests          0.0000000
-## Myanmar Coastal Rain Forests-Kayah-Karen Montane Rain Forests                 0.3111172
-## Northern Indochina Subtropical Forests-Kayah-Karen Montane Rain Forests       0.9993956
+## Myanmar Coastal Rain Forests-Kayah-Karen Montane Rain Forests                 0.2383569
+## Northern Indochina Subtropical Forests-Kayah-Karen Montane Rain Forests       0.9984253
 ## Myanmar Coastal Rain Forests-Mizoram-Manipur-Kachin Rain Forests              0.0000000
 ## Northern Indochina Subtropical Forests-Mizoram-Manipur-Kachin Rain Forests    0.0000000
-## Northern Indochina Subtropical Forests-Myanmar Coastal Rain Forests           0.0000797</code></pre>
-<pre class="r"><code>ggplot(data=Eco_Carbon, aes(x=ECO_NAME, y = MaxCarbon, color=ECO_NAME))+ geom_point()+
+## Northern Indochina Subtropical Forests-Myanmar Coastal Rain Forests           0.0268960</code></pre>
+<pre class="r"><code>ggplot(data=Eco_Carbon, aes(x=ECO_NAME, y = Sum_CHa, color=ECO_NAME))+ geom_boxplot()+
   labs(title = &quot;Carbon storage according to ecoregions&quot;, 
        x= &quot;Ecoregion&quot;,
        y= &quot;MaxCarbon(t/ha)&quot;)+
-  theme(axis.text.x = element_text(size=7, angle = 45, vjust = 0.5),
+  theme(axis.text.x = element_text(size=7, angle = 90, vjust = 0.5),
         axis.text.y = element_text(size = 7))</code></pre>
-<p><img src="Carbon_files/figure-html/unnamed-chunk-18-6.png" width="672" /></p>
+<p><img src="Carbon_files/figure-html/unnamed-chunk-19-6.png" width="672" /></p>
 <pre class="r"><code>detach(Eco_Carbon)</code></pre>
 <p><strong>Carbon and environmental conditions relationship</strong></p>
 <p>BIO1 = Annual Mean Temperature<br />
@@ -893,291 +831,382 @@ BIO18 = Precipitation of Warmest Quarter<br />
 BIO19 = Precipitation of Coldest Quarter</p>
 <p><strong>Modelling carbon storage differences among districts and environmental impact on it</strong></p>
 <p>A one-way ANOVA showed that carbon storage differed significantly between districts (F=55.27, df=20,7860, p &lt; 0.001)</p>
-<pre class="r"><code>C_Env &lt;- read.csv(&quot;Data/WCL_plots.csv&quot;)
-lm.CarbonDistrict &lt;- lm(New_Carbon~District, data = C_Env)
+<pre class="r"><code>lm.CarbonDistrict &lt;- lm(Sum_CHa~District, data = Eco_Carbon)
 anova(lm.CarbonDistrict)</code></pre>
 <pre><code>## Analysis of Variance Table
 ## 
-## Response: New_Carbon
+## Response: Sum_CHa
 ##             Df Sum Sq Mean Sq F value    Pr(&gt;F)    
-## District    20 136008  6800.4   55.27 &lt; 2.2e-16 ***
-## Residuals 7860 967090   123.0                      
+## District    20 143369  7168.4  58.095 &lt; 2.2e-16 ***
+## Residuals 8069 995649   123.4                      
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <pre class="r"><code>plot(lm.CarbonDistrict)</code></pre>
-<p><img src="Carbon_files/figure-html/unnamed-chunk-19-1.png" width="672" /><img src="Carbon_files/figure-html/unnamed-chunk-19-2.png" width="672" /><img src="Carbon_files/figure-html/unnamed-chunk-19-3.png" width="672" /><img src="Carbon_files/figure-html/unnamed-chunk-19-4.png" width="672" /> the test has very conclusively rejected the hypothesis that all means are equal. However, this was not due to all of the sample means being different, but rather just because one of the groups is very different from the others. In order to drill down and investigate this further we use a new test called Tukey’s range test.This will compare all of the groups in a pairwise fashion and reports on whether a significant difference exists.</p>
-<pre class="r"><code>boxplot(New_Carbon~District, data=C_Env)</code></pre>
-<p><img src="Carbon_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
-<pre class="r"><code>aov.Carbon &lt;- aov(New_Carbon~District,data= C_Env)
+<p><img src="Carbon_files/figure-html/unnamed-chunk-20-1.png" width="672" /><img src="Carbon_files/figure-html/unnamed-chunk-20-2.png" width="672" /><img src="Carbon_files/figure-html/unnamed-chunk-20-3.png" width="672" /><img src="Carbon_files/figure-html/unnamed-chunk-20-4.png" width="672" /></p>
+<pre class="r"><code>Env &lt;- read.csv(&quot;Data_Output/WCL_plots(23-10-2019).csv&quot;, stringsAsFactors = F)
+Env_Carbon &lt;- Carbon %&gt;% left_join(Env,by.x=&quot;Plot_names&quot;) %&gt;% drop_na(bio01)</code></pre>
+<pre><code>## Joining, by = &quot;Plot_names&quot;</code></pre>
+<p>the test has very conclusively rejected the hypothesis that all means are equal. However, this was not due to all of the sample means being different, but rather just because one of the groups is very different from the others. In order to drill down and investigate this further we use a new test called Tukey’s range test.This will compare all of the groups in a pairwise fashion and reports on whether a significant difference exists.</p>
+<pre class="r"><code>boxplot(Sum_CHa~District, data=Env_Carbon)</code></pre>
+<p><img src="Carbon_files/figure-html/unnamed-chunk-22-1.png" width="672" /></p>
+<pre class="r"><code>aov.Carbon &lt;- aov(Sum_CHa~District,data= Env_Carbon)
 TukeyHSD(aov.Carbon)</code></pre>
 <pre><code>##   Tukey multiple comparisons of means
 ##     95% family-wise confidence level
 ## 
-## Fit: aov(formula = New_Carbon ~ District, data = C_Env)
+## Fit: aov(formula = Sum_CHa ~ District, data = Env_Carbon)
 ## 
 ## $District
-##                                diff          lwr           upr     p adj
-## Gangaw-Bago             10.71646654   7.84300162  1.358993e+01 0.0000000
-## Kale-Bago                8.02717596   5.82493430  1.022942e+01 0.0000000
-## Katha-Bago               4.76778262   2.45112971  7.084436e+00 0.0000000
-## Khamti-Bago              2.83911818   0.68767149  4.990565e+00 0.0004859
-## Kyaukse-Bago            10.43712705   6.75294106  1.412131e+01 0.0000000
-## Magway-Bago             -0.26864783 -14.37622438  1.383893e+01 1.0000000
-## Mandalay-Bago            4.35068002  -6.01921910  1.472058e+01 0.9964864
-## Mawlaik-Bago            13.17243450  11.02499657  1.531987e+01 0.0000000
-## Meiktila-Bago            0.67626921  -3.97639254  5.328931e+00 1.0000000
-## Minbu-Bago               4.68617772   2.15626293  7.216093e+00 0.0000000
-## Monywa-Bago              8.61186826   5.24094535  1.198279e+01 0.0000000
-## Pakokku-Bago             2.91688192  -4.18964755  1.002341e+01 0.9973605
-## Pyay-Bago                4.82901852   2.16380282  7.494234e+00 0.0000000
-## PyinOoLwin-Bago          4.84752789   2.21567718  7.479379e+00 0.0000000
-## Shwebo-Bago              5.95399195   2.42108993  9.486894e+00 0.0000004
-## Tamu-Bago                0.97842410  -4.45837543  6.415224e+00 1.0000000
-## Taunggoo-Bago            1.18809123  -0.96054130  3.336724e+00 0.9256481
-## Thayarwaddy-Bago         0.06865506  -2.52869029  2.666000e+00 1.0000000
-## Thayet-Bago              5.81744253   2.86072759  8.774157e+00 0.0000000
-## Yamethin-Bago           -1.48712252  -6.29165246  3.317407e+00 0.9999574
-## Kale-Gangaw             -2.68929058  -5.36409110 -1.449006e-02 0.0469162
-## Katha-Gangaw            -5.94868392  -8.71844387 -3.178924e+00 0.0000000
-## Khamti-Gangaw           -7.87734836 -10.51048572 -5.244211e+00 0.0000000
-## Kyaukse-Gangaw          -0.27933949  -4.26404976  3.705371e+00 1.0000000
-## Magway-Gangaw          -10.98511437 -25.17413849  3.203910e+00 0.4027877
-## Mandalay-Gangaw         -6.36578652 -16.84622054  4.114648e+00 0.8389076
-## Mawlaik-Gangaw           2.45596796  -0.17389499  5.085831e+00 0.1036704
-## Meiktila-Gangaw        -10.04019733 -14.93427036 -5.146124e+00 0.0000000
-## Minbu-Gangaw            -6.03028882  -8.98073935 -3.079838e+00 0.0000000
-## Monywa-Gangaw           -2.10459828  -5.80159851  1.592402e+00 0.9040490
-## Pakokku-Gangaw          -7.79958462 -15.06645813 -5.327111e-01 0.0201487
-## Pyay-Gangaw             -5.88744802  -8.95470481 -2.820191e+00 0.0000000
-## PyinOoLwin-Gangaw       -5.86893865  -8.90724865 -2.830629e+00 0.0000000
-## Shwebo-Gangaw           -4.76247459  -8.60774261 -9.172066e-01 0.0018409
-## Tamu-Gangaw             -9.73804243 -15.38281689 -4.093268e+00 0.0000002
-## Taunggoo-Gangaw         -9.52837531 -12.15921382 -6.897537e+00 0.0000000
-## Thayarwaddy-Gangaw     -10.64781148 -13.65628158 -7.639341e+00 0.0000000
-## Thayet-Gangaw           -4.89902401  -8.22270461 -1.575343e+00 0.0000297
-## Yamethin-Gangaw        -12.20358906 -17.24225926 -7.164919e+00 0.0000000
-## Katha-Kale              -3.25939334  -5.32449331 -1.194293e+00 0.0000037
-## Khamti-Kale             -5.18805778  -7.06595023 -3.310165e+00 0.0000000
-## Kyaukse-Kale             2.40995109  -1.12147689  5.941379e+00 0.6582082
-## Magway-Kale             -8.29582379 -22.36428046  5.772633e+00 0.8717471
-## Mandalay-Kale           -3.67649594 -13.99311190  6.640120e+00 0.9996323
-## Mawlaik-Kale             5.14525854   3.27196015  7.018557e+00 0.0000000
-## Meiktila-Kale           -7.35090675 -11.88356805 -2.818245e+00 0.0000015
-## Minbu-Kale              -3.34099824  -5.64278581 -1.039211e+00 0.0000456
-## Monywa-Kale              0.58469230  -2.61856829  3.787953e+00 1.0000000
-## Pakokku-Kale            -5.11029404 -12.13884426  1.918256e+00 0.5327313
-## Pyay-Kale               -3.19815744  -5.64787822 -7.484367e-01 0.0006169
-## PyinOoLwin-Kale         -3.17964807  -5.59302648 -7.662697e-01 0.0005038
-## Shwebo-Kale             -2.07318401  -5.44648416  1.300116e+00 0.8243557
-## Tamu-Kale               -7.04875185 -12.38321962 -1.714284e+00 0.0004718
-## Taunggoo-Kale           -6.83908473  -8.71375242 -4.964417e+00 0.0000000
-## Thayarwaddy-Kale        -7.95852090 -10.33422291 -5.582819e+00 0.0000000
-## Thayet-Kale             -2.20973343  -4.97377403  5.543072e-01 0.3386364
-## Yamethin-Kale           -9.51429848 -14.20271667 -4.825880e+00 0.0000000
-## Khamti-Katha            -1.92866443  -3.93950815  8.217928e-02 0.0793095
-## Kyaukse-Katha            5.66934443   2.06545820  9.273231e+00 0.0000042
-## Magway-Katha            -5.03643045 -19.12325002  9.050389e+00 0.9996143
-## Mandalay-Katha          -0.41710260 -10.75874547  9.924540e+00 1.0000000
-## Mawlaik-Katha            8.40465188   6.39809782  1.041121e+01 0.0000000
-## Meiktila-Katha          -4.09151341  -8.68085223  4.978254e-01 0.1574955
-## Minbu-Katha             -0.08160490  -2.49308544  2.329876e+00 1.0000000
-## Monywa-Katha             3.84408565   0.56111583  7.127055e+00 0.0051745
-## Pakokku-Katha           -1.85090069  -8.91613464  5.214333e+00 0.9999973
-## Pyay-Katha               0.06123590  -2.49182976  2.614302e+00 1.0000000
-## PyinOoLwin-Katha         0.07974527  -2.43846991  2.597960e+00 1.0000000
-## Shwebo-Katha             1.18620933  -2.26287261  4.635291e+00 0.9997830
-## Tamu-Katha              -3.78935851  -9.17206775  1.593351e+00 0.5981665
-## Taunggoo-Katha          -3.57969138  -5.58752388 -1.571859e+00 0.0000000
-## Thayarwaddy-Katha       -4.69912755  -7.18125818 -2.216997e+00 0.0000000
-## Thayet-Katha             1.04965991  -1.80637454  3.905694e+00 0.9994246
-## Yamethin-Katha          -6.25490514 -10.99814006 -1.511670e+00 0.0004937
-## Kyaukse-Khamti           7.59800887   4.09803199  1.109799e+01 0.0000000
-## Magway-Khamti           -3.10776602 -17.16836087  1.095283e+01 0.9999999
-## Mandalay-Khamti          1.51156184  -8.79433063  1.181745e+01 1.0000000
-## Mawlaik-Khamti          10.33331632   8.52000404  1.214663e+01 0.0000000
-## Meiktila-Khamti         -2.16284897  -6.67104962  2.345352e+00 0.9822903
-## Minbu-Khamti             1.84705954  -0.40617827  4.100297e+00 0.2911947
-## Monywa-Khamti            5.77275008   2.60419631  8.941304e+00 0.0000000
-## Pakokku-Khamti           0.07776374  -6.93503690  7.090564e+00 1.0000000
-## Pyay-Khamti              1.98990034  -0.41425991  4.394061e+00 0.2736891
-## PyinOoLwin-Khamti        2.00840971  -0.35870877  4.375528e+00 0.2310906
-## Shwebo-Khamti            3.11487377  -0.22548676  6.455234e+00 0.1051584
-## Tamu-Khamti             -1.86069408  -7.17439344  3.453005e+00 0.9997161
-## Taunggoo-Khamti         -1.65102695  -3.46575379  1.636999e-01 0.1321430
-## Thayarwaddy-Khamti      -2.77046312  -5.09915688 -4.417694e-01 0.0039110
-## Thayet-Khamti            2.97832434   0.25458152  5.702067e+00 0.0154227
-## Yamethin-Khamti         -4.32624070  -8.99101505  3.385336e-01 0.1107680
-## Magway-Kyaukse         -10.70577488 -25.08092118  3.669371e+00 0.4829778
-## Mandalay-Kyaukse        -6.08644703 -16.81751981  4.644626e+00 0.9070263
-## Mawlaik-Kyaukse          2.73530745  -0.76220665  6.232822e+00 0.3822519
-## Meiktila-Kyaukse        -9.76085784 -15.17088340 -4.350832e+00 0.0000000
-## Minbu-Kyaukse           -5.75094933  -9.49548990 -2.006409e+00 0.0000089
-## Monywa-Kyaukse          -1.82525878  -6.18234916  2.531832e+00 0.9965542
-## Pakokku-Kyaukse         -7.52024512 -15.14414677  1.036565e-01 0.0585126
-## Pyay-Kyaukse            -5.60810853  -9.44535884 -1.770858e+00 0.0000377
-## PyinOoLwin-Kyaukse      -5.58959916  -9.40375089 -1.775447e+00 0.0000349
-## Shwebo-Kyaukse          -4.48313510  -8.96671759  4.473906e-04 0.0500584
-## Tamu-Kyaukse            -9.45870294 -15.55623560 -3.361170e+00 0.0000065
-## Taunggoo-Kyaukse        -9.24903582 -12.74728352 -5.750788e+00 0.0000000
-## Thayarwaddy-Kyaukse    -10.36847199 -14.15889652 -6.578047e+00 0.0000000
-## Thayet-Kyaukse          -4.61968452  -8.66483946 -5.745296e-01 0.0078688
-## Yamethin-Kyaukse       -11.92424957 -17.46542482 -6.383074e+00 0.0000000
-## Mandalay-Magway          4.61932785 -12.71867701  2.195733e+01 0.9999964
-## Mawlaik-Magway          13.44108233  -0.61889969  2.750106e+01 0.0820645
-## Meiktila-Magway          0.94491704 -13.70837153  1.559821e+01 1.0000000
-## Minbu-Magway             4.95482555  -9.16863272  1.907828e+01 0.9997082
-## Monywa-Magway            8.88051610  -5.41755112  2.317858e+01 0.8105841
-## Pakokku-Magway           3.18552976 -12.42133943  1.879240e+01 1.0000000
-## Pyay-Magway              5.09766635  -9.05065438  1.924599e+01 0.9995682
-## PyinOoLwin-Magway        5.11617572  -9.02589778  1.925825e+01 0.9995419
-## Shwebo-Magway            6.22263978  -8.11447992  2.055976e+01 0.9945930
-## Tamu-Magway              1.24707194 -13.67373213  1.616788e+01 1.0000000
-## Taunggoo-Magway          1.45673907 -12.60342546  1.551690e+01 1.0000000
-## Thayarwaddy-Magway       0.33730290 -13.79838979  1.447300e+01 1.0000000
-## Thayet-Magway            6.08609036  -8.12002692  2.029221e+01 0.9954093
-## Yamethin-Magway         -1.21847469 -15.92068924  1.348374e+01 1.0000000
-## Mawlaik-Mandalay         8.82175448  -1.48330187  1.912681e+01 0.2166578
-## Meiktila-Mandalay       -3.67441081 -14.77530978  7.426488e+00 0.9998786
-## Minbu-Mandalay           0.33549770 -10.05599716  1.072699e+01 1.0000000
-## Monywa-Mandalay          4.26118824  -6.36640875  1.488879e+01 0.9980671
-## Pakokku-Mandalay        -1.43379810 -13.76609138  1.089850e+01 1.0000000
-## Pyay-Mandalay            0.47833850  -9.94692271  1.090360e+01 1.0000000
-## PyinOoLwin-Mandalay      0.49684787  -9.91993353  1.091363e+01 1.0000000
-## Shwebo-Mandalay          1.60331193  -9.07676734  1.228339e+01 1.0000000
-## Tamu-Mandalay           -3.37225591 -14.82395823  8.079446e+00 0.9999809
-## Taunggoo-Mandalay       -3.16258879 -13.46789414  7.142717e+00 0.9999628
-## Thayarwaddy-Mandalay    -4.28202496 -14.69014196  6.126092e+00 0.9972780
-## Thayet-Mandalay          1.46676251  -9.03680164  1.197033e+01 1.0000000
-## Yamethin-Mandalay       -5.83780254 -17.00320466  5.327600e+00 0.9561889
-## Meiktila-Mawlaik       -12.49616529 -17.00245421 -7.989876e+00 0.0000000
-## Minbu-Mawlaik           -8.48625678 -10.73566723 -6.236846e+00 0.0000000
-## Monywa-Mawlaik          -4.56056624  -7.72639942 -1.394733e+00 0.0000559
-## Pakokku-Mawlaik        -10.25555257 -17.26712441 -3.243981e+00 0.0000369
-## Pyay-Mawlaik            -8.34341598 -10.74398950 -5.942842e+00 0.0000000
-## PyinOoLwin-Mawlaik      -8.32490661 -10.68838216 -5.961431e+00 0.0000000
-## Shwebo-Mawlaik          -7.21844255 -10.55622253 -3.880663e+00 0.0000000
-## Tamu-Mawlaik           -12.19401039 -17.50608792 -6.881933e+00 0.0000000
-## Taunggoo-Mawlaik       -11.98434327 -13.79431572 -1.017437e+01 0.0000000
-## Thayarwaddy-Mawlaik    -13.10377944 -15.42877006 -1.077879e+01 0.0000000
-## Thayet-Mawlaik          -7.35499197 -10.07556944 -4.634415e+00 0.0000000
-## Yamethin-Mawlaik       -14.65955702 -19.32248383 -9.996630e+00 0.0000000
-## Minbu-Meiktila           4.00990851  -0.69068922  8.710506e+00 0.2222762
-## Monywa-Meiktila          7.93559905   2.73384248  1.313736e+01 0.0000109
-## Pakokku-Meiktila         2.24061271  -5.89559717  1.037682e+01 0.9999936
-## Pyay-Meiktila            4.15274931  -0.62203078  8.927529e+00 0.1922705
-## PyinOoLwin-Meiktila      4.17125868  -0.58497811  8.927495e+00 0.1800936
-## Shwebo-Meiktila          5.27772274  -0.03043578  1.058588e+01 0.0534514
-## Tamu-Meiktila            0.30215489  -6.42494993  7.029260e+00 1.0000000
-## Taunggoo-Meiktila        0.51182202  -3.99503630  5.018680e+00 1.0000000
-## Thayarwaddy-Meiktila    -0.60761415  -5.34484468  4.129616e+00 1.0000000
-## Thayet-Meiktila          5.14117332   0.19776221  1.008458e+01 0.0308317
-## Yamethin-Meiktila       -2.16339173  -8.39064298  4.063860e+00 0.9997477
-## Monywa-Minbu             3.92569054   0.48890731  7.362474e+00 0.0078432
-## Pakokku-Minbu           -1.76929580  -8.90730104  5.368709e+00 0.9999989
-## Pyay-Minbu               0.14284080  -2.60520077  2.890882e+00 1.0000000
-## PyinOoLwin-Minbu         0.16135017  -2.55434419  2.877045e+00 1.0000000
-## Shwebo-Minbu             1.26781423  -2.32798254  4.863611e+00 0.9996857
-## Tamu-Minbu              -3.70775362  -9.18563157  1.770124e+00 0.6733676
-## Taunggoo-Minbu          -3.49808649  -5.74863742 -1.247536e+00 0.0000061
-## Thayarwaddy-Minbu       -4.61752266  -7.29979047 -1.935255e+00 0.0000002
-## Thayet-Minbu             1.13126481  -1.90032239  4.162852e+00 0.9992848
-## Yamethin-Minbu          -6.17330024 -11.02426568 -1.322335e+00 0.0010648
-## Pakokku-Monywa          -5.69498634 -13.17253749  1.782565e+00 0.4364814
-## Pyay-Monywa             -3.78284974  -7.32041739 -2.452821e-01 0.0212195
-## PyinOoLwin-Monywa       -3.76434038  -7.27683924 -2.518415e-01 0.0205764
-## Shwebo-Monywa           -2.65787631  -6.88781801  1.572065e+00 0.7946217
-## Tamu-Monywa             -7.63344416 -13.54697097 -1.719917e+00 0.0007884
-## Taunggoo-Monywa         -7.42377703 -10.59042066 -4.257133e+00 0.0000000
-## Thayarwaddy-Monywa      -8.54321320 -12.02993272 -5.056494e+00 0.0000000
-## Thayet-Monywa           -2.79442574  -6.55649609  9.676446e-01 0.4884363
-## Yamethin-Monywa        -10.09899079 -15.43701645 -4.760965e+00 0.0000000
-## Pyay-Pakokku             1.91213660  -5.27493685  9.099210e+00 0.9999964
-## PyinOoLwin-Pakokku       1.93064596  -5.24412150  9.105413e+00 0.9999957
-## Shwebo-Pakokku           3.03711003  -4.51484645  1.058907e+01 0.9979875
-## Tamu-Pakokku            -1.93845782 -10.54714176  6.670226e+00 0.9999998
-## Taunggoo-Pakokku        -1.72879069  -8.74072849  5.283147e+00 0.9999990
-## Thayarwaddy-Pakokku     -2.84822686 -10.01040899  4.313955e+00 0.9982698
-## Thayet-Pakokku           2.90056060  -4.39963208  1.020075e+01 0.9982903
-## Yamethin-Pakokku        -4.40400445 -12.62800335  3.819994e+00 0.9447452
-## PyinOoLwin-Pyay          0.01850937  -2.82365561  2.860674e+00 1.0000000
-## Shwebo-Pyay              1.12497343  -2.56726983  4.817217e+00 0.9999669
-## Tamu-Pyay               -3.85059442  -9.39225958  1.691071e+00 0.6238467
-## Taunggoo-Pyay           -3.64092729  -6.04256951 -1.239285e+00 0.0000131
-## Thayarwaddy-Pyay        -4.76036346  -7.57060659 -1.950120e+00 0.0000003
-## Thayet-Pyay              0.98842401  -2.15695782  4.133806e+00 0.9999459
-## Yamethin-Pyay           -6.31614104 -11.23902348 -1.393259e+00 0.0008974
-## Shwebo-PyinOoLwin        1.10646406  -2.56176762  4.774696e+00 0.9999718
-## Tamu-PyinOoLwin         -3.86910378  -9.39479977  1.656592e+00 0.6088275
-## Taunggoo-PyinOoLwin     -3.65943665  -6.02399767 -1.294876e+00 0.0000070
-## Thayarwaddy-PyinOoLwin  -4.77887283  -7.55749297 -2.000253e+00 0.0000002
-## Thayet-PyinOoLwin        0.96991464  -2.14724597  4.087075e+00 0.9999537
-## Yamethin-PyinOoLwin     -6.33465041 -11.23954948 -1.429751e+00 0.0007799
-## Tamu-Shwebo             -4.97556784 -10.98290292  1.031767e+00 0.2724847
-## Taunggoo-Shwebo         -4.76590072  -8.10444940 -1.427352e+00 0.0000713
-## Thayarwaddy-Shwebo      -5.88533689  -9.52889125 -2.241783e+00 0.0000017
-## Thayet-Shwebo           -0.13654942  -4.04441953  3.771321e+00 1.0000000
-## Yamethin-Shwebo         -7.44111447 -12.88287829 -1.999351e+00 0.0002120
-## Taunggoo-Tamu            0.20966713  -5.10289344  5.522228e+00 1.0000000
-## Thayarwaddy-Tamu        -0.90976904  -6.41911391  4.599576e+00 1.0000000
-## Thayet-Tamu              4.83901842  -0.84858575  1.052662e+01 0.2265819
-## Yamethin-Tamu           -2.46554663  -9.29856836  4.367475e+00 0.9995589
-## Thayarwaddy-Taunggoo    -1.11943617  -3.44553022  1.206658e+00 0.9816669
-## Thayet-Taunggoo          4.62935129   1.90783079  7.350872e+00 0.0000003
-## Yamethin-Taunggoo       -2.67521375  -7.33869084  1.988263e+00 0.8976146
-## Thayet-Thayarwaddy       5.74878746   2.66070473  8.836870e+00 0.0000000
-## Yamethin-Thayarwaddy    -1.55577758  -6.44224867  3.330694e+00 0.9999335
-## Yamethin-Thayet         -7.30456505 -12.39117099 -2.217959e+00 0.0000609</code></pre>
+##                                diff         lwr          upr     p adj
+## Gangaw-Bago             10.75974747   7.9456948  13.57380017 0.0000000
+## Kale-Bago                8.54880189   6.3915946  10.70600918 0.0000000
+## Katha-Bago               5.23543809   2.9642335   7.50664264 0.0000000
+## Khamti-Bago              3.39371077   1.2866398   5.50078178 0.0000019
+## Kyaukse-Bago             9.53790992   5.9955803  13.08023950 0.0000000
+## Magway-Bago              0.28836701 -13.8319891  14.40872316 1.0000000
+## Mandalay-Bago            2.40807963  -6.8417947  11.65795392 0.9999975
+## Mawlaik-Bago            13.76490298  11.6615456  15.86826040 0.0000000
+## Meiktila-Bago            0.70068706  -3.7998606   5.20123470 1.0000000
+## Minbu-Bago               5.09980284   2.6146569   7.58494874 0.0000000
+## Monywa-Bago              9.04166611   5.7098788  12.37345344 0.0000000
+## Pakokku-Bago             3.47389677  -3.6282745  10.57606801 0.9780847
+## Pyay-Bago                3.96425758   1.4272011   6.50131408 0.0000052
+## PyinOoLwin-Bago          4.09718163   1.5829580   6.61140524 0.0000013
+## Shwebo-Bago              6.08970996   2.6211505   9.55826943 0.0000001
+## Tamu-Bago                2.04745092  -3.7507357   7.84563757 0.9996787
+## Taunggoo-Bago            1.73521078  -0.3677379   3.83815949 0.2792575
+## Thayarwaddy-Bago         0.08849711  -2.4241429   2.60113711 1.0000000
+## Thayet-Bago              6.22753725   3.3123507   9.14272378 0.0000000
+## Yamethin-Bago           -1.09185231  -5.8288804   3.64517582 0.9999997
+## Kale-Gangaw             -2.21094558  -4.8594699   0.43757873 0.2586374
+## Katha-Gangaw            -5.52430938  -8.2664815  -2.78213728 0.0000000
+## Khamti-Gangaw           -7.36603670  -9.9738875  -4.75818586 0.0000000
+## Kyaukse-Gangaw          -1.22183754  -5.0830856   2.63941051 0.9999396
+## Magway-Gangaw          -10.47138045 -24.6750981   3.73233721 0.5040636
+## Mandalay-Gangaw         -8.35166783 -17.7283043   1.02496867 0.1587421
+## Mawlaik-Gangaw           3.00515551   0.4003042   5.61000678 0.0066558
+## Meiktila-Gangaw        -10.05906041 -14.8146957  -5.30342514 0.0000000
+## Minbu-Gangaw            -5.65994462  -8.5817742  -2.73811509 0.0000000
+## Monywa-Gangaw           -1.71808135  -5.3871336   1.95097091 0.9865476
+## Pakokku-Gangaw          -7.28585070 -14.5523474  -0.01935401 0.0484627
+## Pyay-Gangaw             -6.79548988  -9.7615973  -3.82938243 0.0000000
+## PyinOoLwin-Gangaw       -6.66256583  -9.6091669  -3.71596473 0.0000000
+## Shwebo-Gangaw           -4.67003750  -8.4637221  -0.87635295 0.0020724
+## Tamu-Gangaw             -8.71229655 -14.7106385  -2.71395459 0.0000447
+## Taunggoo-Gangaw         -9.02453669 -11.6290579  -6.42001543 0.0000000
+## Thayarwaddy-Gangaw     -10.67125036 -13.6165003  -7.72600037 0.0000000
+## Thayet-Gangaw           -4.53221022  -7.8275782  -1.23684222 0.0001841
+## Yamethin-Gangaw        -11.85159977 -16.8316172  -6.87158238 0.0000000
+## Katha-Kale              -3.31336380  -5.3759249  -1.25080265 0.0000021
+## Khamti-Kale             -5.15509112  -7.0353934  -3.27478884 0.0000000
+## Kyaukse-Kale             0.98910804  -2.4232060   4.40142209 0.9999852
+## Magway-Kale             -8.26043488 -22.3487366   5.82786687 0.8774577
+## Mandalay-Kale           -6.14072225 -15.3415898   3.06014525 0.6986507
+## Mawlaik-Kale             5.21610109   3.3399612   7.09224096 0.0000000
+## Meiktila-Kale           -7.84811483 -12.2470599  -3.44916979 0.0000000
+## Minbu-Kale              -3.44899905  -5.7450257  -1.15297237 0.0000172
+## Monywa-Kale              0.49286422  -2.7003466   3.68607502 1.0000000
+## Pakokku-Kale            -5.07490512 -12.1131311   1.96332084 0.5498443
+## Pyay-Kale               -4.58454431  -6.9366591  -2.23242949 0.0000000
+## PyinOoLwin-Kale         -4.45162025  -6.7790886  -2.12415194 0.0000000
+## Shwebo-Kale             -2.45909193  -5.7947617   0.87657789 0.5041123
+## Tamu-Kale               -6.50135097 -12.2210325  -0.78166943 0.0084925
+## Taunggoo-Kale           -6.81359111  -8.6892728  -4.93790946 0.0000000
+## Thayarwaddy-Kale        -8.46030478 -10.7860623  -6.13454723 0.0000000
+## Thayet-Kale             -2.32126464  -5.0770043   0.43447499 0.2431809
+## Yamethin-Kale           -9.64065420 -14.2812602  -5.00004821 0.0000000
+## Khamti-Katha            -1.84172732  -3.8517929   0.16833821 0.1239741
+## Kyaukse-Katha            4.30247184   0.8169713   7.78797238 0.0019649
+## Magway-Katha            -4.94707108 -19.0532780   9.15913582 0.9997097
+## Mandalay-Katha          -2.82735846 -12.0556188   6.40090192 0.9999638
+## Mawlaik-Katha            8.52946489   6.5232925  10.53563727 0.0000000
+## Meiktila-Katha          -4.53475103  -8.9907071  -0.07879499 0.0405324
+## Minbu-Katha             -0.13563525  -2.5390839   2.26781338 1.0000000
+## Monywa-Katha             3.80622802   0.5349252   7.07753082 0.0057679
+## Pakokku-Katha           -1.76154132  -8.8355396   5.31245695 0.9999989
+## Pyay-Katha              -1.27118051  -3.7282664   1.18590535 0.9605734
+## PyinOoLwin-Katha        -1.13825645  -3.5717592   1.29524628 0.9867181
+## Shwebo-Katha             0.85427187  -2.5562295   4.26477330 0.9999987
+## Tamu-Katha              -3.18798717  -8.9516304   2.57565610 0.9254536
+## Taunggoo-Katha          -3.50022731  -5.5059712  -1.49448344 0.0000001
+## Thayarwaddy-Katha       -5.14694098  -7.5788075  -2.71507441 0.0000000
+## Thayet-Katha             0.99209916  -1.8537623   3.83796067 0.9997344
+## Yamethin-Katha          -6.32729040 -11.0219736  -1.63260716 0.0002993
+## Kyaukse-Khamti           6.14419915   2.7633572   9.52504109 0.0000000
+## Magway-Khamti           -3.10534376 -17.1860558  10.97536827 0.9999999
+## Mandalay-Khamti         -0.98563114 -10.1748731   8.20361082 1.0000000
+## Mawlaik-Khamti          10.37119221   8.5529222  12.18946220 0.0000000
+## Meiktila-Khamti         -2.69302371  -7.0676005   1.68155311 0.8222468
+## Minbu-Khamti             1.70609207  -0.5428951   3.95507928 0.4446829
+## Monywa-Khamti            5.64795534   2.4883984   8.80751229 0.0000000
+## Pakokku-Khamti           0.08018600  -6.9428354   7.10320740 1.0000000
+## Pyay-Khamti              0.57054681  -1.7356728   2.87676645 0.9999990
+## PyinOoLwin-Khamti        0.70347086  -1.5776064   2.98454817 0.9999598
+## Shwebo-Khamti            2.69599919  -0.6074684   5.99946678 0.2993913
+## Tamu-Khamti             -1.34625985  -7.0472213   4.35470163 0.9999995
+## Taunggoo-Khamti         -1.65849999  -3.4762972   0.15929720 0.1288404
+## Thayarwaddy-Khamti      -3.30521366  -5.5845454  -1.02588193 0.0000468
+## Thayet-Khamti            2.83382648   0.1171546   5.55049831 0.0296526
+## Yamethin-Khamti         -4.48556308  -9.1030764   0.13195019 0.0692813
+## Magway-Kyaukse          -9.24954291 -23.6152939   5.11620808 0.7583850
+## Mandalay-Kyaukse        -7.12983029 -16.7501483   2.49048771 0.4931227
+## Mawlaik-Kyaukse          4.22699305   0.8484643   7.60552178 0.0015061
+## Meiktila-Kyaukse        -8.83722286 -14.0569233  -3.61752240 0.0000003
+## Minbu-Kyaukse           -4.43810708  -8.0666459  -0.80956825 0.0023446
+## Monywa-Kyaukse          -0.49624381  -4.7496131   3.75712552 1.0000000
+## Pakokku-Kyaukse         -6.06401315 -13.6423494   1.51432309 0.3368980
+## Pyay-Kyaukse            -5.57365234  -9.2379394  -1.90936529 0.0000119
+## PyinOoLwin-Kyaukse      -5.44072829  -9.0892436  -1.79221294 0.0000213
+## Shwebo-Kyaukse          -3.44819996  -7.8095356   0.91313569 0.3604816
+## Tamu-Kyaukse            -7.49045900 -13.8630026  -1.11791537 0.0048404
+## Taunggoo-Kyaukse        -7.80269915 -11.1809734  -4.42442485 0.0000000
+## Thayarwaddy-Kyaukse     -9.44941281 -13.0968371  -5.80198856 0.0000000
+## Thayet-Kyaukse          -3.31037268  -7.2459357   0.62519036 0.2455852
+## Yamethin-Kyaukse       -10.62976223 -16.0546843  -5.20484017 0.0000000
+## Mandalay-Magway          2.11971262 -14.5951573  18.83458257 1.0000000
+## Mawlaik-Magway          13.47653596  -0.6036208  27.55669276 0.0810525
+## Meiktila-Magway          0.41232005 -14.2192086  15.04384874 1.0000000
+## Minbu-Magway             4.81143583  -9.3307936  18.95366525 0.9998157
+## Monywa-Magway            8.75329910  -5.5619903  23.06858847 0.8307730
+## Pakokku-Magway           3.18552976 -12.4435310  18.81459048 1.0000000
+## Pyay-Magway              3.67589057 -10.4755531  17.82733426 0.9999976
+## PyinOoLwin-Magway        3.80881462 -10.3385534  17.95618269 0.9999957
+## Shwebo-Magway            5.80134295  -8.5463958  20.14908171 0.9978373
+## Tamu-Magway              1.75908391 -13.3222181  16.84038595 1.0000000
+## Taunggoo-Magway          1.44684377 -12.6332520  15.52693951 1.0000000
+## Thayarwaddy-Magway      -0.19986990 -14.3469566  13.94721682 1.0000000
+## Thayet-Magway            5.93917023  -8.2849296  20.16327004 0.9966986
+## Yamethin-Magway         -1.38021932 -16.0862092  13.32577056 1.0000000
+## Mawlaik-Mandalay        11.35682334   2.1684322  20.54521450 0.0019158
+## Meiktila-Mandalay       -1.70739257 -11.7202517   8.30546659 1.0000000
+## Minbu-Mandalay           2.69172321  -6.5915074  11.97495377 0.9999851
+## Monywa-Mandalay          6.63358648  -2.9112145  16.17838749 0.6234438
+## Pakokku-Mandalay         1.06581714 -10.3553586  12.48699290 1.0000000
+## Pyay-Mandalay            1.55617795  -7.7410838  10.85343965 1.0000000
+## PyinOoLwin-Mandalay      1.68910200  -7.6019550  10.98015898 1.0000000
+## Shwebo-Mandalay          3.68163033  -5.9117697  13.27503037 0.9989392
+## Tamu-Mandalay           -0.36062871 -11.0199621  10.29870466 1.0000000
+## Taunggoo-Mandalay       -0.67286885  -9.8611665   8.51542875 1.0000000
+## Thayarwaddy-Mandalay    -2.31958252 -11.6102111   6.97104605 0.9999988
+## Thayet-Mandalay          3.81945761  -5.5880252  13.22694038 0.9977157
+## Yamethin-Mandalay       -3.49993194 -13.6212883   6.62142444 0.9997646
+## Meiktila-Mawlaik       -13.06421592 -17.4370053  -8.69142658 0.0000000
+## Minbu-Mawlaik           -8.66510013 -10.9106085  -6.41959181 0.0000000
+## Monywa-Mawlaik          -4.72323687  -7.8803185  -1.56615525 0.0000194
+## Pakokku-Mawlaik        -10.29100621 -17.3129143  -3.26909807 0.0000349
+## Pyay-Mawlaik            -9.80064539 -12.1034726  -7.49781817 0.0000000
+## PyinOoLwin-Mawlaik      -9.66772134 -11.9453688  -7.39007390 0.0000000
+## Shwebo-Mawlaik          -7.67519302 -10.9762932  -4.37409285 0.0000000
+## Tamu-Mawlaik           -11.71745206 -17.4170420  -6.01786207 0.0000000
+## Taunggoo-Mawlaik       -12.02969220 -13.8431835 -10.21620087 0.0000000
+## Thayarwaddy-Mawlaik    -13.67640587 -15.9523051 -11.40050663 0.0000000
+## Thayet-Mawlaik          -7.53736573 -10.2511583  -4.82357317 0.0000000
+## Yamethin-Mawlaik       -14.85675528 -19.4725751 -10.24093542 0.0000000
+## Minbu-Meiktila           4.39911578  -0.1695957   8.96782722 0.0761336
+## Monywa-Meiktila          8.34097905   3.2618078  13.42015033 0.0000010
+## Pakokku-Meiktila         2.77320971  -5.2976025  10.84402196 0.9997860
+## Pyay-Meiktila            3.26357052  -1.3335840   7.86072506 0.5814372
+## PyinOoLwin-Meiktila      3.39649457  -1.1880986   7.98108774 0.4938866
+## Shwebo-Meiktila          5.38902290   0.2191023  10.55894349 0.0299301
+## Tamu-Meiktila            1.34676386  -5.6042176   8.29774527 1.0000000
+## Taunggoo-Meiktila        1.03452372  -3.3380690   5.40711647 0.9999995
+## Thayarwaddy-Meiktila    -0.61218995  -5.1959148   3.97153494 1.0000000
+## Thayet-Meiktila          5.52685019   0.7106809  10.34301948 0.0072691
+## Yamethin-Meiktila       -1.79253937  -7.8865208   4.30144206 0.9999812
+## Monywa-Minbu             3.94186327   0.5185605   7.36516606 0.0068705
+## Pakokku-Minbu           -1.62590607  -8.7714663   5.51965419 0.9999998
+## Pyay-Minbu              -1.13554526  -3.7916422   1.52055167 0.9955296
+## PyinOoLwin-Minbu        -1.00262121  -3.6369172   1.63167482 0.9990550
+## Shwebo-Minbu             0.98990712  -2.5666502   4.54646444 0.9999924
+## Tamu-Minbu              -3.05235192  -8.9036051   2.79890125 0.9571723
+## Taunggoo-Minbu          -3.36459206  -5.6097176  -1.11946657 0.0000184
+## Thayarwaddy-Minbu       -5.01130573  -7.6440904  -2.37852108 0.0000000
+## Thayet-Minbu             1.12773440  -1.8916211   4.14708992 0.9992756
+## Yamethin-Minbu          -6.19165515 -10.9934913  -1.38981897 0.0008069
+## Pakokku-Monywa          -5.56776934 -13.0500075   1.91446884 0.4846985
+## Pyay-Monywa             -5.07740853  -8.5385799  -1.61623711 0.0000340
+## PyinOoLwin-Monywa       -4.94448448  -8.3889543  -1.50001468 0.0000615
+## Shwebo-Monywa           -2.95195615  -7.1440865   1.24017417 0.5976791
+## Tamu-Monywa             -6.99421519 -13.2521718  -0.73625863 0.0110864
+## Taunggoo-Monywa         -7.30645533 -10.4632647  -4.14964600 0.0000000
+## Thayarwaddy-Monywa      -8.95316900 -12.3964831  -5.50985495 0.0000000
+## Thayet-Monywa           -2.81412886  -6.5613097   0.93305199 0.4655976
+## Yamethin-Monywa        -10.13351842 -15.4233660  -4.84367085 0.0000000
+## Pyay-Pakokku             0.49036081  -6.6734187   7.65414034 1.0000000
+## PyinOoLwin-Pakokku       0.62328486  -6.5324402   7.77900997 1.0000000
+## Shwebo-Pakokku           2.61581319  -4.9283227  10.15994907 0.9997549
+## Tamu-Pakokku            -1.42644585 -10.2865841   7.43369240 1.0000000
+## Taunggoo-Pakokku        -1.73868599  -8.7604717   5.28309973 0.9999990
+## Thayarwaddy-Pakokku     -3.38539966 -10.5405685   3.76976918 0.9848566
+## Thayet-Pakokku           2.75364048  -4.5526167  10.05989765 0.9991768
+## Yamethin-Pakokku        -4.56574908 -12.7707791   3.63928090 0.9213300
+## PyinOoLwin-Pyay          0.13292405  -2.5503987   2.81624683 1.0000000
+## Shwebo-Pyay              2.12545238  -1.4675694   5.71847416 0.8684944
+## Tamu-Pyay               -1.91680666  -7.7902953   3.95668202 0.9999024
+## Taunggoo-Pyay           -2.22904680  -4.5315007   0.07340712 0.0718689
+## Thayarwaddy-Pyay        -3.87576047  -6.5575995  -1.19392144 0.0000513
+## Thayet-Pyay              2.26327966  -0.7989439   5.32550325 0.4988079
+## Yamethin-Pyay           -5.05610989  -9.8850162  -0.22720357 0.0282256
+## Shwebo-PyinOoLwin        1.99252833  -1.5844075   5.56946419 0.9205831
+## Tamu-PyinOoLwin         -2.04973071  -7.9133929   3.81393144 0.9997234
+## Taunggoo-PyinOoLwin     -2.36197086  -4.6392409  -0.08470084 0.0319285
+## Thayarwaddy-PyinOoLwin  -4.00868452  -6.6689336  -1.34843543 0.0000157
+## Thayet-PyinOoLwin        2.13035561  -0.9129777   5.17368897 0.6093924
+## Yamethin-PyinOoLwin     -5.18903394 -10.0059833  -0.37208460 0.0191340
+## Tamu-Shwebo             -4.04225904 -10.3740928   2.28957468 0.7714511
+## Taunggoo-Shwebo         -4.35449918  -7.6553389  -1.05365942 0.0004893
+## Thayarwaddy-Shwebo      -6.00121285  -9.5770358  -2.42538992 0.0000005
+## Thayet-Shwebo            0.13782729  -3.7314701   4.00712469 1.0000000
+## Yamethin-Shwebo         -7.18156227 -12.5586047  -1.80451984 0.0003695
+## Taunggoo-Tamu           -0.31224014  -6.0116793   5.38719903 1.0000000
+## Thayarwaddy-Tamu        -1.95895381  -7.8219371   3.90402951 0.9998599
+## Thayet-Tamu              4.18008633  -1.8663611  10.22653372 0.6336623
+## Yamethin-Tamu           -3.13930323 -10.2456841   3.96707764 0.9932718
+## Thayarwaddy-Taunggoo    -1.64671367  -3.9222352   0.62880785 0.5424231
+## Thayet-Taunggoo          4.49232647   1.7788507   7.20580226 0.0000007
+## Yamethin-Taunggoo       -2.82706309  -7.4426967   1.78857055 0.8286698
+## Thayet-Thayarwaddy       6.13904014   3.0970149   9.18106535 0.0000000
+## Yamethin-Thayarwaddy    -1.18034942  -5.9964724   3.63577354 0.9999991
+## Yamethin-Thayet         -7.31938955 -12.3572456  -2.28153355 0.0000444</code></pre>
 <p>I performed a simple liner regression analysis on the two variables Carbon and Annual precipitaion(AP)/Annual Mean Temperature(AMT). I wish to determine wheter the AP/AMT varible is a significant predictor of the Carbon Variable.</p>
-<pre class="r"><code>plot(New_Carbon~bio12, data = C_Env)</code></pre>
-<p><img src="Carbon_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
-<pre class="r"><code>lm.AMP &lt;- lm(New_Carbon~bio12, data=C_Env)
+<pre class="r"><code>plot(Sum_CHa~bio12, data = Env_Carbon)</code></pre>
+<p><img src="Carbon_files/figure-html/unnamed-chunk-23-1.png" width="672" /></p>
+<pre class="r"><code>lm.AMP &lt;- lm(Sum_CHa~bio12, data=Env_Carbon)
 anova(lm.AMP)</code></pre>
 <pre><code>## Analysis of Variance Table
 ## 
-## Response: New_Carbon
+## Response: Sum_CHa
 ##             Df  Sum Sq Mean Sq F value    Pr(&gt;F)    
-## bio12        1    9514  9513.7  68.543 &lt; 2.2e-16 ***
-## Residuals 7879 1093585   138.8                      
+## bio12        1    7955  7954.9  56.884 5.125e-14 ***
+## Residuals 8088 1131062   139.8                      
 ## ---
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<pre class="r"><code>plot(New_Carbon~bio01, data = C_Env)</code></pre>
-<p><img src="Carbon_files/figure-html/unnamed-chunk-21-2.png" width="672" /></p>
-<pre class="r"><code>lm.AMT &lt;- lm(New_Carbon~bio01, data=C_Env)
-anova(lm.AMT)</code></pre>
-<pre><code>## Analysis of Variance Table
-## 
-## Response: New_Carbon
-##             Df  Sum Sq Mean Sq F value    Pr(&gt;F)    
-## bio01        1    1617  1616.6  11.564 0.0006759 ***
-## Residuals 7879 1101482   139.8                      
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<pre class="r"><code>ggplot(data=C_Env, aes(x=bio12, y = New_Carbon, color=District))+ geom_point()+
+<pre class="r"><code>ggplot(data=Env_Carbon, aes(x=bio12, y = Sum_CHa, color=District))+ geom_point()+
   labs(title = &quot;Carbon storage and Annual Precipitation Relationship&quot;, 
        x= &quot;Annual Annual Precipitation (mm)&quot;,
        y= &quot;MaxCarbon(t/ha)&quot;)+
   theme(axis.text.x = element_text(size=7, angle = 45, vjust = 0.5),
         axis.text.y = element_text(size = 7))</code></pre>
-<p><img src="Carbon_files/figure-html/unnamed-chunk-21-3.png" width="672" /></p>
+<p><img src="Carbon_files/figure-html/unnamed-chunk-23-2.png" width="672" /></p>
 <pre class="r"><code># According to Year 
-ggplot(data=C_Env, aes(x=bio01, y = New_Carbon, color=District))+ geom_line()+
+ggplot(data=Env_Carbon, aes(x=bio12, y = Sum_CHa, color=District))+ geom_line()+
   facet_wrap(facets = vars(Year))+
-  labs(title = &quot;Carbon storage and Annual Mean Temperature Relationship&quot;, 
-       x= &quot;Annual Mean Temperature&quot;,
+  labs(title = &quot;Carbon storage and Annual Precipitation (mm) Relationship According to Census Year&quot;, 
+       x= &quot;Annual Precipitation (mm)&quot;,
        y= &quot;MaxCarbon(t/ha)&quot;)+
   theme(axis.text.x = element_text(size=7, angle = 45, vjust = 0.5),
         axis.text.y = element_text(size = 7))</code></pre>
-<p><img src="Carbon_files/figure-html/unnamed-chunk-21-4.png" width="672" /></p>
+<p><img src="Carbon_files/figure-html/unnamed-chunk-23-3.png" width="672" /></p>
 <pre class="r"><code># According to Districts
 
-ggplot(data=C_Env, aes(x=bio01, y = New_Carbon, color=District))+ geom_line()+
+ggplot(data=Env_Carbon, aes(x=bio12, y = Sum_CHa, color=District))+ geom_line()+
   facet_wrap(facets = vars(District))+
-  labs(title = &quot;Carbon storage and Annual Mean Temperature Relationship&quot;, 
+  labs(title = &quot;Carbon storage and Annual Precipitation (mm) Relationship according to Districts&quot;, 
+       x= &quot;Annual Precipitation (mm)&quot;,
+       y= &quot;MaxCarbon(t/ha)&quot;)+
+  theme(axis.text.x = element_text(size=7, angle = 45, vjust = 0.5),
+        axis.text.y = element_text(size = 7))</code></pre>
+<p><img src="Carbon_files/figure-html/unnamed-chunk-23-4.png" width="672" /></p>
+<pre class="r"><code>plot(Sum_CHa~bio01, data = Env_Carbon)</code></pre>
+<p><img src="Carbon_files/figure-html/unnamed-chunk-24-1.png" width="672" /></p>
+<pre class="r"><code>lm.AMT &lt;- lm(Sum_CHa~bio01, data=Env_Carbon)
+anova(lm.AMT)</code></pre>
+<pre><code>## Analysis of Variance Table
+## 
+## Response: Sum_CHa
+##             Df  Sum Sq Mean Sq F value    Pr(&gt;F)    
+## bio01        1    1721 1720.88  12.238 0.0004707 ***
+## Residuals 8088 1137296  140.62                      
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code># According to Year 
+ggplot(data=Env_Carbon, aes(x=bio01, y = Sum_CHa, color=District))+ geom_line()+
+  facet_wrap(facets = vars(Year))+
+  labs(title = &quot;Carbon storage and Annual Mean Temperature Relationship according to Census Year&quot;, 
        x= &quot;Annual Mean Temperature&quot;,
        y= &quot;MaxCarbon(t/ha)&quot;)+
   theme(axis.text.x = element_text(size=7, angle = 45, vjust = 0.5),
         axis.text.y = element_text(size = 7))</code></pre>
-<p><img src="Carbon_files/figure-html/unnamed-chunk-21-5.png" width="672" /></p>
+<p><img src="Carbon_files/figure-html/unnamed-chunk-24-2.png" width="672" /></p>
+<pre class="r"><code># According to Districts
+
+ggplot(data=Env_Carbon, aes(x=bio01, y = Sum_CHa, color=District))+ geom_line()+
+  facet_wrap(facets = vars(District))+
+  labs(title = &quot;Carbon storage and Annual Mean Temperature Relationship according to District&quot;, 
+       x= &quot;Annual Mean Temperature&quot;,
+       y= &quot;MaxCarbon(t/ha)&quot;)+
+  theme(axis.text.x = element_text(size=7, angle = 45, vjust = 0.5),
+        axis.text.y = element_text(size = 7))</code></pre>
+<p><img src="Carbon_files/figure-html/unnamed-chunk-24-3.png" width="672" /></p>
+<p><strong>-Creating a dataframe which includes all the variables-</strong></p>
+<pre class="r"><code>library(tidyverse)
+Carbon_dataframe &lt;- read.csv(&quot;Data_Output/Carbon_Per_Plots.csv&quot;, stringsAsFactors = F)
+NDVI_dataframe &lt;- read.csv(&quot;Data_Output/NDVIC_2010.csv&quot;, stringsAsFactors = F)
+EVI_dataframe &lt;- read.csv(&quot;Data_Output/EVIC_2010.csv&quot;, stringsAsFactors = F)
+WCL_dataframe &lt;- read.csv(&quot;Data_Output/WCL_plots(23-10-2019).csv&quot;, stringsAsFactors = F)
+Avitabile_dataframe &lt;- read.csv(&quot;Data_Output/Avitabile_Data(23-10-2019).csv&quot;, stringsAsFactors = F)
+Distance_dataframe &lt;- read.csv(&quot;Data_Output/distance_to_cities.csv&quot;, stringsAsFactors = F)
+
+TEST &lt;- Carbon_dataframe %&gt;% 
+  inner_join(dplyr::select(NDVI_dataframe,Plot_names,NDVI2010), by= c(&quot;Plot_names&quot;= &quot;Plot_names&quot;)) %&gt;% 
+    inner_join(dplyr::select(EVI_dataframe,Plot_names,EVI2010), by= c(&quot;Plot_names&quot;= &quot;Plot_names&quot;)) %&gt;%
+  inner_join(dplyr:: select(WCL_dataframe,Plot_names,bio01,bio12), by= c(&quot;Plot_names&quot;= &quot;Plot_names&quot;)) %&gt;% 
+  inner_join(dplyr:: select(Avitabile_dataframe,Plot_names,mean), by= c(&quot;Plot_names&quot;= &quot;Plot_names&quot;)) %&gt;% rename(Avt_Carbon = mean) %&gt;% 
+  inner_join(dplyr:: select(Distance_dataframe,Plot_names,Travel_Time_min), by= c(&quot;Plot_names&quot;= &quot;Plot_names&quot;))
+library(stringr)
+TEST$Ploat_names &lt;- str_trim(TEST$Plot_names)
+Final_Dataframe &lt;- TEST[!duplicated(TEST$Sum_CHa),] 
+All_variables &lt;- Final_Dataframe[!duplicated(Final_Dataframe$Plot_names),] %&gt;% dplyr:: select(-Ploat_names) %&gt;% rename(Annual_mean_Temperature = bio01, Annual_Precipitation = bio12) %&gt;% dplyr:: select(-c(EAST,NORTH))</code></pre>
+<pre class="r"><code>attach(All_variables)
+lm1 &lt;- lm(Sum_CHa~Annual_mean_Temperature, data=All_variables)
+lm2 &lt;- lm(Sum_CHa~Annual_mean_Temperature+Annual_Precipitation, data=All_variables)
+glm.carbon &lt;- glm(Sum_CHa~Annual_mean_Temperature+Annual_Precipitation, data = All_variables)
+summary(lm2)</code></pre>
+<pre><code>## 
+## Call:
+## lm(formula = Sum_CHa ~ Annual_mean_Temperature + Annual_Precipitation, 
+##     data = All_variables)
+## 
+## Residuals:
+##     Min      1Q  Median      3Q     Max 
+## -17.261  -7.994  -3.549   4.669  91.150 
+## 
+## Coefficients:
+##                          Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)             4.8078731  1.8476638   2.602  0.00928 ** 
+## Annual_mean_Temperature 0.0205459  0.0075973   2.704  0.00686 ** 
+## Annual_Precipitation    0.0022485  0.0003086   7.286  3.5e-13 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## Residual standard error: 11.83 on 8072 degrees of freedom
+## Multiple R-squared:  0.00815,    Adjusted R-squared:  0.007904 
+## F-statistic: 33.16 on 2 and 8072 DF,  p-value: 4.526e-15</code></pre>
+<pre class="r"><code>summary(glm.carbon)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = Sum_CHa ~ Annual_mean_Temperature + Annual_Precipitation, 
+##     data = All_variables)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -17.261   -7.994   -3.549    4.669   91.150  
+## 
+## Coefficients:
+##                          Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)             4.8078731  1.8476638   2.602  0.00928 ** 
+## Annual_mean_Temperature 0.0205459  0.0075973   2.704  0.00686 ** 
+## Annual_Precipitation    0.0022485  0.0003086   7.286  3.5e-13 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for gaussian family taken to be 139.8596)
+## 
+##     Null deviance: 1138224  on 8074  degrees of freedom
+## Residual deviance: 1128947  on 8072  degrees of freedom
+## AIC: 62817
+## 
+## Number of Fisher Scoring iterations: 2</code></pre>
 </div>
 
 

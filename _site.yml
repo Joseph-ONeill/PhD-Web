@@ -2,14 +2,16 @@ name: "National Carbon Stocks Assessment"
 navbar:
   title: "O'Neill-PhD"
   left:
-    - text: "Carbon and Environmental Variables"
+    - text: "Carbon and Environment"
       href: Carbon.html
     - text: "Carbon,NDVI and EVI"
       href: NDVI.html
     - text: "Carbon and cities proximity"
       href: Human_C.html
-    - text: "Species Analysis"
-      href: Species-Analysis.html
+    - text: "NFI and Avitabile Comparison"
+      href: NFI-Avitabile.html  
     - text: "Fieldwork Analysis"
       href: Fieldwork.html  
+    - text: "Species Analysis"
+      href: Species-Analysis.html
   

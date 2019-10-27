@@ -275,28 +275,22 @@ $(document).ready(function () {
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="Carbon.html">Carbon</a>
+  <a href="Carbon.html">Carbon and Environment</a>
 </li>
 <li>
-  <a href="Plots_Locations.html">Plots_Locations</a>
+  <a href="NDVI.html">Carbon,NDVI and EVI</a>
 </li>
 <li>
-  <a href="EVI.html">EVI</a>
+  <a href="Human_C.html">Carbon and cities proximity</a>
 </li>
 <li>
-  <a href="NDVI.html">NDVI</a>
-</li>
-<li>
-  <a href="Env.html">Environment &amp; Carbon</a>
-</li>
-<li>
-  <a href="Human_C.html">Human &amp; Carbon</a>
-</li>
-<li>
-  <a href="Species-Analysis.html">Species Analysis</a>
+  <a href="NFI-Avitabile.html">NFI and Avitabile Comparison</a>
 </li>
 <li>
   <a href="Fieldwork.html">Fieldwork Analysis</a>
+</li>
+<li>
+  <a href="Species-Analysis.html">Species Analysis</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -317,11 +311,16 @@ $(document).ready(function () {
 </div>
 
 
-<div id="git-and-atom-has-been-integrated" class="section level1">
-<h1>Git and Atom has been integrated</h1>
-<p>rm(list = ls())</p>
-<pre class="r"><code>library(tidyverse)
-library(lubridate)</code></pre>
+<pre class="r"><code>library(tidyverse)</code></pre>
+<pre><code>## -- Attaching packages ---------------------------------------------------------------------------------------------------------------------- tidyverse 1.2.1 --</code></pre>
+<pre><code>## v ggplot2 3.2.1     v purrr   0.3.2
+## v tibble  2.1.3     v dplyr   0.8.3
+## v tidyr   0.8.3     v stringr 1.4.0
+## v readr   1.3.1     v forcats 0.4.0</code></pre>
+<pre><code>## -- Conflicts ------------------------------------------------------------------------------------------------------------------------- tidyverse_conflicts() --
+## x dplyr::filter() masks stats::filter()
+## x dplyr::lag()    masks stats::lag()</code></pre>
+<pre class="r"><code>library(lubridate)</code></pre>
 <pre><code>## 
 ## Attaching package: &#39;lubridate&#39;</code></pre>
 <pre><code>## The following object is masked from &#39;package:base&#39;:
@@ -331,245 +330,109 @@ library(lubridate)</code></pre>
 library(ape)
 library(ggplot2)
 library(measurements)</code></pre>
-<pre class="r"><code>Field_Data &lt;- read.csv(&quot;Data/Fieldwork_PSP.csv&quot;)</code></pre>
-</div>
-<div id="omitting-the-na-values-" class="section level1">
-<h1>Omitting the NA Values—-</h1>
-<p>Field_Data &lt;- na.omit(Field_Data) str(Field_Data) hist(Field_Data$DBH_cm) View(Field_Data)</p>
-</div>
-<div id="checking-typos-in-taxonomy-" class="section level1">
-<h1>Checking typos in taxonomy—-</h1>
-<p>Taxo &lt;- correctTaxo(genus=Field_Data<span class="math inline">\(Genus, species = Field_Data\)</span>Species) Field_Data<span class="math inline">\(genusCorr &lt;- Taxo\)</span>genusCorrected Field_Data<span class="math inline">\(speciesCorr &lt;- Taxo\)</span>speciesCorrected</p>
-</div>
-<div id="retrieving-apg-iii-families-and-orders-from-genus-names-" class="section level1">
-<h1>Retrieving APG III Families and Orders from Genus names—-</h1>
-<p>APG &lt;- getTaxonomy(Field_Data<span class="math inline">\(genusCorr, findOrder = T) Field_Data\)</span>familyAPG &lt;- APG<span class="math inline">\(family Field_Data\)</span>orderAPG &lt;- APG$order</p>
-</div>
-<div id="retrieve-wood-density-" class="section level1">
-<h1>2-RETRIEVE WOOD DENSITY—-</h1>
-<p>dataWD &lt;- getWoodDensity(genus=as.character(Field_Data<span class="math inline">\(genusCorr),  species=as.character(Field_Data\)</span>speciesCorr), stand=Field_Data$Plot)</p>
-<p>sum(dataWD$levelWD == “species”)</p>
-<p>sum(dataWD$levelWD == “genus”)</p>
-<p>sum(!dataWD$levelWD%in%c(“genus”,“species”))</p>
-<p>Field_Data<span class="math inline">\(WD &lt;- dataWD\)</span>meanWD str(Field_Data)</p>
-<p>AGBtree&lt;-computeAGB(D=Field_Data<span class="math inline">\(DBH_cm,  WD=Field_Data\)</span>WD, H = Field_Data$Height_m)</p>
-</div>
-<div id="compute-agbmg-per-tree-" class="section level1">
-<h1>Compute AGB(Mg) per tree—-</h1>
-<p>Field_Data$AGB_Mg &lt;- AGBtree</p>
-</div>
-<div id="compute-carbon-mg-per-tree" class="section level1">
-<h1>Compute Carbon (Mg) per tree –</h1>
-<p>Field_Data &lt;- Field_Data %&gt;% mutate(Carbon_Mg= AGB_Mg*0.47)</p>
-<p>Field_Carbon &lt;- Field_Data %&gt;% group_by(Plot) %&gt;% dplyr::summarise(Total_C = sum(Carbon_Mg)) %&gt;% mutate(C_ha=Total_C/0.04)</p>
-<p>hist(Field_Carbon$C_ha) str(Field_Carbon)</p>
-</div>
-<div id="carbon-distribution-in-the-plots" class="section level1">
-<h1>Carbon distribution in the plots———————————————————————————</h1>
-<p>barplot(Field_Carbon<span class="math inline">\(C_ha, Field_Carbon\)</span>Plot)</p>
-<p>View(Field_Data)</p>
-</div>
-<div id="change-the-degree-symbol-to-a-space" class="section level1">
-<h1>change the degree symbol to a space</h1>
-<p>Field_Data<span class="math inline">\(North = gsub(&#39;°&#39;, &#39; &#39;,Field_Data\)</span>North) Field_Data<span class="math inline">\(North = gsub(&quot;&#39;&quot;, &#39; &#39;,Field_Data\)</span>North) Field_Data<span class="math inline">\(North = gsub(&#39;&quot;&#39;, &#39; &#39;,Field_Data\)</span>North) Field_Data<span class="math inline">\(North = gsub(&#39;N&#39;, &#39; &#39;,Field_Data\)</span>North) Field_Data<span class="math inline">\(North = gsub(&#39; &#39;, &#39; &#39;,Field_Data\)</span>North) Field_Data<span class="math inline">\(North = gsub(&#39; &#39;, &#39; &#39;,Field_Data\)</span>North)</p>
-<p>Field_Data<span class="math inline">\(East = gsub(&#39;°&#39;, &#39; &#39;,Field_Data\)</span>East) Field_Data<span class="math inline">\(East = gsub(&quot;&#39;&quot;, &#39; &#39;,Field_Data\)</span>East) Field_Data<span class="math inline">\(East = gsub(&#39;&quot;&#39;, &#39; &#39;,Field_Data\)</span>East) Field_Data<span class="math inline">\(East = gsub(&#39;E&#39;, &#39; &#39;,Field_Data\)</span>East) Field_Data<span class="math inline">\(East = gsub(&#39; &#39;, &#39; &#39;,Field_Data\)</span>East) Field_Data<span class="math inline">\(East = gsub(&quot; &quot;,&#39; &#39;,Field_Data\)</span>East)</p>
-</div>
-<div id="convert-from-decimal-minutes-to-decimal-degrees" class="section level1">
-<h1>convert from decimal minutes to decimal degrees</h1>
-<p>Field_Data<span class="math inline">\(Lat = measurements::conv_unit(Field_Data\)</span>North, from = ‘deg_min_sec’, to = ‘dec_deg’) Field_Data<span class="math inline">\(Long = measurements::conv_unit(Field_Data\)</span>East, from = ‘deg_min_sec’, to = ‘dec_deg’)</p>
-</div>
-<div id="diameter-distribution-in-three-areas" class="section level1">
-<h1>Diameter distribution in three areas—————————————————————————</h1>
-</div>
-<div id="field_dataplot---as.factorfield_dataplot" class="section level1">
-<h1>Field_Data<span class="math inline">\(Plot &lt;- as.factor(Field_Data\)</span>Plot)</h1>
-</div>
-<div id="cbpalettecforestgreenblue-darkred" class="section level1">
-<h1>cbPalette=c(“forestgreen”,“blue”, “darkred”)</h1>
-</div>
-<div id="ggplotfield_data-aesx-plot-y-dbh_cm" class="section level1">
-<h1>ggplot(Field_Data, aes(x = Plot, y = Dbh_cm)) +</h1>
-</div>
-<div id="geom_boxplotaesfill-location-alpha-0.5" class="section level1">
-<h1>geom_boxplot(aes(fill = Location), alpha = 0.5)+</h1>
-</div>
-<div id="geom_jitteraescolor-location-width-0.01" class="section level1">
-<h1>geom_jitter(aes(color = Location, width = 0.01))+</h1>
-</div>
-<div id="scale_fill_manualvaluescbpalette-boxplot-fill-color" class="section level1">
-<h1>scale_fill_manual(values=cbPalette)+ # Boxplot fill color</h1>
-</div>
-<div id="scale_color_manualvalues-cbpalette-jitter-color-palette" class="section level1">
-<h1>scale_color_manual(values = cbPalette)+# Jitter color palette</h1>
-</div>
-<div id="ylabdbh-cm" class="section level1">
-<h1>ylab(“DBH (cm)”) +</h1>
-</div>
-<div id="xlablocation" class="section level1">
-<h1>xlab(“Location”)+</h1>
-</div>
-<div id="scale_y_continuousbreaks-c020406080100" class="section level1">
-<h1>scale_y_continuous(breaks = c(0,20,40,60,80,100))+</h1>
-</div>
-<div id="ylim1100" class="section level1">
-<h1>ylim(1,100)+</h1>
-</div>
-<div id="theme_bw" class="section level1">
-<h1>theme_bw()+</h1>
-</div>
-<div id="themetext-element_textsize15-axis.text.x-element_blank" class="section level1">
-<h1>theme(text = element_text(size=15), axis.text.x = element_blank(),</h1>
-</div>
-<div id="axis.title.x-element_textmargin-margint-18-r-0-b-0-l-0" class="section level1">
-<h1>axis.title.x = element_text(margin = margin(t = 18, r = 0, b = 0, l = 0)),</h1>
-</div>
-<div id="axis.title.y-element_textmargin-margint-0-r-18-b-0-l-0" class="section level1">
-<h1>axis.title.y = element_text(margin = margin(t = 0, r = 18, b = 0, l = 0)))</h1>
-</div>
-<div id="height-distribution-in-three-areas" class="section level1">
-<h1># Height distribution in three areas———————————————————————————</h1>
-</div>
-<div id="ggplotfield_data-aesx-location-y-h_m" class="section level1">
-<h1>ggplot(Field_Data, aes(x = Location, y = H_m)) +</h1>
-</div>
-<div id="geom_boxplotaesfill-location-alpha-0.5-1" class="section level1">
-<h1>geom_boxplot(aes(fill = Location), alpha = 0.5)+</h1>
-</div>
-<div id="geom_jitteraescolor-location" class="section level1">
-<h1>geom_jitter(aes(color = Location))+</h1>
-</div>
-<div id="scale_fill_manualvaluescbpalette-boxplot-fill-color-1" class="section level1">
-<h1>scale_fill_manual(values=cbPalette)+ # Boxplot fill color</h1>
-</div>
-<div id="scale_color_manualvalues-cbpalette-jitter-color-palette-1" class="section level1">
-<h1>scale_color_manual(values = cbPalette)+# Jitter color palette</h1>
-</div>
-<div id="ylabheightm" class="section level1">
-<h1>ylab(“Height(m)”) +</h1>
-</div>
-<div id="xlablocation-1" class="section level1">
-<h1>xlab(“Location”)+</h1>
-</div>
-<div id="scale_y_continuousbreaks-c01020304050" class="section level1">
-<h1>scale_y_continuous(breaks = c(0,10,20,30,40,50))+</h1>
-</div>
-<div id="ylim150" class="section level1">
-<h1>ylim(1,50)+</h1>
-</div>
-<div id="theme_bw-1" class="section level1">
-<h1>theme_bw()+</h1>
-</div>
-<div id="themetext-element_textsize15-axis.text.x-element_blank-1" class="section level1">
-<h1>theme(text = element_text(size=15), axis.text.x = element_blank(),</h1>
-</div>
-<div id="axis.title.x-element_textmargin-margint-18-r-0-b-0-l-0-1" class="section level1">
-<h1>axis.title.x = element_text(margin = margin(t = 18, r = 0, b = 0, l = 0)),</h1>
-</div>
-<div id="axis.title.y-element_textmargin-margint-0-r-18-b-0-l-0-1" class="section level1">
-<h1>axis.title.y = element_text(margin = margin(t = 0, r = 18, b = 0, l = 0)))</h1>
-</div>
-<div id="section" class="section level1">
-<h1></h1>
-</div>
-<div id="section-1" class="section level1">
-<h1></h1>
-</div>
-<div id="height-and-diameter-relationship" class="section level1">
-<h1># Height and diameter relationship————————————————————————————</h1>
-</div>
-<div id="field_data" class="section level1">
-<h1>Field_Data %&gt;%</h1>
-</div>
-<div id="na.omit" class="section level1">
-<h1>na.omit %&gt;%</h1>
-</div>
-<div id="ggplotaesy-h_m-x-dbh_cm" class="section level1">
-<h1>ggplot(aes(y = H_m, x = Dbh_cm)) +</h1>
-</div>
-<div id="geom_pointposition-jitter-color-green-size-3" class="section level1">
-<h1>geom_point(position = “jitter”, color = “green”, size = 3)+</h1>
-</div>
-<div id="xlabdbh-cm" class="section level1">
-<h1>xlab(“DBH (cm)”)+</h1>
-</div>
-<div id="ylabheight-h-m" class="section level1">
-<h1>ylab(“Height-H (m)”)+</h1>
-</div>
-<div id="scale_x_continuousbreaks-c020406080100-120" class="section level1">
-<h1>scale_x_continuous(breaks = c(0,20,40,60,80,100, 120))+</h1>
-</div>
-<div id="geom_smoothmethod-lm" class="section level1">
-<h1>geom_smooth(method = “lm”)+</h1>
-</div>
-<div id="theme_bw-2" class="section level1">
-<h1>theme_bw() +</h1>
-</div>
-<div id="themetext-element_textsize15axis.text.x-element_textangle0-hjust2" class="section level1">
-<h1>theme(text = element_text(size=15),axis.text.x = element_text(angle=0, hjust=2),</h1>
-</div>
-<div id="axis.title.x-element_textmargin-margint-18-r-0-b-0-l-0-2" class="section level1">
-<h1>axis.title.x = element_text(margin = margin(t = 18, r = 0, b = 0, l = 0)),</h1>
-</div>
-<div id="axis.title.y-element_textmargin-margint-0-r-18-b-0-l-0-2" class="section level1">
-<h1>axis.title.y = element_text(margin = margin(t = 0, r = 18, b = 0, l = 0)))</h1>
-</div>
-<div id="section-2" class="section level1">
-<h1></h1>
-</div>
-<div id="field_data-lmh_mdbh_cm" class="section level1">
-<h1>Field_Data %&gt;% lm(H_m~Dbh_cm)</h1>
-</div>
-<div id="section-3" class="section level1">
-<h1></h1>
-</div>
-<div id="lmhd---lmfield_datah_mfield_datadbh_cm" class="section level1">
-<h1>LmHD &lt;- lm(Field_Data<span class="math inline">\(H_m~Field_Data\)</span>Dbh_cm)</h1>
-</div>
-<div id="summarylmhd" class="section level1">
-<h1>summary(LmHD)</h1>
-</div>
-<div id="section-4" class="section level1">
-<h1></h1>
-</div>
-<div id="section-5" class="section level1">
-<h1></h1>
-</div>
-<div id="section-6" class="section level1">
-<h1></h1>
-</div>
-<div id="draft-" class="section level1">
-<h1>Draft——-</h1>
-</div>
-<div id="data1---na.omitfield_data" class="section level1">
-<h1>Data1 &lt;- na.omit(Field_Data)</h1>
-</div>
-<div id="viewdata1" class="section level1">
-<h1>&gt; View(Data1)</h1>
-</div>
-<div id="viewfield_data" class="section level1">
-<h1>&gt; View(Field_Data)</h1>
-</div>
-<div id="viewdata1-1" class="section level1">
-<h1>&gt; View(Data1)</h1>
-</div>
-<div id="data2---na.omitfield_datagenus-data2---na.omitfield_data-genus-error-in-.data.framefield_data--genus-object-genus-not-found-data2---na.omitfield_data-field_datagenus" class="section level1">
-<h1>&gt; Data2 &lt;- na.omit(Field_Data<span class="math inline">\(Genus) # &gt; Data2 &lt;- na.omit(Field_Data[,-Genus]) # Error in `[.data.frame`(Field_Data, , -Genus) : object &#39;Genus&#39; not found # &gt; Data2 &lt;- na.omit(Field_Data[,-Field_Data\)</span>Genus])</h1>
-</div>
-<div id="error-in-.data.framefield_data--field_datagenus-undefined-columns-selected-in-addition-warning-message-in-ops.factorfield_datagenus---not-meaningful-for-factors" class="section level1">
-<h1>Error in <code>[.data.frame</code>(Field_Data, , -Field_Data<span class="math inline">\(Genus) : # undefined columns selected # In addition: Warning message: # In Ops.factor(Field_Data\)</span>Genus) : ‘-’ not meaningful for factors</h1>
-</div>
-<div id="data2---na.omitfield_data-genus" class="section level1">
-<h1>&gt; Data2 &lt;- na.omit(Field_Data[-Genus])</h1>
-</div>
-<div id="error-in-.data.framefield_data--genus-object-genus-not-found" class="section level1">
-<h1>Error in <code>[.data.frame</code>(Field_Data, -Genus) : object ‘Genus’ not found</h1>
-</div>
-<div id="data2---na.omitfield_data-7" class="section level1">
-<h1>&gt; Data2 &lt;- na.omit(Field_Data[-7])</h1>
-</div>
-<div id="viewdata2" class="section level1">
-<h1>&gt; View(Data2)</h1>
-</div>
+<pre class="r"><code>Field_Data &lt;- read.csv(&quot;Data/Popa_Fieldwork/Popa_Fieldwork(23-10-2019).csv&quot;, stringsAsFactors = F)</code></pre>
+<p>Checking typos in taxonomy</p>
+<pre class="r"><code>Taxo &lt;- correctTaxo(genus=Field_Data$Genus, species = Field_Data$Species)</code></pre>
+<pre><code>## Cache last modification time : 2019-10-23 19:30:35</code></pre>
+<pre><code>## Source cache:623, NA:4</code></pre>
+<pre><code>## Corrections TRUE:197, FALSE:405, SpNotFound:6, NA:4, NoMatch(low_score):15</code></pre>
+<pre class="r"><code>Field_Data$genusCorr &lt;- Taxo$genusCorrected
+Field_Data$speciesCorr &lt;- Taxo$speciesCorrected</code></pre>
+<p><strong>Retrieving APG III Families and Orders from Genus names</strong></p>
+<pre class="r"><code>APG &lt;- getTaxonomy(Field_Data$genusCorr, findOrder = T)
+Field_Data$familyAPG &lt;- APG$family
+Field_Data$orderAPG &lt;- APG$order</code></pre>
+<p><strong>RETRIEVE WOOD DENSITY</strong></p>
+<pre class="r"><code>dataWD &lt;- getWoodDensity(genus=as.character(Field_Data$genusCorr),
+                         species=as.character(Field_Data$speciesCorr),
+                         stand=Field_Data$Plot)</code></pre>
+<pre><code>## The reference dataset contains 16467 wood density values</code></pre>
+<pre><code>## Your taxonomic table contains 65 taxa</code></pre>
+<pre class="r"><code>sum(dataWD$levelWD == &quot;species&quot;)</code></pre>
+<pre><code>## [1] 394</code></pre>
+<pre class="r"><code>sum(dataWD$levelWD == &quot;genus&quot;)</code></pre>
+<pre><code>## [1] 214</code></pre>
+<pre class="r"><code>sum(!dataWD$levelWD%in%c(&quot;genus&quot;,&quot;species&quot;))</code></pre>
+<pre><code>## [1] 19</code></pre>
+<pre class="r"><code>Field_Data$WD &lt;- dataWD$meanWD
+str(Field_Data)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    627 obs. of  20 variables:
+##  $ Plot        : int  1 1 1 1 1 1 1 1 1 1 ...
+##  $ Sub_Plot    : int  1 1 1 2 4 5 6 6 7 8 ...
+##  $ Tree_Tag    : int  8999 9000 8998 8997 8996 8995 8994 8993 8992 8989 ...
+##  $ X_Coordinate: num  0.8 1 3.2 3 4.8 2.4 1.5 3 1.6 4.4 ...
+##  $ Y_Coordinate: num  2 1.7 2.5 3.9 2.1 1.8 2.2 4 0.5 0.8 ...
+##  $ Local_Name  : chr  &quot;Lunbo&quot; &quot;Tei&quot; &quot;Tei&quot; &quot;Ingyin&quot; ...
+##  $ Genus       : chr  &quot;Buchananaia&quot; &quot;Diospyros&quot; &quot;Diospyros&quot; &quot;Shorea&quot; ...
+##  $ Species     : chr  &quot;cochinchinensis&quot; &quot;burmanica&quot; &quot;burmanica&quot; &quot;siamensis&quot; ...
+##  $ DBH_inch    : num  6 4 4.8 14.3 6.9 4 4 4.9 4.2 8.3 ...
+##  $ DBH_cm      : num  15.2 10.2 12.2 36.3 17.5 ...
+##  $ POM_m       : num  1.3 1.3 1.3 1.3 1.3 1.3 1.3 1.3 1.3 1.3 ...
+##  $ Height_m    : num  6 6 7 12 6.7 8 5.1 6 5.7 10 ...
+##  $ North       : chr  &quot;20  53 0.33&quot; &quot;20  53 0.33&quot; &quot;20  53 0.33&quot; &quot;20  53 0.33&quot; ...
+##  $ East        : chr  &quot;95  13 0.56&quot; &quot;95  13 0.56&quot; &quot;95  13 0.56&quot; &quot;95  13 0.56&quot; ...
+##  $ Elevation_m : num  364 364 364 364 364 ...
+##  $ genusCorr   : chr  &quot;Buchanania&quot; &quot;Diospyros&quot; &quot;Diospyros&quot; &quot;Shorea&quot; ...
+##  $ speciesCorr : chr  &quot;cochinchinensis&quot; &quot;burmanica&quot; &quot;burmanica&quot; &quot;siamensis&quot; ...
+##  $ familyAPG   : chr  &quot;Anacardiaceae&quot; &quot;Ebenaceae&quot; &quot;Ebenaceae&quot; &quot;Dipterocarpaceae&quot; ...
+##  $ orderAPG    : chr  &quot;Sapindales&quot; &quot;Ericales&quot; &quot;Ericales&quot; &quot;Malvales&quot; ...
+##  $ WD          : num  0.409 1.095 1.095 0.86 0.77 ...</code></pre>
+<p><strong>Computing AGB</strong></p>
+<pre class="r"><code>AGBtree&lt;-computeAGB(D=Field_Data$DBH_cm,
+                    WD=Field_Data$WD,
+                    H = Field_Data$Height_m)
+# Compute AGB(Mg) per tree----
+Field_Data$AGB_Mg &lt;- AGBtree
+
+# Compute Carbon (Mg) per tree --
+Field_Data &lt;- Field_Data %&gt;%
+  mutate(Carbon_Mg= AGB_Mg*0.47) %&gt;% mutate(C_Tree_Ha = Carbon_Mg/0.04)
+str(Field_Data)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    627 obs. of  23 variables:
+##  $ Plot        : int  1 1 1 1 1 1 1 1 1 1 ...
+##  $ Sub_Plot    : int  1 1 1 2 4 5 6 6 7 8 ...
+##  $ Tree_Tag    : int  8999 9000 8998 8997 8996 8995 8994 8993 8992 8989 ...
+##  $ X_Coordinate: num  0.8 1 3.2 3 4.8 2.4 1.5 3 1.6 4.4 ...
+##  $ Y_Coordinate: num  2 1.7 2.5 3.9 2.1 1.8 2.2 4 0.5 0.8 ...
+##  $ Local_Name  : chr  &quot;Lunbo&quot; &quot;Tei&quot; &quot;Tei&quot; &quot;Ingyin&quot; ...
+##  $ Genus       : chr  &quot;Buchananaia&quot; &quot;Diospyros&quot; &quot;Diospyros&quot; &quot;Shorea&quot; ...
+##  $ Species     : chr  &quot;cochinchinensis&quot; &quot;burmanica&quot; &quot;burmanica&quot; &quot;siamensis&quot; ...
+##  $ DBH_inch    : num  6 4 4.8 14.3 6.9 4 4 4.9 4.2 8.3 ...
+##  $ DBH_cm      : num  15.2 10.2 12.2 36.3 17.5 ...
+##  $ POM_m       : num  1.3 1.3 1.3 1.3 1.3 1.3 1.3 1.3 1.3 1.3 ...
+##  $ Height_m    : num  6 6 7 12 6.7 8 5.1 6 5.7 10 ...
+##  $ North       : chr  &quot;20  53 0.33&quot; &quot;20  53 0.33&quot; &quot;20  53 0.33&quot; &quot;20  53 0.33&quot; ...
+##  $ East        : chr  &quot;95  13 0.56&quot; &quot;95  13 0.56&quot; &quot;95  13 0.56&quot; &quot;95  13 0.56&quot; ...
+##  $ Elevation_m : num  364 364 364 364 364 ...
+##  $ genusCorr   : chr  &quot;Buchanania&quot; &quot;Diospyros&quot; &quot;Diospyros&quot; &quot;Shorea&quot; ...
+##  $ speciesCorr : chr  &quot;cochinchinensis&quot; &quot;burmanica&quot; &quot;burmanica&quot; &quot;siamensis&quot; ...
+##  $ familyAPG   : chr  &quot;Anacardiaceae&quot; &quot;Ebenaceae&quot; &quot;Ebenaceae&quot; &quot;Dipterocarpaceae&quot; ...
+##  $ orderAPG    : chr  &quot;Sapindales&quot; &quot;Ericales&quot; &quot;Ericales&quot; &quot;Malvales&quot; ...
+##  $ WD          : num  0.409 1.095 1.095 0.86 0.77 ...
+##  $ AGB_Mg      : num  0.033 0.039 0.0648 0.7292 0.0894 ...
+##  $ Carbon_Mg   : num  0.0155 0.0183 0.0304 0.3427 0.042 ...
+##  $ C_Tree_Ha   : num  0.387 0.459 0.761 8.568 1.05 ...</code></pre>
+<pre class="r"><code>Field_Data$Plot &lt;- factor(Field_Data$Plot)
+
+boxplot(C_Tree_Ha~Plot, data=Field_Data)</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<pre class="r"><code>summary(aov(C_Tree_Ha ~ factor(Plot), data = Field_Data))</code></pre>
+<pre><code>##               Df Sum Sq Mean Sq F value   Pr(&gt;F)    
+## factor(Plot)  19   1698   89.35   3.713 2.24e-07 ***
+## Residuals    607  14608   24.07                     
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>Field_Carbon &lt;- Field_Data %&gt;%
+  group_by(Plot) %&gt;%
+  dplyr::summarise(Total_C = sum(C_Tree_Ha)) %&gt;% rename(Plot_Number=Plot)
+
+ggplot(data=Field_Carbon, aes(x=as.numeric(Plot_Number),y =Total_C, color=as.numeric(Plot_Number)))+ geom_point()+ geom_line()+
+      labs(title = &quot;Carbon storage in 20 Permanent sample plots&quot;, 
+       x= &quot;Plot&quot;,
+       y= &quot;Carbon(t/ha)&quot;)+
+  theme(axis.text.x = element_text(size=7, angle = 45, vjust = 0.5),
+        axis.text.y = element_text(size = 7))</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-7-2.png" width="672" /></p>
 
 
 

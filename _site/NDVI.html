@@ -273,19 +273,22 @@ $(document).ready(function () {
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="Carbon.html">Carbon and Environmental Variables</a>
+  <a href="Carbon.html">Carbon and Environment</a>
 </li>
 <li>
   <a href="NDVI.html">Carbon,NDVI and EVI</a>
 </li>
 <li>
-  <a href="Human_C.html">Human &amp; Carbon</a>
+  <a href="Human_C.html">Carbon and cities proximity</a>
 </li>
 <li>
-  <a href="Species-Analysis.html">Species Analysis</a>
+  <a href="NFI-Avitabile.html">NFI and Avitabile Comparison</a>
 </li>
 <li>
   <a href="Fieldwork.html">Fieldwork Analysis</a>
+</li>
+<li>
+  <a href="Species-Analysis.html">Species Analysis</a>
 </li>
       </ul>
       <ul class="nav navbar-nav navbar-right">
@@ -320,22 +323,22 @@ library(&quot;sf&quot;)</code></pre>
 ##  Linking to sp version: 1.3-1</code></pre>
 <pre class="r"><code>library(ggplot2)
 library(tidyverse)</code></pre>
-<pre><code>## -- Attaching packages ---------------------------------------------------------------------------------------------------------------- tidyverse 1.2.1 --</code></pre>
+<pre><code>## -- Attaching packages ---------------------------------------------------------------------------------------------------------------------- tidyverse 1.2.1 --</code></pre>
 <pre><code>## v tibble  2.1.3     v purrr   0.3.2
 ## v tidyr   0.8.3     v dplyr   0.8.3
 ## v readr   1.3.1     v stringr 1.4.0
 ## v tibble  2.1.3     v forcats 0.4.0</code></pre>
-<pre><code>## -- Conflicts ------------------------------------------------------------------------------------------------------------------- tidyverse_conflicts() --
+<pre><code>## -- Conflicts ------------------------------------------------------------------------------------------------------------------------- tidyverse_conflicts() --
 ## x tidyr::extract() masks raster::extract()
 ## x dplyr::filter()  masks stats::filter()
 ## x dplyr::lag()     masks stats::lag()
 ## x dplyr::select()  masks raster::select()</code></pre>
-<pre class="r"><code>NFI2010_PLT &lt;-raster(&quot;Data/NDVI2010_NFI.tif&quot;)
-mypts &lt;-readOGR(&quot;Plots_Locations/locations_WGS84.shp&quot;)</code></pre>
+<pre class="r"><code>NFI2010_PLT &lt;-raster(&quot;Data/NDVI2010_NFI(23-10-2019).tif&quot;)
+mypts &lt;-readOGR(&quot;Plot_points/locations_WGS84.shp&quot;)</code></pre>
 <pre><code>## OGR data source with driver: ESRI Shapefile 
-## Source: &quot;D:\PhD-Web\Plots_Locations\locations_WGS84.shp&quot;, layer: &quot;locations_WGS84&quot;
-## with 7881 features
-## It has 9 fields</code></pre>
+## Source: &quot;D:\PhD-Web\Plot_points\locations_WGS84.shp&quot;, layer: &quot;locations_WGS84&quot;
+## with 8087 features
+## It has 7 fields</code></pre>
 <pre class="r"><code>NDVI2010 &lt;- crop(NFI2010_PLT, mypts)
 plot(NFI2010_PLT)
 mydata &lt;- raster::extract(NFI2010_PLT, mypts)
@@ -344,53 +347,75 @@ plot(mypts, add = TRUE, cex=0.1)</code></pre>
 <pre class="r"><code>class(mydata)</code></pre>
 <pre><code>## [1] &quot;numeric&quot;</code></pre>
 <pre class="r"><code>NDVI2010_values &lt;- as.data.frame(mydata)
-NDVI2010 &lt;- NDVI2010_values %&gt;% rename(NDVI2010=mydata)</code></pre>
-<p>joining the NDVI value to the Carbon-dataframe</p>
-<pre class="r"><code>Plots_Carbon &lt;- read.csv(&quot;Data_Output/Plots_Carbon.csv&quot;)
-Plots_Carbon$NDVI2010 &lt;- NDVI2010$NDVI2010
-C_NDVI2010 &lt;- Plots_Carbon
-
-C_NDVI2010 &lt;- C_NDVI2010 %&gt;% drop_na(NDVI2010)
-
-
-ggplot(data=C_NDVI2010, aes(x=New_Carbon, y = NDVI2010, color=Year))+ geom_point()+
+NDVI2010 &lt;- NDVI2010_values %&gt;% rename(NDVI2010=mydata)
+Plot_names &lt;- read.csv(&quot;Data_Output/Plot_names.csv&quot;,stringsAsFactors = F)
+NDVI2010_Plot &lt;- bind_cols(Plot_names,NDVI2010)
+Carbon &lt;- read.csv(&quot;Data_Output/Carbon_Per_Plots.csv&quot;, stringsAsFactors = F)
+NDVI_Carbon &lt;- Carbon %&gt;% left_join(NDVI2010_Plot, by.x = &quot;Plot_names&quot;) %&gt;% dplyr::select(-NORTH,-EAST) %&gt;% drop_na(NDVI2010)</code></pre>
+<pre><code>## Joining, by = &quot;Plot_names&quot;</code></pre>
+<pre class="r"><code>write.csv(NDVI_Carbon,file = &quot;Data_Output/NDVIC_2010.csv&quot;, row.names = F)</code></pre>
+<pre class="r"><code>ggplot(data=NDVI_Carbon, mapping= aes(Sum_CHa,NDVI2010, color= Year))+ geom_point()+
+   facet_wrap(facets = vars(District))+
   labs(title = &quot;Carbon storage &amp; NDVI2010&quot;, 
        x= &quot;MaxCarbon(t/ha)&quot;,
        y= &quot;NDVI 2010&quot;)+
   theme(axis.text.x = element_text(size=7, angle = 45, vjust = 0.5),
         axis.text.y = element_text(size = 7))</code></pre>
 <p><img src="NDVI_files/figure-html/unnamed-chunk-3-1.png" width="672" /></p>
-<p>** EVI and Carbon storage relationship for 2010 EVI**</p>
-<pre class="r"><code>NFI2010_EVI &lt;-raster(&quot;Data/EVI2010_NFI.tif&quot;)
-mypts &lt;-readOGR(&quot;Plots_Locations/locations_WGS84.shp&quot;)</code></pre>
+<pre class="r"><code>NFI2010_PLTE &lt;-raster(&quot;Data/EVI2010(23-10-2019).tif&quot;)
+mypts &lt;-readOGR(&quot;Plot_points/locations_WGS84.shp&quot;)</code></pre>
 <pre><code>## OGR data source with driver: ESRI Shapefile 
-## Source: &quot;D:\PhD-Web\Plots_Locations\locations_WGS84.shp&quot;, layer: &quot;locations_WGS84&quot;
-## with 7881 features
-## It has 9 fields</code></pre>
-<pre class="r"><code>EVI2010 &lt;- crop(NFI2010_EVI, mypts)
-plot(NFI2010_EVI)
-mydata &lt;- raster::extract(NFI2010_EVI, mypts)
+## Source: &quot;D:\PhD-Web\Plot_points\locations_WGS84.shp&quot;, layer: &quot;locations_WGS84&quot;
+## with 8087 features
+## It has 7 fields</code></pre>
+<pre class="r"><code>EVI2010 &lt;- crop(NFI2010_PLTE, mypts)
+plot(NFI2010_PLTE)
+mydata &lt;- raster::extract(NFI2010_PLTE, mypts)
 plot(mypts, add = TRUE, cex=0.1)</code></pre>
 <p><img src="NDVI_files/figure-html/unnamed-chunk-4-1.png" width="672" /></p>
 <pre class="r"><code>class(mydata)</code></pre>
 <pre><code>## [1] &quot;numeric&quot;</code></pre>
 <pre class="r"><code>EVI2010_values &lt;- as.data.frame(mydata)
-EVI2010 &lt;- EVI2010_values %&gt;% rename(EVI2010=mydata)</code></pre>
-<p>joining the EVI value to the Carbon-dataframe</p>
-<pre class="r"><code>Plots_Carbon &lt;- read.csv(&quot;Data_Output/Plots_Carbon.csv&quot;)
-Plots_Carbon$EVI2010 &lt;- EVI2010$EVI2010
-C_EVI2010 &lt;- Plots_Carbon
-
-C_EVI2010 &lt;- C_EVI2010 %&gt;% drop_na(EVI2010) # %&gt;% filter(Year==2010)
-
-
-ggplot(data=C_EVI2010, aes(x=New_Carbon, y = EVI2010, color=Year))+ geom_point()+
+EVI2010 &lt;- EVI2010_values %&gt;% rename(EVI2010=mydata)
+Plot_names &lt;- read.csv(&quot;Data_Output/Plot_names.csv&quot;,stringsAsFactors = F)
+EVI2010_Plot &lt;- bind_cols(Plot_names,EVI2010)
+Carbon &lt;- read.csv(&quot;Data_Output/Carbon_Per_Plots.csv&quot;, stringsAsFactors = F)
+EVI_Carbon &lt;- Carbon %&gt;% left_join(EVI2010_Plot, by.x = &quot;Plot_names&quot;) %&gt;% dplyr::select(-NORTH,-EAST) %&gt;% drop_na(EVI2010)</code></pre>
+<pre><code>## Joining, by = &quot;Plot_names&quot;</code></pre>
+<pre class="r"><code>write.csv(EVI_Carbon,file = &quot;Data_Output/EVIC_2010.csv&quot;, row.names = F)</code></pre>
+<pre class="r"><code>ggplot(data=EVI_Carbon, mapping= aes(Sum_CHa,EVI2010, color= Year))+ geom_point()+
+   facet_wrap(facets = vars(District))+
   labs(title = &quot;Carbon storage &amp; EVI2010&quot;, 
        x= &quot;MaxCarbon(t/ha)&quot;,
        y= &quot;EVI 2010&quot;)+
   theme(axis.text.x = element_text(size=7, angle = 45, vjust = 0.5),
         axis.text.y = element_text(size = 7))</code></pre>
 <p><img src="NDVI_files/figure-html/unnamed-chunk-5-1.png" width="672" /></p>
+<p>I performed a simple liner regression analysis on the two variables Carbon and NDVI2010/EVI2010. I wish to determine wheter the AP/AMT varible is a significant predictor of the Carbon Variable.</p>
+<pre class="r"><code>plot(NDVI2010~Sum_CHa, data = NDVI_Carbon)</code></pre>
+<p><img src="NDVI_files/figure-html/unnamed-chunk-6-1.png" width="672" /></p>
+<pre class="r"><code>lm.NDVI2010 &lt;- lm(NDVI2010~Sum_CHa, data = NDVI_Carbon)
+anova(lm.NDVI2010)</code></pre>
+<pre><code>## Analysis of Variance Table
+## 
+## Response: NDVI2010
+##             Df     Sum Sq  Mean Sq F value    Pr(&gt;F)    
+## Sum_CHa      1   48272373 48272373  75.436 &lt; 2.2e-16 ***
+## Residuals 8088 5175598729   639911                      
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>plot(EVI2010~Sum_CHa, data = EVI_Carbon)</code></pre>
+<p><img src="NDVI_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<pre class="r"><code>lm.EVI2010 &lt;- lm(EVI2010~Sum_CHa, data = EVI_Carbon)
+anova(lm.EVI2010)</code></pre>
+<pre><code>## Analysis of Variance Table
+## 
+## Response: EVI2010
+##             Df     Sum Sq  Mean Sq F value    Pr(&gt;F)    
+## Sum_CHa      1   14447824 14447824  62.292 3.349e-15 ***
+## Residuals 8088 1875900626   231936                      
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 
 
 

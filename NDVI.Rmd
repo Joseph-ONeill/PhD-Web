@@ -20,8 +20,8 @@ library(tidyverse)
 ```
 
 ```{r}
-NFI2010_PLT <-raster("Data/NDVI2010_NFI.tif")
-mypts <-readOGR("Plots_Locations/locations_WGS84.shp")
+NFI2010_PLT <-raster("Data/NDVI2010_NFI(23-10-2019).tif")
+mypts <-readOGR("Plot_points/locations_WGS84.shp")
 NDVI2010 <- crop(NFI2010_PLT, mypts)
 plot(NFI2010_PLT)
 mydata <- raster::extract(NFI2010_PLT, mypts)
@@ -29,21 +29,17 @@ plot(mypts, add = TRUE, cex=0.1)
 class(mydata)
 NDVI2010_values <- as.data.frame(mydata)
 NDVI2010 <- NDVI2010_values %>% rename(NDVI2010=mydata)
-
+Plot_names <- read.csv("Data_Output/Plot_names.csv",stringsAsFactors = F)
+NDVI2010_Plot <- bind_cols(Plot_names,NDVI2010)
+Carbon <- read.csv("Data_Output/Carbon_Per_Plots.csv", stringsAsFactors = F)
+NDVI_Carbon <- Carbon %>% left_join(NDVI2010_Plot, by.x = "Plot_names") %>% dplyr::select(-NORTH,-EAST) %>% drop_na(NDVI2010)
+write.csv(NDVI_Carbon,file = "Data_Output/NDVIC_2010.csv", row.names = F)
 ```
 
-joining the NDVI value to the Carbon-dataframe
 
 ```{r}
-Plots_Carbon <- read.csv("Data_Output/Plots_Carbon.csv")
-Plots_Carbon$NDVI2010 <- NDVI2010$NDVI2010
-C_NDVI2010 <- Plots_Carbon
-
-C_NDVI2010 <- C_NDVI2010 %>% drop_na(NDVI2010) %>% dplyr::select(-X)
-write.csv(C_NDVI2010, file = "Data_Output/NDVI_2010.csv",row.names= FALSE)
-
-
-ggplot(data=C_NDVI2010, aes(x=New_Carbon, y = NDVI2010, color=Year))+ geom_point()+
+ggplot(data=NDVI_Carbon, mapping= aes(Sum_CHa,NDVI2010, color= Year))+ geom_point()+
+   facet_wrap(facets = vars(District))+
   labs(title = "Carbon storage & NDVI2010", 
        x= "MaxCarbon(t/ha)",
        y= "NDVI 2010")+
@@ -51,39 +47,51 @@ ggplot(data=C_NDVI2010, aes(x=New_Carbon, y = NDVI2010, color=Year))+ geom_point
         axis.text.y = element_text(size = 7))
 ```
 
-
-** EVI and Carbon storage relationship for 2010 EVI**
-
 ```{r}
-NFI2010_EVI <-raster("Data/EVI2010_NFI.tif")
-mypts <-readOGR("Plots_Locations/locations_WGS84.shp")
-EVI2010 <- crop(NFI2010_EVI, mypts)
-plot(NFI2010_EVI)
-mydata <- raster::extract(NFI2010_EVI, mypts)
+NFI2010_PLTE <-raster("Data/EVI2010(23-10-2019).tif")
+mypts <-readOGR("Plot_points/locations_WGS84.shp")
+EVI2010 <- crop(NFI2010_PLTE, mypts)
+plot(NFI2010_PLTE)
+mydata <- raster::extract(NFI2010_PLTE, mypts)
 plot(mypts, add = TRUE, cex=0.1)
 class(mydata)
 EVI2010_values <- as.data.frame(mydata)
 EVI2010 <- EVI2010_values %>% rename(EVI2010=mydata)
-
+Plot_names <- read.csv("Data_Output/Plot_names.csv",stringsAsFactors = F)
+EVI2010_Plot <- bind_cols(Plot_names,EVI2010)
+Carbon <- read.csv("Data_Output/Carbon_Per_Plots.csv", stringsAsFactors = F)
+EVI_Carbon <- Carbon %>% left_join(EVI2010_Plot, by.x = "Plot_names") %>% dplyr::select(-NORTH,-EAST) %>% drop_na(EVI2010)
+write.csv(EVI_Carbon,file = "Data_Output/EVIC_2010.csv", row.names = F)
 ```
 
-joining the EVI value to the Carbon-dataframe
 
 ```{r}
-Plots_Carbon <- read.csv("Data_Output/Plots_Carbon.csv")
-Plots_Carbon$EVI2010 <- EVI2010$EVI2010
-C_EVI2010 <- Plots_Carbon
-
-C_EVI2010 <- C_EVI2010 %>% drop_na(EVI2010) # %>% filter(Year==2010)
-
-C_EVI2010 <- C_EVI2010 %>% drop_na(EVI2010)
-write.csv(C_EVI2010, file = "Data_Output/EVI_2010.csv",row.names= FALSE)
-
-
-ggplot(data=C_EVI2010, aes(x=New_Carbon, y = EVI2010, color=Year))+ geom_point()+
+ggplot(data=EVI_Carbon, mapping= aes(Sum_CHa,EVI2010, color= Year))+ geom_point()+
+   facet_wrap(facets = vars(District))+
   labs(title = "Carbon storage & EVI2010", 
        x= "MaxCarbon(t/ha)",
        y= "EVI 2010")+
   theme(axis.text.x = element_text(size=7, angle = 45, vjust = 0.5),
         axis.text.y = element_text(size = 7))
 ```
+
+
+
+
+I performed a simple liner regression analysis on the two variables Carbon and NDVI2010/EVI2010. I wish to determine wheter the AP/AMT varible is a significant predictor of the Carbon Variable. 
+
+
+```{r}
+plot(NDVI2010~Sum_CHa, data = NDVI_Carbon)
+lm.NDVI2010 <- lm(NDVI2010~Sum_CHa, data = NDVI_Carbon)
+anova(lm.NDVI2010)
+
+```
+```{r}
+plot(EVI2010~Sum_CHa, data = EVI_Carbon)
+lm.EVI2010 <- lm(EVI2010~Sum_CHa, data = EVI_Carbon)
+anova(lm.EVI2010)
+```
+
+
+
