@@ -7,7 +7,7 @@ output:
 rm(list=ls())
 knitr::opts_chunk$set(echo = TRUE)
 ```
-2010 NDVI Values----
+
 
 ```{r}
 library(raster)
@@ -19,62 +19,58 @@ library(tidyverse)
 
 ```
 
+**2010 NDVI Values and Carbon Storage**
+
 ```{r}
-NFI2010_PLT <-raster("Data/NDVI2010_NFI(23-10-2019).tif")
-mypts <-readOGR("Plot_points/locations_WGS84.shp")
-NDVI2010 <- crop(NFI2010_PLT, mypts)
-plot(NFI2010_PLT)
+NFI2010_PLT <-raster("Data/NDVI2010_edited.tif")
+mypts <-readOGR("Edited_Plots_shapefile/locations_WGS84Edited.shp")
+# NDVI2010 <- crop(NFI2010_PLT, mypts)
+NDVI2010A <- trim(NFI2010_PLT)
+plot(NDVI2010A)
 mydata <- raster::extract(NFI2010_PLT, mypts)
 plot(mypts, add = TRUE, cex=0.1)
+
 class(mydata)
 NDVI2010_values <- as.data.frame(mydata)
 NDVI2010 <- NDVI2010_values %>% rename(NDVI2010=mydata)
-Plot_names <- read.csv("Data_Output/Plot_names.csv",stringsAsFactors = F)
-NDVI2010_Plot <- bind_cols(Plot_names,NDVI2010)
-Carbon <- read.csv("Data_Output/Carbon_Per_Plots.csv", stringsAsFactors = F)
-NDVI_Carbon <- Carbon %>% left_join(NDVI2010_Plot, by.x = "Plot_names") %>% dplyr::select(-NORTH,-EAST) %>% drop_na(NDVI2010)
-write.csv(NDVI_Carbon,file = "Data_Output/NDVIC_2010.csv", row.names = F)
+Plot_names <- read.csv("Data_Output/WCL_plots_edited(31-10-2019).csv",stringsAsFactors = F)
+NDVI2010_Plots <- bind_cols(Plot_names,NDVI2010)
+
 ```
 
 
 ```{r}
-ggplot(data=NDVI_Carbon, mapping= aes(Sum_CHa,NDVI2010, color= Year))+ geom_point()+
-   facet_wrap(facets = vars(District))+
-  labs(title = "Carbon storage & NDVI2010", 
-       x= "MaxCarbon(t/ha)",
-       y= "NDVI 2010")+
-  theme(axis.text.x = element_text(size=7, angle = 45, vjust = 0.5),
+ggplot(data=NDVI2010_Plots, mapping= aes(log(Sum_CHa),NDVI2010, color=as.factor(Year)))+ geom_point(size= 0.0000005,alpha=0.5)+
+     labs(title = "Carbon storage & NDVI2010", 
+       x= "Carbon(t/ha)",
+       y= "Median NDVI 2010 Values")+
+  theme(axis.text.x = element_text(size=7, angle = 90, vjust = 0.5),
         axis.text.y = element_text(size = 7))
 ```
 
 ```{r}
-NFI2010_PLTE <-raster("Data/EVI2010(23-10-2019).tif")
-mypts <-readOGR("Plot_points/locations_WGS84.shp")
+NFI2010_PLTE <-raster("Data/EVI2010_edited.tif")
+NFI2010_PLTE <- trim(NFI2010_PLTE)
+mypts <-readOGR("Edited_Plots_shapefile/locations_WGS84Edited.shp")
 EVI2010 <- crop(NFI2010_PLTE, mypts)
 plot(NFI2010_PLTE)
 mydata <- raster::extract(NFI2010_PLTE, mypts)
 plot(mypts, add = TRUE, cex=0.1)
 class(mydata)
 EVI2010_values <- as.data.frame(mydata)
-EVI2010 <- EVI2010_values %>% rename(EVI2010=mydata)
-Plot_names <- read.csv("Data_Output/Plot_names.csv",stringsAsFactors = F)
-EVI2010_Plot <- bind_cols(Plot_names,EVI2010)
-Carbon <- read.csv("Data_Output/Carbon_Per_Plots.csv", stringsAsFactors = F)
-EVI_Carbon <- Carbon %>% left_join(EVI2010_Plot, by.x = "Plot_names") %>% dplyr::select(-NORTH,-EAST) %>% drop_na(EVI2010)
-write.csv(EVI_Carbon,file = "Data_Output/EVIC_2010.csv", row.names = F)
+EVI2010 <- NDVI2010_values %>% rename(EVI2010=mydata)
+EVI2010_Plot <- bind_cols(NDVI2010_Plot,EVI2010)
 ```
 
-
 ```{r}
-ggplot(data=EVI_Carbon, mapping= aes(Sum_CHa,EVI2010, color= Year))+ geom_point()+
-   facet_wrap(facets = vars(District))+
+ggplot(data=EVI2010_Plot, mapping= aes(Sum_CHa,NDVI2010, color=as.factor(Year)))+ geom_point(size= 0.0000005,alpha=0.5)+
+   facet_wrap(facets = vars(Year))+
   labs(title = "Carbon storage & EVI2010", 
-       x= "MaxCarbon(t/ha)",
-       y= "EVI 2010")+
+       x= "Carbon(t/ha)",
+       y= "Median EVI 2010 Value")+
   theme(axis.text.x = element_text(size=7, angle = 45, vjust = 0.5),
         axis.text.y = element_text(size = 7))
 ```
-
 
 
 
@@ -82,15 +78,20 @@ I performed a simple liner regression analysis on the two variables Carbon and N
 
 
 ```{r}
-plot(NDVI2010~Sum_CHa, data = NDVI_Carbon)
-lm.NDVI2010 <- lm(NDVI2010~Sum_CHa, data = NDVI_Carbon)
-anova(lm.NDVI2010)
-
+plot(NDVI2010~Sum_CHa, data = EVI2010_Plot)
+glm.NDVI2010 <- glm(log(Sum_CHa)~NDVI2010, data = EVI2010_Plot, family = gaussian (link = "identity"))
+anova(glm.NDVI2010)
+summary(glm.NDVI2010)
+plot(glm.NDVI2010)
 ```
 ```{r}
-plot(EVI2010~Sum_CHa, data = EVI_Carbon)
-lm.EVI2010 <- lm(EVI2010~Sum_CHa, data = EVI_Carbon)
-anova(lm.EVI2010)
+plot(EVI2010~Sum_CHa, data = EVI2010_Plot)
+glm.EVI2010 <- glm(log(Sum_CHa) ~ EVI2010, data = EVI2010_Plot, family = gaussian(link = "identity"))
+glm.EVI2010b <- glm(log(Sum_CHa) ~ 1, data = EVI2010_Plot, family = gaussian(link = "identity"))
+AIC(glm.EVI2010, glm.EVI2010b)
+anova(glm.EVI2010)
+summary(glm.EVI2010)
+plot(glm.EVI2010)
 ```
 
 

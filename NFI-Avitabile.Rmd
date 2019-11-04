@@ -7,30 +7,34 @@ output: html_document
 
 **Load up the values extracted from the AVitabile AGB Map**
 
+There are 5 plots that do not have AGB values from the Avitable AGB Map.**AGB_Avitabile %>% filter(!complete.cases(.)**
+
 
 ```{r}
 library(tidyverse)
-AGB_Avitabile <- read.csv("Data_Output/Avitabile_Data(23-10-2019).csv",stringsAsFactors = F) %>% rename(AGB=mean)
-Carbon_Avitabile <- AGB_Avitabile%>% mutate(Avt_Carbon= 0.47*(AGB))
-Carbon_NFI <- read.csv("Data_Output/Carbon_Per_Plots.csv", stringsAsFactors = F) %>% rename(NFI_Carbon = Sum_CHa)
-NFI_AVI_Carbon <- Carbon_NFI %>% left_join(Carbon_Avitabile, by.x = Plot_names) %>% dplyr::select(-c(EAST, NORTH,AGB)) %>% drop_na(Avt_Carbon)
-
+AGB_Avitabile <- read.csv("Data_Output/Avitabile_AGB(31-10-2019).csv",stringsAsFactors = F)
+Carbon_Avitabile <- AGB_Avitabile%>% mutate(Avt_Carbon= 0.47*(Avt_AGB))
+Carbon_NFI <- read.csv("Data_Output/WCL_plots_edited(31-10-2019).csv", stringsAsFactors = F)
+Carbon_NFI$Avt_Carbon <- Carbon_Avitabile$Avt_Carbon
+Carbon_NFI_Avt <- Carbon_NFI
+Carbon_NFI_Avt <- Carbon_NFI_Avt %>% rename(NFI_Carbon = Sum_CHa)
 ```
 
 I performed a simple liner regression analysis on the two variables NFI Carbon and Avitabile Carbon. I wish to determine wheter the there is a correlation betetween them.
 
 ```{r}
-plot(Avt_Carbon~NFI_Carbon, data = NFI_AVI_Carbon)
-lm.Avt_NFI <- lm(Avt_Carbon~NFI_Carbon, data = NFI_AVI_Carbon)
-anova(lm.Avt_NFI)
+plot(Avt_Carbon~NFI_Carbon, data = Carbon_NFI_Avt )
+glm.Avt_NFI <- lm(log(NFI_Carbon)~scale(Avt_Carbon), data = Carbon_NFI_Avt)
+anova(glm.Avt_NFI)
+summary(glm.Avt_NFI)
+plot(glm.Avt_NFI)
 ```
 
 ```{r}
-ggplot(data=NFI_AVI_Carbon, mapping= aes(Avt_Carbon,NFI_Carbon, color= Year))+ geom_point()+
-   facet_wrap(facets = vars(District))+
-  labs(title = "NFI Carbon storage & Avitabile", 
+ggplot(data = Carbon_NFI_Avt, mapping = aes(NFI_Carbon, Avt_Carbon, color=DIST))+ geom_point(size= 0.05,alpha=0.5)+
+      labs(title = "NFI Carbon storage & Avitabile Comparison", 
        x= "NFI_Carbon(t/ha)",
-       y= "Avitabile Carbon (t/ha)")+
+       y= "Average Avitabile Carbon (t/ha)")+
   theme(axis.text.x = element_text(size=7, angle = 45, vjust = 0.5),
         axis.text.y = element_text(size = 7))
 ```

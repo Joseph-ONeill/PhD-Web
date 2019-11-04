@@ -20,30 +20,27 @@ library(ggplot2)
 library(tidyverse)
 ```
 ```{r}
-C_Cities <- read.csv("Data_Output/distance_to_cities.csv", stringsAsFactors = F) %>% rename(Time_min = Travel_Time_min)
+Travel_time <- read.csv("Data_Output/TravelTime_to_cities(31-10-2019).csv", stringsAsFactors = F) %>% rename(AvgTime_min = mean)
 
-Carbon <- read.csv("Data_Output/Carbon_Per_Plots.csv", stringsAsFactors = F)
-Carbon_Cities <- Carbon %>% left_join(C_Cities,by.x = Plot_names) %>% dplyr::select(-EAST,-NORTH) %>% drop_na(Time_min)
+Carbon <- read.csv("Data_Output/WCL_plots_edited(31-10-2019).csv", stringsAsFactors = F)
 
-lm.CarbonCities <- lm(Sum_CHa~Time_min, data = Carbon_Cities)
-anova(lm.CarbonCities)
-plot(lm.CarbonCities)
+Carbon$AvgTime_min <- Travel_time$AvgTime_min
 
-ggplot(data=Carbon_Cities, aes(x=Time_min, y = Sum_CHa, color=District))+ geom_line()+ 
+Carbon_Cities <- Carbon
+
+glm.CarbonCities <- glm(log(Sum_CHa)~AvgTime_min, data = Carbon_Cities, family = gaussian(link = "identity"))
+anova(glm.CarbonCities)
+plot(glm.CarbonCities)
+summary(glm.CarbonCities)
+
+ggplot(data=Carbon_Cities, aes(x=log(AvgTime_min), y = log(Sum_CHa), color=DIST))+ geom_line()+ 
+  facet_wrap(facets = vars(DIST))+
   labs(title = "Carbon storage and Travel time to nearest city", 
-       x= "Travel Time (min)",
-       y= "MaxCarbon(t/ha)")+
+       x= " Average Travel Time to the nearest city (min)",
+       y= "Carbon(t/ha)")+
   theme(axis.text.x = element_text(size=7, angle = 45, vjust = 0.5),
         axis.text.y = element_text(size = 7))
 
-
-ggplot(data = Carbon_Cities, mapping=aes(x=Time_min,y=Sum_CHa, color=District))+geom_line()+
-  facet_wrap(facets = vars(District))+
-  labs(title = "Carbon storage and Travel time to nearest city", 
-       x= "Travel Time (min)",
-       y= "MaxCarbon(t/ha)")+
-  theme(axis.text.x = element_text(size=7, angle = 45, vjust = 0.5),
-        axis.text.y = element_text(size = 7))
 
 ```
 

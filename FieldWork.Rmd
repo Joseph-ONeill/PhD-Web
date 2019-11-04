@@ -19,14 +19,12 @@ library(measurements)
 Field_Data <- read.csv("Data/Popa_Fieldwork/Popa_Fieldwork(23-10-2019).csv", stringsAsFactors = F)
 ```
 
-Checking typos in taxonomy
+**Checking typos in taxonomy**
 
 ```{r}
-
 Taxo <- correctTaxo(genus=Field_Data$Genus, species = Field_Data$Species)
 Field_Data$genusCorr <- Taxo$genusCorrected
 Field_Data$speciesCorr <- Taxo$speciesCorrected
-
 ```
 **Retrieving APG III Families and Orders from Genus names**
 
@@ -54,6 +52,10 @@ sum(!dataWD$levelWD%in%c("genus","species"))
 
 Field_Data$WD <- dataWD$meanWD
 str(Field_Data)
+
+
+
+
 ```
 
 **Computing AGB**
@@ -82,13 +84,19 @@ ggplot(data=Field_Carbon, aes(x=as.numeric(Plot_Number),y =Total_C, color=as.num
       labs(title = "Carbon storage in 20 Permanent sample plots", 
        x= "Plot",
        y= "Carbon(t/ha)")+
-  theme(axis.text.x = element_text(size=7, angle = 45, vjust = 0.5),
+  theme(axis.text.x = element_text(size=7, angle = 0, vjust = 0.5),
         axis.text.y = element_text(size = 7))
  
 
 ```
 
+```{r}
+hist(Field_Data$Height_m)
+hist(Field_Data$DBH_cm)
+ggplot(data = Field_Data, aes(y = Height_m, x = log(DBH_cm))) + 
+  geom_point(color='green') +
+  geom_smooth(method = "lm", se = FALSE)
 
-
+```
 
 
