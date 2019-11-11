@@ -328,12 +328,11 @@ $(document).ready(function () {
 ##     date</code></pre>
 <pre class="r"><code>library(BIOMASS)
 library(ape)
-library(ggplot2)
-library(measurements)</code></pre>
+library(ggplot2)</code></pre>
 <pre class="r"><code>Field_Data &lt;- read.csv(&quot;Data/Popa_Fieldwork/Popa_Fieldwork(23-10-2019).csv&quot;, stringsAsFactors = F)</code></pre>
-<p>Checking typos in taxonomy</p>
+<p><strong>Checking typos in taxonomy</strong></p>
 <pre class="r"><code>Taxo &lt;- correctTaxo(genus=Field_Data$Genus, species = Field_Data$Species)</code></pre>
-<pre><code>## Cache last modification time : 2019-10-23 19:30:35</code></pre>
+<pre><code>## Cache last modification time : 2019-10-29 15:08:46</code></pre>
 <pre><code>## Source cache:623, NA:4</code></pre>
 <pre><code>## Corrections TRUE:197, FALSE:405, SpNotFound:6, NA:4, NoMatch(low_score):15</code></pre>
 <pre class="r"><code>Field_Data$genusCorr &lt;- Taxo$genusCorrected
@@ -424,15 +423,288 @@ boxplot(C_Tree_Ha~Plot, data=Field_Data)</code></pre>
 ## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
 <pre class="r"><code>Field_Carbon &lt;- Field_Data %&gt;%
   group_by(Plot) %&gt;%
-  dplyr::summarise(Total_C = sum(C_Tree_Ha)) %&gt;% rename(Plot_Number=Plot)
+  dplyr::summarise(Total_C = sum(C_Tree_Ha), Elevation = mean(Elevation_m)) %&gt;% rename(Plot_Number=Plot)
 
 ggplot(data=Field_Carbon, aes(x=as.numeric(Plot_Number),y =Total_C, color=as.numeric(Plot_Number)))+ geom_point()+ geom_line()+
       labs(title = &quot;Carbon storage in 20 Permanent sample plots&quot;, 
        x= &quot;Plot&quot;,
        y= &quot;Carbon(t/ha)&quot;)+
-  theme(axis.text.x = element_text(size=7, angle = 45, vjust = 0.5),
+  theme(axis.text.x = element_text(size=7, angle = 0, vjust = 0.5),
         axis.text.y = element_text(size = 7))</code></pre>
 <p><img src="FieldWork_files/figure-html/unnamed-chunk-7-2.png" width="672" /></p>
+<pre class="r"><code>write.csv(Field_Carbon, file = &quot;Data_Output/Field_Carbon.csv&quot;, row.names = F)</code></pre>
+<pre class="r"><code>hist(Field_Data$Height_m)</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<pre class="r"><code>hist(Field_Data$DBH_cm)</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-8-2.png" width="672" /></p>
+<pre class="r"><code>ggplot(data = Field_Data, aes(y = Height_m, x = log(DBH_cm))) + 
+  geom_point(color=&#39;green&#39;) +
+  geom_smooth(method = &quot;lm&quot;, se = FALSE)</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-8-3.png" width="672" /> <strong>convert from decimal minutes to decimal degrees</strong></p>
+<pre class="r"><code>library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(stringr)
+library(maps)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;maps&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:purrr&#39;:
+## 
+##     map</code></pre>
+<pre class="r"><code>library(mapdata)
+library(maptools)</code></pre>
+<pre><code>## Loading required package: sp</code></pre>
+<pre><code>## Checking rgeos availability: FALSE
+##      Note: when rgeos is not available, polygon geometry     computations in maptools depend on gpclib,
+##      which has a restricted licence. It is disabled by default;
+##      to enable gpclib, type gpclibPermit()</code></pre>
+<pre class="r"><code>library(sp)
+library(raster)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;raster&#39;</code></pre>
+<pre><code>## The following objects are masked from &#39;package:ape&#39;:
+## 
+##     rotate, zoom</code></pre>
+<pre><code>## The following object is masked from &#39;package:dplyr&#39;:
+## 
+##     select</code></pre>
+<pre><code>## The following object is masked from &#39;package:tidyr&#39;:
+## 
+##     extract</code></pre>
+<pre class="r"><code>library(BIOMASS)
+library(ape)
+library(magrittr)</code></pre>
+<pre><code>## 
+## Attaching package: &#39;magrittr&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:raster&#39;:
+## 
+##     extract</code></pre>
+<pre><code>## The following object is masked from &#39;package:purrr&#39;:
+## 
+##     set_names</code></pre>
+<pre><code>## The following object is masked from &#39;package:tidyr&#39;:
+## 
+##     extract</code></pre>
+<pre class="r"><code>library(tinytex)
+library(raster)
+library(rgdal)</code></pre>
+<pre><code>## rgdal: version: 1.4-4, (SVN revision 833)
+##  Geospatial Data Abstraction Library extensions to R successfully loaded
+##  Loaded GDAL runtime: GDAL 2.2.3, released 2017/11/20
+##  Path to GDAL shared files: C:/Users/kyaws/Documents/R/win-library/3.6/rgdal/gdal
+##  GDAL binary built with GEOS: TRUE 
+##  Loaded PROJ.4 runtime: Rel. 4.9.3, 15 August 2016, [PJ_VERSION: 493]
+##  Path to PROJ.4 shared files: C:/Users/kyaws/Documents/R/win-library/3.6/rgdal/proj
+##  Linking to sp version: 1.3-1</code></pre>
+<pre class="r"><code>library(measurements)
+
+# Field_Data &lt;- read.csv(&quot;Data/Popa_Fieldwork/Popa_Fieldwork(23-10-2019).csv&quot;, stringsAsFactors = F)
+# head(Field_Data)
+# sum(is.na(Field_Data$North))
+# sum(is.na(Field_Data$East))
+# str(Field_Data)
+# 
+# Field_Data$North = gsub(&#39;  &#39;, &#39; &#39;,Field_Data$North)
+# Field_Data$East = gsub(&#39;  &#39;, &#39; &#39;,Field_Data$East)
+# 
+# Field_Data$Lat = conv_unit(Field_Data$North, from = &#39;deg_min_sec&#39;, to = &#39;dec_deg&#39;)
+# Field_Data$Long = conv_unit(Field_Data$East, from = &#39;deg_min_sec&#39;, to = &#39;dec_deg&#39;)
+# 
+# write.csv(Field_Data, file=&quot;Data_Output/FieldPlots.csv&quot;, row.names = F)
+
+
+
+Field_Data &lt;- read.csv(&quot;Data_Output/FieldPlots.csv&quot;)
+world2HiresMapEnv</code></pre>
+<pre><code>## [1] &quot;R_MAPDATA_DATA_DIR&quot;</code></pre>
+<pre class="r"><code>data(wrld_simpl)
+myanmar &lt;- wrld_simpl[wrld_simpl$NAME==&quot;Burma&quot;,]
+
+FPopaPlots &lt;- Field_Data %&gt;% group_by(Plot) %&gt;% summarise(Long= mean (Long),Lat=mean(Lat))
+coords = cbind(FPopaPlots$Long, FPopaPlots$Lat)
+llCRS &lt;- CRS(&quot;+init=epsg:4326&quot;)
+Coords_sp &lt;- SpatialPoints(coords, proj4string = llCRS)
+Coords_sp &lt;- spTransform(Coords_sp, &quot;+init=epsg:4326&quot;)
+
+spdf = SpatialPointsDataFrame(Coords_sp,data = FPopaPlots)
+writeOGR(spdf,&quot;FieldPopa_plots.shp&quot;, layer=&quot;Coords_sp&quot;, driver = &quot;ESRI Shapefile&quot;)
+plot(myanmar)</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
+<pre class="r"><code>plot(Coords_sp)</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-9-2.png" width="672" /></p>
+<pre class="r"><code>EVI2018Popa &lt;-raster(&quot;Data/EVI2018_Popa.tif&quot;)
+mypts &lt;-readOGR(&quot;Field_Plots_shapefile/FieldPopa_plots.shp&quot;)</code></pre>
+<pre><code>## OGR data source with driver: ESRI Shapefile 
+## Source: &quot;D:\PhD-Web\Field_Plots_shapefile\FieldPopa_plots.shp&quot;, layer: &quot;FieldPopa_plots&quot;
+## with 20 features
+## It has 3 fields</code></pre>
+<pre class="r"><code>EVI2018Popa &lt;- trim(EVI2018Popa)
+plot(EVI2018Popa)
+mydata &lt;- raster::extract(EVI2018Popa, mypts)
+plot(mypts, add = TRUE, cex=0.1)</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-10-1.png" width="672" /></p>
+<pre class="r"><code>class(mydata)</code></pre>
+<pre><code>## [1] &quot;numeric&quot;</code></pre>
+<pre class="r"><code>EVI2018_values &lt;- as.data.frame(mydata)
+EVI2018 &lt;- EVI2018_values %&gt;% rename(EVI2018=mydata)
+Plot_names &lt;- read.csv(&quot;Data_Output/FieldPlots.csv&quot;,stringsAsFactors = F)
+Plots_EVI2018 &lt;- Plot_names %&gt;% group_by(Plot) %&gt;% summarise(Long = mean(Long),Lat=mean(Lat))
+EVI2018_Popa &lt;- bind_cols(Plots_EVI2018,EVI2018)
+EVI2018_Popa &lt;- EVI2018_Popa %&gt;% rename(Plot_Number=Plot)</code></pre>
+<p>Joining Field Carbon and EVI</p>
+<pre class="r"><code>Field_Carbon &lt;- read.csv(&quot;Data_Output/Field_Carbon.csv&quot;, stringsAsFactors = F)
+EVI2018_Popa$Carbon &lt;-  Field_Carbon$Total_C
+EVI2018_Popa$Elevation &lt;- Field_Carbon$Elevation
+Carbon_EVI_Popa &lt;- EVI2018_Popa
+plot(Carbon_EVI_Popa$Carbon, Carbon_EVI_Popa$EVI2018)</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
+<pre class="r"><code>plot(Carbon_EVI_Popa$Carbon, Carbon_EVI_Popa$Elevation)</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-11-2.png" width="672" /></p>
+<pre class="r"><code>write.csv(Carbon_EVI_Popa,file = &quot;Data_Output/Carbon_EVI_Popa.csv&quot;, row.names = F)</code></pre>
+<p><strong>Carbon and environmental conditions relationship</strong></p>
+<p>BIO1 = Annual Mean Temperature<br />
+BIO2 = Mean Diurnal Range (Mean of monthly (max temp - min temp))<br />
+BIO3 = Isothermality (BIO2/BIO7) (* 100)<br />
+BIO4 = Temperature Seasonality (standard deviation *100)<br />
+BIO5 = Max Temperature of Warmest Month<br />
+BIO6 = Min Temperature of Coldest Month<br />
+BIO7 = Temperature Annual Range (BIO5-BIO6)<br />
+BIO8 = Mean Temperature of Wettest Quarter<br />
+BIO9 = Mean Temperature of Driest Quarter<br />
+BIO10 = Mean Temperature of Warmest Quarter<br />
+BIO11 = Mean Temperature of Coldest Quarter<br />
+BIO12 = Annual Precipitation<br />
+BIO13 = Precipitation of Wettest Month<br />
+BIO14 = Precipitation of Driest Month<br />
+BIO15 = Precipitation Seasonality (Coefficient of Variation)<br />
+BIO16 = Precipitation of Wettest Quarter<br />
+BIO17 = Precipitation of Driest Quarter<br />
+BIO18 = Precipitation of Warmest Quarter<br />
+BIO19 = Precipitation of Coldest Quarter</p>
+<p>I performed a simple liner regression analysis on the two variables Carbon and Annual precipitaion(AP)/Annual Mean Temperature(AMT). I wish to determine wheter the AP/AMT varible is a significant predictor of the Carbon Variable.</p>
+<pre class="r"><code>Carbon_EVI_Popa &lt;- read.csv(&quot;Data_Output/Carbon_EVI_Popa.csv&quot;, stringsAsFactors = F)
+WCL_Popa &lt;- read.csv(&quot;Data_Output/WCL_Popa.csv&quot;, stringsAsFactors = F) %&gt;% rename(Plot_Number=Plot)
+CEVI_WCL_Popa &lt;- Carbon_EVI_Popa %&gt;% inner_join(WCL_Popa, by = &quot;Plot_Number&quot;,suffix = c(&quot;.EVI&quot;, &quot;.WCL&quot;), all = T) %&gt;% rename(Long= Long.EVI, Lat=Lat.EVI) %&gt;% dplyr::select(-c(Long.WCL, Lat.WCL))
+
+
+plot(Carbon~bio01, data = CEVI_WCL_Popa)</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-12-1.png" width="672" /></p>
+<pre class="r"><code>glm.AMT &lt;- glm(log(Carbon)~bio01,data=CEVI_WCL_Popa, family = gaussian(link = &quot;identity&quot;))
+summary(glm.AMT)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = log(Carbon) ~ bio01, family = gaussian(link = &quot;identity&quot;), 
+##     data = CEVI_WCL_Popa)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -1.0457  -0.4193   0.0682   0.5074   0.7733  
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 13.907147   2.006384   6.931 1.77e-06 ***
+## bio01       -0.041685   0.008561  -4.869 0.000123 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for gaussian family taken to be 0.286772)
+## 
+##     Null deviance: 11.9612  on 19  degrees of freedom
+## Residual deviance:  5.1619  on 18  degrees of freedom
+## AIC: 35.669
+## 
+## Number of Fisher Scoring iterations: 2</code></pre>
+<pre class="r"><code>plot(glm.AMT)</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-12-2.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-12-3.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-12-4.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-12-5.png" width="672" /></p>
+<pre class="r"><code>ggplot(data=CEVI_WCL_Popa, aes(x=bio01, y = Carbon, color=as.factor(Plot_Number)))+ geom_jitter()+
+  labs(title = &quot;Carbon storage and Annual Mean Temperature Relationship&quot;, 
+       x= &quot;Annual Mean Temperature(°C)&quot;,
+       y= &quot;Carbon(t/ha)&quot;)+
+  theme(axis.text.x = element_text(size=7, angle = 45, vjust = 0.5),
+        axis.text.y = element_text(size = 7))</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-12-6.png" width="672" /></p>
+<pre class="r"><code>plot(Carbon~bio12, data = CEVI_WCL_Popa)</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-12-7.png" width="672" /></p>
+<pre class="r"><code>glm.AMT &lt;- glm(log(Carbon)~bio12,data=CEVI_WCL_Popa, family = gaussian(link = &quot;identity&quot;))
+summary(glm.AMT)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = log(Carbon) ~ bio12, family = gaussian(link = &quot;identity&quot;), 
+##     data = CEVI_WCL_Popa)
+## 
+## Deviance Residuals: 
+##      Min        1Q    Median        3Q       Max  
+## -1.13521  -0.48973   0.05025   0.55358   0.79696  
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 0.1733467  0.9106709   0.190 0.851165    
+## bio12       0.0043382  0.0009826   4.415 0.000334 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for gaussian family taken to be 0.3190467)
+## 
+##     Null deviance: 11.9612  on 19  degrees of freedom
+## Residual deviance:  5.7428  on 18  degrees of freedom
+## AIC: 37.802
+## 
+## Number of Fisher Scoring iterations: 2</code></pre>
+<pre class="r"><code>plot(glm.AMT)</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-12-8.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-12-9.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-12-10.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-12-11.png" width="672" /></p>
+<pre class="r"><code>ggplot(data=CEVI_WCL_Popa, aes(x=bio12, y = Carbon, color=as.factor(Plot_Number)))+ geom_jitter()+
+  labs(title = &quot;Carbon storage and Annual Precipiation Relationship&quot;, 
+       x= &quot;Annual Precipiation (mm)&quot;,
+       y= &quot;Carbon(t/ha)&quot;)+
+  theme(axis.text.x = element_text(size=7, angle = 45, vjust = 0.5),
+        axis.text.y = element_text(size = 7))</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-12-12.png" width="672" /></p>
+<pre class="r"><code>write.csv(CEVI_WCL_Popa, file=&quot;Data_Output/Carbon_EVI_Popa.csv&quot;, row.names = F)</code></pre>
+<p><strong>Load up the values extracted from the AVitabile AGB Map</strong></p>
+<pre class="r"><code>Avt_Carbon_Popa &lt;- read.csv(&quot;Data_Output/Avitabile_AGB_Popa.csv&quot;, stringsAsFactors = F)
+All_Plot_info &lt;- read.csv(&quot;Data_Output/Carbon_EVI_Popa.csv&quot;, stringsAsFactors = F)
+AVt_Fieldwork &lt;- Avt_Carbon_Popa %&gt;% inner_join(All_Plot_info, by = &quot;Plot_Number&quot;,suffix = c(&quot;.Avt&quot;, &quot;.FW&quot;), all = T) %&gt;% rename(Lat=Lat.FW, Long = Long.FW) %&gt;% dplyr::select(-c(Lat.Avt, Long.Avt))
+
+attach(AVt_Fieldwork)</code></pre>
+<pre><code>## The following object is masked _by_ .GlobalEnv:
+## 
+##     EVI2018</code></pre>
+<pre class="r"><code>plot(Carbon~Mean_Avt_Carbon, data = AVt_Fieldwork)</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
+<pre class="r"><code>glm.Avt_FW &lt;- glm(Carbon~Mean_Avt_Carbon,data = AVt_Fieldwork, family = gaussian(link = &quot;identity&quot;))
+summary(glm.Avt_FW)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = Carbon ~ Mean_Avt_Carbon, family = gaussian(link = &quot;identity&quot;), 
+##     data = AVt_Fieldwork)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -64.109  -40.449   -5.727   36.641   74.198  
+## 
+## Coefficients:
+##                 Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)     109.3329    23.3576   4.681 0.000186 ***
+## Mean_Avt_Carbon  -0.6870     0.5075  -1.354 0.192543    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for gaussian family taken to be 2252.094)
+## 
+##     Null deviance: 44666  on 19  degrees of freedom
+## Residual deviance: 40538  on 18  degrees of freedom
+## AIC: 215.04
+## 
+## Number of Fisher Scoring iterations: 2</code></pre>
+<pre class="r"><code>plot(glm.Avt_FW)</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-13-2.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-13-3.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-13-4.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-13-5.png" width="672" /></p>
+<pre class="r"><code>ggplot(data=AVt_Fieldwork, aes(x=Mean_Avt_Carbon, y = Carbon, color=as.factor(Plot_Number)))+ geom_jitter()+
+  labs(title = &quot;Fieldwork Carbon storage and Avitabile Carbon Relationship&quot;, 
+       x=expression(bold(paste(&quot;Carbon predicted by Avitabile t &quot;, ha^bold(&quot;-1&quot;)))),
+       y= expression(bold(paste(&quot;Carbon calculated from fieldwork t &quot;, ha^bold(&quot;-1&quot;)))))+
+  theme(axis.text.x = element_text(size=7, angle = 45, vjust = 0.5),
+        axis.text.y = element_text(size = 7))</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-13-6.png" width="672" /></p>
 
 
 

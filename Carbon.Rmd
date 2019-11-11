@@ -279,6 +279,8 @@ Plots_location <- rbind(coords46,coords47)
 spdf = SpatialPointsDataFrame(Plots_location,data = Plot_Carbon)
 
 writeOGR(spdf,"locations_WGS84Edited.shp", layer="plot_locations", driver = "ESRI Shapefile")
+
+
 ```
 
 This section describes how carbon storage of all the plots are different according to the ecoregions published by WWF.The plot locations shape file and ecoregion shape files ware used with QGIS to extract which plots belong to which ecoregions. The function called "Join attributed by locations " was used in this process. 
@@ -361,7 +363,11 @@ ggplot(data=Env, aes(x=bio12, y = log(Sum_CHa), color=DIST))+ geom_point(alpha=1
   labs(title = "Carbon storage and Annual Precipitation Relationship", 
        x= "Annual Annual Precipitation (mm)",
        y= "Carbon(t/ha)")+
-  theme(axis.text.x = element_text(size=7, angle = 45, vjust = 0.5),
+```
+
+
+```{r}
+theme(axis.text.x = element_text(size=7, angle = 45, vjust = 0.5),
         axis.text.y = element_text(size = 7))
 
 # According to Year 
@@ -375,6 +381,30 @@ ggplot(data=Env, aes(x=bio12, y = log(Sum_CHa), color=DIST))+ geom_line()+
 ```
 
 
+```{r}
+n<-10000
+
+rsq<-vector(n, mode = 'numeric')
+pval<-vector(n, mode = 'numeric')
+for(i in 1:n){
+  
+x<-rnorm(100)
+y<-rnorm(100)
+
+fm<-lm(y~x)
+
+fm_sum<-summary(fm)
+rsq[[i]]<-fm_sum$r.squared
+pval[[i]]<-fm_sum$coefficients[2,4]
+}
+
+hist(rsq, breaks = 100)
+hist(pval, breaks = 100)
+
+(sum(pval<0.05) / length(pval))*100
+
+
+```
 
 
 

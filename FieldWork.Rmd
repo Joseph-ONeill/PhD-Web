@@ -12,7 +12,7 @@ library(lubridate)
 library(BIOMASS)
 library(ape)
 library(ggplot2)
-library(measurements)
+
 ```
 
 ```{r}
@@ -78,7 +78,7 @@ summary(aov(C_Tree_Ha ~ factor(Plot), data = Field_Data))
  
 Field_Carbon <- Field_Data %>%
   group_by(Plot) %>%
-  dplyr::summarise(Total_C = sum(C_Tree_Ha)) %>% rename(Plot_Number=Plot)
+  dplyr::summarise(Total_C = sum(C_Tree_Ha), Elevation = mean(Elevation_m)) %>% rename(Plot_Number=Plot)
 
 ggplot(data=Field_Carbon, aes(x=as.numeric(Plot_Number),y =Total_C, color=as.numeric(Plot_Number)))+ geom_point()+ geom_line()+
       labs(title = "Carbon storage in 20 Permanent sample plots", 
@@ -86,6 +86,8 @@ ggplot(data=Field_Carbon, aes(x=as.numeric(Plot_Number),y =Total_C, color=as.num
        y= "Carbon(t/ha)")+
   theme(axis.text.x = element_text(size=7, angle = 0, vjust = 0.5),
         axis.text.y = element_text(size = 7))
+
+write.csv(Field_Carbon, file = "Data_Output/Field_Carbon.csv", row.names = F)
  
 
 ```
@@ -98,5 +100,205 @@ ggplot(data = Field_Data, aes(y = Height_m, x = log(DBH_cm))) +
   geom_smooth(method = "lm", se = FALSE)
 
 ```
+**convert from decimal minutes to decimal degrees**
 
+```{r}
+library(tidyverse)
+library(dplyr)
+library(ggplot2)
+library(stringr)
+library(maps)
+library(mapdata)
+library(maptools)
+library(sp)
+library(raster)
+library(BIOMASS)
+library(ape)
+library(magrittr)
+library(tinytex)
+library(raster)
+library(rgdal)
+library(measurements)
+
+# Field_Data <- read.csv("Data/Popa_Fieldwork/Popa_Fieldwork(23-10-2019).csv", stringsAsFactors = F)
+# head(Field_Data)
+# sum(is.na(Field_Data$North))
+# sum(is.na(Field_Data$East))
+# str(Field_Data)
+# 
+# Field_Data$North = gsub('  ', ' ',Field_Data$North)
+# Field_Data$East = gsub('  ', ' ',Field_Data$East)
+# 
+# Field_Data$Lat = conv_unit(Field_Data$North, from = 'deg_min_sec', to = 'dec_deg')
+# Field_Data$Long = conv_unit(Field_Data$East, from = 'deg_min_sec', to = 'dec_deg')
+# 
+# write.csv(Field_Data, file="Data_Output/FieldPlots.csv", row.names = F)
+
+
+
+Field_Data <- read.csv("Data_Output/FieldPlots.csv")
+world2HiresMapEnv
+
+data(wrld_simpl)
+myanmar <- wrld_simpl[wrld_simpl$NAME=="Burma",]
+
+FPopaPlots <- Field_Data %>% group_by(Plot) %>% summarise(Long= mean (Long),Lat=mean(Lat))
+coords = cbind(FPopaPlots$Long, FPopaPlots$Lat)
+llCRS <- CRS("+init=epsg:4326")
+Coords_sp <- SpatialPoints(coords, proj4string = llCRS)
+Coords_sp <- spTransform(Coords_sp, "+init=epsg:4326")
+
+spdf = SpatialPointsDataFrame(Coords_sp,data = FPopaPlots)
+writeOGR(spdf,"FieldPopa_plots.shp", layer="Coords_sp", driver = "ESRI Shapefile")
+plot(myanmar)
+plot(Coords_sp)
+
+```
+```{r}
+EVI2018Popa <-raster("Data/EVI2018_Popa.tif")
+mypts <-readOGR("Field_Plots_shapefile/FieldPopa_plots.shp")
+EVI2018Popa <- trim(EVI2018Popa)
+plot(EVI2018Popa)
+mydata <- raster::extract(EVI2018Popa, mypts)
+plot(mypts, add = TRUE, cex=0.1)
+
+class(mydata)
+EVI2018_values <- as.data.frame(mydata)
+EVI2018 <- EVI2018_values %>% rename(EVI2018=mydata)
+Plot_names <- read.csv("Data_Output/FieldPlots.csv",stringsAsFactors = F)
+Plots_EVI2018 <- Plot_names %>% group_by(Plot) %>% summarise(Long = mean(Long),Lat=mean(Lat))
+EVI2018_Popa <- bind_cols(Plots_EVI2018,EVI2018)
+EVI2018_Popa <- EVI2018_Popa %>% rename(Plot_Number=Plot)
+
+
+```
+Joining Field Carbon and EVI
+
+```{r}
+Field_Carbon <- read.csv("Data_Output/Field_Carbon.csv", stringsAsFactors = F)
+EVI2018_Popa$Carbon <-  Field_Carbon$Total_C
+EVI2018_Popa$Elevation <- Field_Carbon$Elevation
+Carbon_EVI_Popa <- EVI2018_Popa
+plot(Carbon_EVI_Popa$Carbon, Carbon_EVI_Popa$EVI2018)
+plot(Carbon_EVI_Popa$Carbon, Carbon_EVI_Popa$Elevation)
+
+write.csv(Carbon_EVI_Popa,file = "Data_Output/Carbon_EVI_Popa.csv", row.names = F)
+```
+**Carbon and environmental conditions relationship** 
+
+BIO1 = Annual Mean Temperature  
+BIO2 = Mean Diurnal Range (Mean of monthly (max temp - min temp))  
+BIO3 = Isothermality (BIO2/BIO7) (* 100)  
+BIO4 = Temperature Seasonality (standard deviation *100)  
+BIO5 = Max Temperature of Warmest Month  
+BIO6 = Min Temperature of Coldest Month  
+BIO7 = Temperature Annual Range (BIO5-BIO6)  
+BIO8 = Mean Temperature of Wettest Quarter  
+BIO9 = Mean Temperature of Driest Quarter  
+BIO10 = Mean Temperature of Warmest Quarter  
+BIO11 = Mean Temperature of Coldest Quarter  
+BIO12 = Annual Precipitation  
+BIO13 = Precipitation of Wettest Month  
+BIO14 = Precipitation of Driest Month  
+BIO15 = Precipitation Seasonality (Coefficient of Variation)  
+BIO16 = Precipitation of Wettest Quarter  
+BIO17 = Precipitation of Driest Quarter  
+BIO18 = Precipitation of Warmest Quarter  
+BIO19 = Precipitation of Coldest Quarter  
+
+I performed a simple liner regression analysis on the two variables Carbon and Annual precipitaion(AP)/Annual Mean Temperature(AMT). I wish to determine wheter the AP/AMT varible is a significant predictor of the Carbon Variable.
+
+```{r}
+Carbon_EVI_Popa <- read.csv("Data_Output/Carbon_EVI_Popa.csv", stringsAsFactors = F)
+WCL_Popa <- read.csv("Data_Output/WCL_Popa.csv", stringsAsFactors = F) %>% rename(Plot_Number=Plot)
+CEVI_WCL_Popa <- Carbon_EVI_Popa %>% inner_join(WCL_Popa, by = "Plot_Number",suffix = c(".EVI", ".WCL"), all = T) %>% rename(Long= Long.EVI, Lat=Lat.EVI) %>% dplyr::select(-c(Long.WCL, Lat.WCL))
+
+
+plot(Carbon~bio01, data = CEVI_WCL_Popa)
+glm.AMT <- glm(log(Carbon)~bio01,data=CEVI_WCL_Popa, family = gaussian(link = "identity"))
+summary(glm.AMT)
+plot(glm.AMT)
+
+ggplot(data=CEVI_WCL_Popa, aes(x=bio01, y = Carbon, color=as.factor(Plot_Number)))+ geom_jitter()+
+  labs(title = "Carbon storage and Annual Mean Temperature Relationship", 
+       x= "Annual Mean Temperature(°C)",
+       y= "Carbon(t/ha)")+
+  theme(axis.text.x = element_text(size=7, angle = 45, vjust = 0.5),
+        axis.text.y = element_text(size = 7))
+
+
+plot(Carbon~bio12, data = CEVI_WCL_Popa)
+glm.AMT <- glm(log(Carbon)~bio12,data=CEVI_WCL_Popa, family = gaussian(link = "identity"))
+summary(glm.AMT)
+plot(glm.AMT)
+
+ggplot(data=CEVI_WCL_Popa, aes(x=bio12, y = Carbon, color=as.factor(Plot_Number)))+ geom_jitter()+
+  labs(title = "Carbon storage and Annual Precipiation Relationship", 
+       x= "Annual Precipiation (mm)",
+       y= "Carbon(t/ha)")+
+  theme(axis.text.x = element_text(size=7, angle = 45, vjust = 0.5),
+        axis.text.y = element_text(size = 7))
+
+
+
+write.csv(CEVI_WCL_Popa, file="Data_Output/Carbon_EVI_Popa.csv", row.names = F)
+
+```
+**Load up the values extracted from the AVitabile AGB Map**
+
+```{r}
+Avt_Carbon_Popa <- read.csv("Data_Output/Avitabile_AGB_Popa.csv", stringsAsFactors = F)
+All_Plot_info <- read.csv("Data_Output/Carbon_EVI_Popa.csv", stringsAsFactors = F)
+AVt_Fieldwork <- Avt_Carbon_Popa %>% inner_join(All_Plot_info, by = "Plot_Number",suffix = c(".Avt", ".FW"), all = T) %>% rename(Lat=Lat.FW, Long = Long.FW) %>% dplyr::select(-c(Lat.Avt, Long.Avt))
+
+attach(AVt_Fieldwork)
+plot(Carbon~Mean_Avt_Carbon, data = AVt_Fieldwork)
+glm.Avt_FW <- glm(Carbon~Mean_Avt_Carbon,data = AVt_Fieldwork, family = gaussian(link = "identity"))
+summary(glm.Avt_FW)
+plot(glm.Avt_FW)
+
+ggplot(data=AVt_Fieldwork, aes(x=Mean_Avt_Carbon, y = Carbon, color=as.factor(Plot_Number)))+ geom_jitter()+
+  labs(title = "Fieldwork Carbon storage and Avitabile Carbon Relationship", 
+       x=expression(bold(paste("Carbon predicted by Avitabile t ", ha^bold("-1")))),
+       y= expression(bold(paste("Carbon calculated from fieldwork t ", ha^bold("-1")))))+
+  theme(axis.text.x = element_text(size=7, angle = 45, vjust = 0.5),
+        axis.text.y = element_text(size = 7))
+
+```
+
+**Loading Last Year's Popa datasets here to check with the field dataset I collected**
+
+```{r}
+First_Year_Forests <- read.csv("Data/All_data_Final.csv", stringsAsFactors = F)
+Popa_Forests <- First_Year_Forests %>% filter(Forest_type!="Moist_Mixed_Deciduous_Forest") %>% filter(Forest_type!="Dry_Mixed_Deciduous_Forest")
+
+NA_Rows <- Popa_Forests %>% filter(!complete.cases(.))
+
+DF$col[is.na(DF$col)] <- "None"
+NA_Rows$Species_names[is.na(NA_Rows$Species_names)] <- "Unknown species"
+NA_Rows$Genus[is.na(NA_Rows$Genus)] <- "Unknown"
+NA_Rows$Species[is.na(NA_Rows$Species)] <- "species"
+NA_Rows$Family[is.na(NA_Rows$Family)] <- "Unknown"
+NA_Rows_Completed <- NA_Rows
+
+Complete_Rows <- Popa_Forests %>% filter(complete.cases(.))
+
+Popa_Forests_Full <- rbind(Complete_Rows, NA_Rows_Completed)
+
+```
+
+
+names(Forests)
+Forests <- filter(Forests,!is.na(Species_names) & !is.na(Dbh_cm))
+summary(Forests)
+unique(Forests$Forest_type)
+
+LogDH_Selected_Forests <- Selected_Forests %>% mutate(LogDbh_cm=log(Dbh_cm)) %>% mutate(LogH_m=log(H_m))
+ggplot(data = Selected_Forests, aes(Dbh_cm, H_m, color=Forest_type) )+ geom_point()
+ModelForHeight <- lmer(log(H_m)~log(Dbh_cm)+(1|Plot_id), REML = FALSE, data = Selected_Forests)
+ModelForHeight
+ranef(ModelForHeight)$Plot_id[,1] %>% hist()
+
+ModelForHeight_Log <- lmer(LogH_m~LogDbh_cm +(1|Plot_id), REML = FALSE, data = LogDH_Selected_Forests)
+ModelForHeight_Log
 
