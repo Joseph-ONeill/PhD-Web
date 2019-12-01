@@ -2,15 +2,9 @@ name: "National Carbon Stocks Assessment"
 navbar:
   title: "O'Neill-PhD"
   left:
-    - text: "Carbon and Environment"
+    - text: "NFI(2010-2017)"
       href: Carbon.html
-    - text: "Carbon,NDVI and EVI"
-      href: NDVI.html
-    - text: "Carbon and cities proximity"
-      href: Human_C.html
-    - text: "NFI and Avitabile Comparison"
-      href: NFI-Avitabile.html  
-    - text: "Fieldwork Analysis"
+    - text: "Fieldworks (2007,2013,2019)"
       href: Fieldwork.html  
     - text: "Species Analysis"
       href: Species-Analysis.html

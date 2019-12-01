@@ -2,9 +2,16 @@
 title: "About This Website"
 ---
 
-```{r}
-Ecoregions <- read.csv("Data/Plots_Ecoregions.csv")
-summary(Ecoregions)
+Date: 29-11-2019
 
-```
+Elevation, Aspect and direction, slope degree information are integrated with WCL, carbon, NDVI, EVI, AVT data for NFI dataset and FieldWork dataset. 
+Two final dataframes named 20191129NFIDataframe.csv and 20191129Popa2019Df.csv are written in the Data_Output folder. 
+
+Date: 30-11-2019
+Final dataframe name 20191130Popa2007.csv was writeen in the Data_Output folder. :)
+
+Final dataframes for all datasets are produced in the Data_output Folder. File Naming system is 
+Year_Month_Date_DataName
+20191130NFI/Pp/Mmd/
+
 

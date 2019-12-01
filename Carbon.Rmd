@@ -59,7 +59,7 @@ Trees <- Trees %>% mutate(DBH_cm=DBH_mm/10) %>% mutate(WD=dataWD$meanWD)
 
 ```
 
-**Building a Diameter Height Model based on the first year data**
+**Building a Diameter Height Model based on the moist mixed deciduous forest of Bago Region (collected in 2013) first year data**
 
 ```{r, message=FALSE}
 library(lme4)
@@ -68,12 +68,12 @@ names(Forests)
 Forests <- filter(Forests,!is.na(Species_names) & !is.na(Dbh_cm))
 summary(Forests)
 unique(Forests$Forest_type)
-Selected_Forests <- Forests %>% filter(Forest_type=="Moist_Mixed_Deciduous_Forest"| Forest_type=="Dry_Mixed_Deciduous_Forest")
+Selected_Forests <- Forests %>% filter(Forest_type=="Moist_Mixed_Deciduous_Forest")
 LogDH_Selected_Forests <- Selected_Forests %>% mutate(LogDbh_cm=log(Dbh_cm)) %>% mutate(LogH_m=log(H_m))
 ggplot(data = Selected_Forests, aes(Dbh_cm, H_m, color=Forest_type) )+ geom_point()
 ModelForHeight <- lmer(log(H_m)~log(Dbh_cm)+(1|Plot_id), REML = FALSE, data = Selected_Forests)
 ModelForHeight
-ranef(ModelForHeight)$Plot_id[,1] %>% hist()
+ranef(ModelForHeight)$Plot_id[,1] %>% hist(breaks=10)
 
 ModelForHeight_Log <- lmer(LogH_m~LogDbh_cm +(1|Plot_id), REML = FALSE, data = LogDH_Selected_Forests)
 ModelForHeight_Log
@@ -189,99 +189,101 @@ library(tinytex)
 library(raster)
 library(rgdal)
 
-In_46 <- read.csv("Data_Output/Qgis_edited_Plots_Locations and Carbon/In_Plots46.csv",stringsAsFactors = F)
-In_47 <- read.csv("Data_Output/Qgis_edited_Plots_Locations and Carbon/In_Plots47.csv",stringsAsFactors = F)
-Out_47 <- read.csv("Data_Output/Qgis_edited_Plots_Locations and Carbon/Out_47.csv", stringsAsFactors = F)
-Out_46 <- read.csv("Data_Output/Qgis_edited_Plots_Locations and Carbon/Out_46.csv", stringsAsFactors = F)
-Out_46Adjusted <- read.csv("Data_Output/Qgis_edited_Plots_Locations and Carbon/46 Adjusted.csv", stringsAsFactors = F)
-Out_47Adjusted <- read.csv("Data_Output/Qgis_edited_Plots_Locations and Carbon/47 Adjusted.csv",stringsAsFactors = F)
-
-
-Out46RowToBeRemoved <- Out_46Adjusted$Plot_names
-Cleaned_Out46 <- Out_46[-which(Out_46$Plot_names %in% Out46RowToBeRemoved),]
-New_Out46 <- rbind(Cleaned_Out46,Out_46Adjusted)                  
-                  
-
-Out47RowToBeRemoved <- Out_47Adjusted$Plot_names
-Cleaned_Out47 <- Out_47[-which(Out_47$Plot_names %in% Out47RowToBeRemoved),]
-New_Out47 <- rbind(Cleaned_Out47,Out_47Adjusted)   
-   
-
-Lcorrected_Plots <- rbind(In_46,In_47,New_Out46, New_Out47)
-Carbon <- read.csv("Data_Output/All_plots.csv", stringsAsFactors = F)
-Carbon <- Carbon %>% dplyr::select(Plot_names,Sum_CHa)
-Plot_Carbon <- left_join(Lcorrected_Plots,Carbon, by="Plot_names")
-
-
-str(Plot_Carbon)
-
-summary(Plot_Carbon)
-
-world2HiresMapEnv
-
-data(wrld_simpl)
-myanmar <- wrld_simpl[wrld_simpl$NAME=="Burma",]
-plot(myanmar)
-myanmar_utm46 <- spTransform(myanmar, "+init=epsg:32646")
-myanmar_utm47 <- spTransform(myanmar, "+init=epsg:32647")
-plot(myanmar_utm47)
-plot(myanmar_utm46)
-# Loading the known plots and add a colum called Zone (46/47)----
-
-coords46 <- Plot_Carbon %>% 
-  filter(Zone==46)
-
-coords47 <-Plot_Carbon %>% 
-  filter(Zone ==47) 
-
-
-coords46 = SpatialPoints(cbind(coords46$EAST, coords46$NORTH))
-proj4string(coords46) = CRS("+init=epsg:32646")
-coords46<-spTransform(coords46, "+init=epsg:4326")
-
-coords47 = SpatialPoints(cbind(coords47$EAST, coords47$NORTH))
-proj4string(coords47) = CRS("+init=epsg:32647")
-coords47<-spTransform(coords47, "+init=epsg:4326")
-
-par(mar=c(4,4,2,2), mfrow =c(2,2))
-plot(myanmar, border = "red")
-plot(coords46, add = TRUE, cex = 0.1, col = "blue")
-plot(coords47, add= TRUE, cex = 0.1, col = "green")
-
-Plot_Carbon$Year <- as.factor(Plot_Carbon$Year)
-ggplot(data = Plot_Carbon, aes(x = DIST, y= log(Sum_CHa), color= Year))+ 
-  geom_boxplot()+
-  labs(title = "Carbon storage per ha in 21 disctricts from 2010 to 2017", 
-       x= "District name",
-       y= "Carbon(t/ha)")+
-  theme(axis.text.x = element_text(size=7, angle = 90, vjust = 0.5),
-        axis.text.y = element_text(size = 7))
-
-glm.CarbonDistrict <- glm(log(Sum_CHa)~DIST, data = Plot_Carbon, family= gaussian(link="identity") )
-anova(glm.CarbonDistrict)
-plot(glm.CarbonDistrict)
-summary(glm.CarbonDistrict)
-
-Grid46 <- Plot_Carbon %>% filter(Zone=="46")
-
-Grid47 <- Plot_Carbon %>% filter(Zone=="47")
-
-coords46 = SpatialPoints(cbind(Grid46$EAST, Grid46$NORTH))
-proj4string(coords46) = CRS("+init=epsg:32646")
-coords46 <- spTransform(coords46, "+init=epsg:4326")
-
-coords47 = SpatialPoints(cbind(Grid47$EAST, Grid47$NORTH))
-proj4string(coords47) = CRS("+init=epsg:32647")
-coords47 <- spTransform(coords47, "+init=epsg:4326")
-
-Plots_location <- rbind(coords46,coords47) 
-
-spdf = SpatialPointsDataFrame(Plots_location,data = Plot_Carbon)
-
-writeOGR(spdf,"locations_WGS84Edited.shp", layer="plot_locations", driver = "ESRI Shapefile")
+# In_46 <- read.csv("Data_Output/Qgis_edited_Plots_Locations and Carbon/In_Plots46.csv",stringsAsFactors = F)
+# In_47 <- read.csv("Data_Output/Qgis_edited_Plots_Locations and Carbon/In_Plots47.csv",stringsAsFactors = F)
+# Out_47 <- read.csv("Data_Output/Qgis_edited_Plots_Locations and Carbon/Out_47.csv", stringsAsFactors = F)
+# Out_46 <- read.csv("Data_Output/Qgis_edited_Plots_Locations and Carbon/Out_46.csv", stringsAsFactors = F)
+# Out_46Adjusted <- read.csv("Data_Output/Qgis_edited_Plots_Locations and Carbon/46 Adjusted.csv", stringsAsFactors = F)
+# Out_47Adjusted <- read.csv("Data_Output/Qgis_edited_Plots_Locations and Carbon/47 Adjusted.csv",stringsAsFactors = F)
+# 
+# 
+# Out46RowToBeRemoved <- Out_46Adjusted$Plot_names
+# Cleaned_Out46 <- Out_46[-which(Out_46$Plot_names %in% Out46RowToBeRemoved),]
+# New_Out46 <- rbind(Cleaned_Out46,Out_46Adjusted)                  
+#                   
+# 
+# Out47RowToBeRemoved <- Out_47Adjusted$Plot_names
+# Cleaned_Out47 <- Out_47[-which(Out_47$Plot_names %in% Out47RowToBeRemoved),]
+# New_Out47 <- rbind(Cleaned_Out47,Out_47Adjusted)   
+#    
+# 
+# Lcorrected_Plots <- rbind(In_46,In_47,New_Out46, New_Out47)
+# Carbon <- read.csv("Data_Output/All_plots.csv", stringsAsFactors = F)
+# Carbon <- Carbon %>% dplyr::select(Plot_names,Sum_CHa)
+# Plot_Carbon <- left_join(Lcorrected_Plots,Carbon, by="Plot_names")
+# 
+# 
+# str(Plot_Carbon)
+# 
+# summary(Plot_Carbon)
+# 
+# world2HiresMapEnv
+# 
+# data(wrld_simpl)
+# myanmar <- wrld_simpl[wrld_simpl$NAME=="Burma",]
+# plot(myanmar)
+# myanmar_utm46 <- spTransform(myanmar, "+init=epsg:32646")
+# myanmar_utm47 <- spTransform(myanmar, "+init=epsg:32647")
+# plot(myanmar_utm47)
+# plot(myanmar_utm46)
+# # Loading the known plots and add a colum called Zone (46/47)----
+# 
+# coords46 <- Plot_Carbon %>% 
+#   filter(Zone==46)
+# 
+# coords47 <-Plot_Carbon %>% 
+#   filter(Zone ==47) 
+# 
+# 
+# coords46 = SpatialPoints(cbind(coords46$EAST, coords46$NORTH))
+# proj4string(coords46) = CRS("+init=epsg:32646")
+# coords46<-spTransform(coords46, "+init=epsg:4326")
+# 
+# coords47 = SpatialPoints(cbind(coords47$EAST, coords47$NORTH))
+# proj4string(coords47) = CRS("+init=epsg:32647")
+# coords47<-spTransform(coords47, "+init=epsg:4326")
+# 
+# par(mar=c(4,4,2,2), mfrow =c(2,2))
+# plot(myanmar, border = "red")
+# plot(coords46, add = TRUE, cex = 0.1, col = "blue")
+# plot(coords47, add= TRUE, cex = 0.1, col = "green")
+# 
+# Plot_Carbon$Year <- as.factor(Plot_Carbon$Year)
+# ggplot(data = Plot_Carbon, aes(x = DIST, y= log(Sum_CHa), color= Year))+ 
+#   geom_boxplot()+
+#   labs(title = "Carbon storage per ha in 21 disctricts from 2010 to 2017", 
+#        x= "District name",
+#        y= "Carbon(t/ha)")+
+#   theme(axis.text.x = element_text(size=7, angle = 90, vjust = 0.5),
+#         axis.text.y = element_text(size = 7))
+# 
+# glm.CarbonDistrict <- glm(log(Sum_CHa)~DIST, data = Plot_Carbon, family= gaussian(link="identity") )
+# anova(glm.CarbonDistrict)
+# plot(glm.CarbonDistrict)
+# summary(glm.CarbonDistrict)
+# 
+# Grid46 <- Plot_Carbon %>% filter(Zone=="46")
+# 
+# Grid47 <- Plot_Carbon %>% filter(Zone=="47")
+# 
+# coords46 = SpatialPoints(cbind(Grid46$EAST, Grid46$NORTH))
+# proj4string(coords46) = CRS("+init=epsg:32646")
+# coords46 <- spTransform(coords46, "+init=epsg:4326")
+# 
+# coords47 = SpatialPoints(cbind(Grid47$EAST, Grid47$NORTH))
+# proj4string(coords47) = CRS("+init=epsg:32647")
+# coords47 <- spTransform(coords47, "+init=epsg:4326")
+# 
+# Plots_location <- rbind(coords46,coords47) 
+# 
+# spdf = SpatialPointsDataFrame(Plots_location,data = Plot_Carbon)
+# 
+# writeOGR(spdf,"locations_WGS84Edited.shp", layer="plot_locations", driver = "ESRI Shapefile")
 
 
 ```
+
+**Enhanced vegetation Index and Carbon relationship**
 
 This section describes how carbon storage of all the plots are different according to the ecoregions published by WWF.The plot locations shape file and ecoregion shape files ware used with QGIS to extract which plots belong to which ecoregions. The function called "Join attributed by locations " was used in this process. 
 
@@ -291,6 +293,47 @@ glm.CarbonEcoregions <- glm(log(Sum_CHa)~ECO_NAME, data = Ecoregions, family = g
 anova(glm.CarbonEcoregions)
 plot(glm.CarbonEcoregions)
 summary(glm.CarbonEcoregions)
+
+Eco_Name <- Ecoregions %>% dplyr::select(Plot_names, ECO_NAME) %>% unique()
+
+Elevation <- read.csv("Data_Output/SRTM_NFI2010_17_ele_as_sl.csv", stringsAsFactors = F)
+
+Elevation <- Elevations %>% unique() %>% mutate(Aspect_direction = case_when(Aspect_deg == 0 ~ 'N',
+                              Aspect_deg == 360 ~ 'N',
+                              between(Aspect_deg,0.1,44.9)  ~ 'NNE',
+                              Aspect_deg == 45 ~ 'NE',
+                              between(Aspect_deg,45,67.4)  ~ 'NE',
+                              between(Aspect_deg,67.5,89.9)  ~ 'ENE',
+                              Aspect_deg == 90 ~ 'E',
+                              between(Aspect_deg,90.1,112.5)  ~ 'ESE',
+                              between(Aspect_deg,112.6,134.9)  ~ 'ESE',
+                              Aspect_deg == 135 ~ 'SE',
+                              between(Aspect_deg,135.1,157.4)  ~ 'SE',
+                              Aspect_deg == 157.5 ~ 'SSE',
+                              between(Aspect_deg,157.6,179.9)  ~ 'SSE',
+                              Aspect_deg == 180 ~ 'S',
+                              between(Aspect_deg,180.1,202.5)  ~ 'SSW',
+                              between(Aspect_deg,202.6,224.9)  ~ 'SSW',
+                              Aspect_deg == 225 ~ 'SW',
+                              between(Aspect_deg,225,247.4)  ~ 'SW',
+                              Aspect_deg == 247.5 ~ 'WSW',
+                              between(Aspect_deg,247.5,269.9)  ~ 'WSW',
+                              Aspect_deg == 270 ~ 'W',
+                              between(Aspect_deg,270.1,292.4)  ~ 'WNW',
+                              between(Aspect_deg,292.5,314.9)  ~ 'WNW',
+                              Aspect_deg == 315 ~ 'NW',
+                              between(Aspect_deg,315.1,337.4)  ~ 'NW',
+                              Aspect_deg == 337.5 ~ 'NNW',
+                              between(Aspect_deg,337.5,359.9)  ~ 'NNW',
+                              )) %>% rename(Carbon_ha=Sum_CHa)
+
+Elevation <- Elevation[!duplicated(Elevation$Plot_names),]
+
+
+Ele_Eco <- left_join(Elevation, Eco_Name, by="Plot_names" )
+
+
+
 ```
 ```{r}
 boxplot(log(Sum_CHa)~ECO_NAME, data = Ecoregions)
@@ -332,7 +375,12 @@ BIO19 = Precipitation of Coldest Quarter
 I performed a simple liner regression analysis on the two variables Carbon and Annual precipitaion(AP)/Annual Mean Temperature(AMT). I wish to determine wheter the AP/AMT varible is a significant predictor of the Carbon Variable.
 
 ```{r}
-Env <- read.csv("Data_Output/WCL_plots_edited(31-10-2019).csv")
+Env <- read.csv("Data_Output/WCL_plots_edited(31-10-2019).csv", stringsAsFactors = F)
+
+Wcl <- Env %>% dplyr::select(-c("DIST","EAST", "NORTH","Sum_CHa", "Year", "Zone"))
+Wcl <- Wcl[!duplicated(Wcl$Plot_names),]
+
+Wcl_Ele_Eco <- inner_join(Wcl, Ele_Eco, by = "Plot_names")
 
 ```
 
@@ -363,6 +411,9 @@ ggplot(data=Env, aes(x=bio12, y = log(Sum_CHa), color=DIST))+ geom_point(alpha=1
   labs(title = "Carbon storage and Annual Precipitation Relationship", 
        x= "Annual Annual Precipitation (mm)",
        y= "Carbon(t/ha)")+
+   theme(axis.text.x = element_text(size=7, angle = 90, vjust = 0.5),
+        axis.text.y = element_text(size = 7))
+  
 ```
 
 
@@ -380,28 +431,146 @@ ggplot(data=Env, aes(x=bio12, y = log(Sum_CHa), color=DIST))+ geom_line()+
         axis.text.y = element_text(size = 7))
 ```
 
+**2010 NDVI Values and Carbon Storage of NFI**
 
 ```{r}
-n<-10000
+NFI2010_PLT <-raster("Data/NDVI2010_edited.tif")
+mypts <-readOGR("Edited_Plots_shapefile/locations_WGS84Edited.shp")
+# NDVI2010 <- crop(NFI2010_PLT, mypts)
+NDVI2010A <- trim(NFI2010_PLT)
+plot(NDVI2010A)
+mydata <- raster::extract(NFI2010_PLT, mypts)
+plot(mypts, add = TRUE, cex=0.1)
 
-rsq<-vector(n, mode = 'numeric')
-pval<-vector(n, mode = 'numeric')
-for(i in 1:n){
-  
-x<-rnorm(100)
-y<-rnorm(100)
+class(mydata)
+NDVI2010_values <- as.data.frame(mydata)
+NDVI2010 <- NDVI2010_values %>% rename(NDVI2010=mydata)
+Plot_names <- read.csv("Data_Output/WCL_plots_edited(31-10-2019).csv",stringsAsFactors = F)
+NDVI2010_Plots <- bind_cols(Plot_names,NDVI2010)
 
-fm<-lm(y~x)
+NDVI <- NDVI2010_Plots[!duplicated(NDVI2010_Plots$Plot_names),]
 
-fm_sum<-summary(fm)
-rsq[[i]]<-fm_sum$r.squared
-pval[[i]]<-fm_sum$coefficients[2,4]
-}
+Ndvi <- NDVI %>% dplyr::select(Plot_names, NDVI2010)
 
-hist(rsq, breaks = 100)
-hist(pval, breaks = 100)
+Wcl_Ele_Eco_Ndvi <- left_join(Wcl_Ele_Eco, Ndvi, by= "Plot_names")
 
-(sum(pval<0.05) / length(pval))*100
+```
+
+
+```{r}
+ggplot(data=NDVI2010_Plots, mapping= aes(log(Sum_CHa),NDVI2010, color=as.factor(Year)))+ geom_point(size= 0.0000005,alpha=0.5)+
+     labs(title = "Carbon storage & NDVI2010", 
+       x= "Carbon(t/ha)",
+       y= "Median NDVI 2010 Values")+
+  theme(axis.text.x = element_text(size=7, angle = 90, vjust = 0.5),
+        axis.text.y = element_text(size = 7))
+```
+
+```{r}
+NFI2010_PLTE <-raster("Data/EVI2010_edited.tif")
+NFI2010_PLTE <- trim(NFI2010_PLTE)
+mypts <-readOGR("Edited_Plots_shapefile/locations_WGS84Edited.shp")
+EVI2010 <- crop(NFI2010_PLTE, mypts)
+plot(NFI2010_PLTE)
+mydata <- raster::extract(NFI2010_PLTE, mypts)
+plot(mypts, add = TRUE, cex=0.1)
+class(mydata)
+EVI2010_values <- as.data.frame(mydata)
+EVI2010 <- NDVI2010_values %>% rename(EVI2010=mydata)
+EVI2010_Plot <- bind_cols(NDVI2010_Plots,EVI2010)
+
+
+EVI <- EVI2010_Plot[!duplicated(EVI2010_Plot$Plot_names),]
+
+Evi <- EVI %>% dplyr::select(Plot_names, EVI2010)
+
+Wcl_Ele_Eco_Ndvi_Evi <- left_join(Wcl_Ele_Eco_Ndvi, Evi, by= "Plot_names")
+
+
+```
+
+```{r}
+ggplot(data=EVI2010_Plot, mapping= aes(Sum_CHa,NDVI2010, color=as.factor(Year)))+ geom_point(size= 0.0000005,alpha=0.5)+
+   facet_wrap(facets = vars(Year))+
+  labs(title = "Carbon storage & EVI2010", 
+       x= "Carbon(t/ha)",
+       y= "Median EVI 2010 Value")+
+  theme(axis.text.x = element_text(size=7, angle = 45, vjust = 0.5),
+        axis.text.y = element_text(size = 7))
+```
+
+
+
+I performed a simple liner regression analysis on the two variables Carbon and NDVI2010/EVI2010. I wish to determine wheter the AP/AMT varible is a significant predictor of the Carbon Variable. 
+
+
+```{r}
+plot(NDVI2010~Sum_CHa, data = EVI2010_Plot)
+glm.NDVI2010 <- glm(log(Sum_CHa)~NDVI2010, data = EVI2010_Plot, family = gaussian (link = "identity"))
+anova(glm.NDVI2010)
+summary(glm.NDVI2010)
+plot(glm.NDVI2010)
+```
+```{r}
+plot(EVI2010~Sum_CHa, data = EVI2010_Plot)
+glm.EVI2010 <- glm(log(Sum_CHa) ~ EVI2010, data = EVI2010_Plot, family = gaussian(link = "identity"))
+glm.EVI2010b <- glm(log(Sum_CHa) ~ 1, data = EVI2010_Plot, family = gaussian(link = "identity"))
+AIC(glm.EVI2010, glm.EVI2010b)
+anova(glm.EVI2010)
+summary(glm.EVI2010)
+plot(glm.EVI2010)
+```
+
+
+**Carbon storage and Travel time to nearest city**
+
+Accessibility to Cities 2015
+This global accessibility map enumerates land-based travel time to the nearest densely-populated area for all areas between 85 degrees north and 60 degrees south for a nominal year 2015.
+
+Densely-populated areas are defined as contiguous areas with 1,500 or more inhabitants per square kilometer or a majority of built-up land cover types coincident with a population centre of at least 50,000 inhabitants.
+
+This map was produced through a collaboration between the University of Oxford Malaria Atlas Project (MAP), Google, the European Union Joint Research Centre (JRC), and the University of Twente, Netherlands. The underlying datasets used to produce the map include roads (comprising the first ever global-scale use of Open Street Map and Google roads datasets), railways, rivers, lakes, oceans, topographic conditions (slope and elevation), landcover types, and national borders.
+
+These datasets were each allocated a speed or speeds of travel in terms of time to cross each pixel of that type. The datasets were then combined to produce a “friction surface”, a map where every pixel is allocated a nominal overall speed of travel based on the types occurring within that pixel. Least-cost-path algorithms (running in Google Earth Engine and, for high-latitude areas, in R) were used in conjunction with this friction surface to calculate the time of travel from all locations to the nearest city (by travel time). Cities were determined using the high-density-cover product created by the Global Human Settlement Project.
+
+Each pixel in the resultant accessibility map thus represents the modeled shortest time from that location to a city.  
+
+```{r}
+library(raster)
+library("sp")
+library("sf")
+library("rgdal")
+library(ggplot2)
+library(tidyverse)
+```
+```{r}
+Travel_time <- read.csv("Data_Output/TravelTime_to_cities(31-10-2019).csv", stringsAsFactors = F) %>% rename(AvgTime_min = mean)
+
+TT <- Travel_time[!duplicated(Travel_time$Plot_names),]
+
+Tt <- TT %>% dplyr::select(Plot_names, AvgTime_min)
+
+Wcl_Ele_Eco_Ndvi_Evi_Tt <- left_join(Wcl_Ele_Eco_Ndvi_Evi, Tt, by= "Plot_names")
+
+
+Carbon <- read.csv("Data_Output/WCL_plots_edited(31-10-2019).csv", stringsAsFactors = F)
+
+Carbon$AvgTime_min <- Travel_time$AvgTime_min
+
+Carbon_Cities <- Carbon
+
+glm.CarbonCities <- glm(log(Sum_CHa)~AvgTime_min, data = Carbon_Cities, family = gaussian(link = "identity"))
+anova(glm.CarbonCities)
+plot(glm.CarbonCities)
+summary(glm.CarbonCities)
+
+ggplot(data=Carbon_Cities, aes(x=log(AvgTime_min), y = log(Sum_CHa), color=DIST))+ geom_line()+ 
+  facet_wrap(facets = vars(DIST))+
+  labs(title = "Carbon storage and Travel time to nearest city", 
+       x= " Average Travel Time to the nearest city (min)",
+       y= "Carbon(t/ha)")+
+  theme(axis.text.x = element_text(size=7, angle = 45, vjust = 0.5),
+        axis.text.y = element_text(size = 7))
 
 
 ```
@@ -409,8 +578,58 @@ hist(pval, breaks = 100)
 
 
 
+**Load up the values extracted from the AVitabile AGB Map**
+
+There are 5 plots that do not have AGB values from the Avitable AGB Map.**AGB_Avitabile %>% filter(!complete.cases(.)**
 
 
+```{r}
+library(tidyverse)
+AGB_Avitabile <- read.csv("Data_Output/Avitabile_AGB(31-10-2019).csv",stringsAsFactors = F)
+Carbon_Avitabile <- AGB_Avitabile%>% mutate(Avt_Carbon= 0.47*(Avt_AGB))
+
+AVT <- Carbon_Avitabile[!duplicated(Carbon_Avitabile$Plot_names),]
+
+Avt <- AVT %>% dplyr::select(Plot_names, Avt_Carbon)
+
+Wcl_Ele_Eco_Ndvi_Evi_Tt_Avt <- left_join(Wcl_Ele_Eco_Ndvi_Evi_Tt, Avt, by= "Plot_names")
+
+
+Carbon_NFI <- read.csv("Data_Output/WCL_plots_edited(31-10-2019).csv", stringsAsFactors = F)
+Carbon_NFI$Avt_Carbon <- Carbon_Avitabile$Avt_Carbon
+Carbon_NFI_Avt <- Carbon_NFI
+Carbon_NFI_Avt <- Carbon_NFI_Avt %>% rename(NFI_Carbon = Sum_CHa)
+```
+
+I performed a simple liner regression analysis on the two variables NFI Carbon and Avitabile Carbon. I wish to determine wheter the there is a correlation betetween them.
+
+```{r}
+plot(Avt_Carbon~NFI_Carbon, data = Carbon_NFI_Avt )
+glm.Avt_NFI <- lm(log(NFI_Carbon)~scale(Avt_Carbon), data = Carbon_NFI_Avt)
+anova(glm.Avt_NFI)
+summary(glm.Avt_NFI)
+plot(glm.Avt_NFI)
+```
+
+```{r}
+ggplot(data = Carbon_NFI_Avt, mapping = aes(NFI_Carbon, Avt_Carbon, color=DIST))+ geom_point(size= 0.05,alpha=0.5)+
+      labs(title = "NFI Carbon storage & Avitabile Comparison", 
+       x= "NFI_Carbon(t/ha)",
+       y= "Average Avitabile Carbon (t/ha)")+
+  theme(axis.text.x = element_text(size=7, angle = 45, vjust = 0.5),
+        axis.text.y = element_text(size = 7))
+```
+
+**Producing the big dataframe with all information for all plots of NFI(2010-2017)**
+
+```{r}
+write.csv(Wcl_Ele_Eco_Ndvi_Evi_Tt_Avt, file = "Data_Output/20191129NFIDataframe.csv", row.names = F)
+```
+### load Main dataframe with all information
+
+```{r}
+NFI_2010_17 <- read.csv("Data_Output/20191129NFIDataframe.csv", stringsAsFactors = F)
+```
 
 
 

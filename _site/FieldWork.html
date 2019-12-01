@@ -275,19 +275,10 @@ $(document).ready(function () {
     <div id="navbar" class="navbar-collapse collapse">
       <ul class="nav navbar-nav">
         <li>
-  <a href="Carbon.html">Carbon and Environment</a>
+  <a href="Carbon.html">NFI(2010-2017)</a>
 </li>
 <li>
-  <a href="NDVI.html">Carbon,NDVI and EVI</a>
-</li>
-<li>
-  <a href="Human_C.html">Carbon and cities proximity</a>
-</li>
-<li>
-  <a href="NFI-Avitabile.html">NFI and Avitabile Comparison</a>
-</li>
-<li>
-  <a href="Fieldwork.html">Fieldwork Analysis</a>
+  <a href="Fieldwork.html">Fieldworks (2007,2013,2019)</a>
 </li>
 <li>
   <a href="Species-Analysis.html">Species Analysis</a>
@@ -328,120 +319,8 @@ $(document).ready(function () {
 ##     date</code></pre>
 <pre class="r"><code>library(BIOMASS)
 library(ape)
-library(ggplot2)</code></pre>
-<pre class="r"><code>Field_Data &lt;- read.csv(&quot;Data/Popa_Fieldwork/Popa_Fieldwork(23-10-2019).csv&quot;, stringsAsFactors = F)</code></pre>
-<p><strong>Checking typos in taxonomy</strong></p>
-<pre class="r"><code>Taxo &lt;- correctTaxo(genus=Field_Data$Genus, species = Field_Data$Species)</code></pre>
-<pre><code>## Cache last modification time : 2019-10-29 15:08:46</code></pre>
-<pre><code>## Source cache:623, NA:4</code></pre>
-<pre><code>## Corrections TRUE:197, FALSE:405, SpNotFound:6, NA:4, NoMatch(low_score):15</code></pre>
-<pre class="r"><code>Field_Data$genusCorr &lt;- Taxo$genusCorrected
-Field_Data$speciesCorr &lt;- Taxo$speciesCorrected</code></pre>
-<p><strong>Retrieving APG III Families and Orders from Genus names</strong></p>
-<pre class="r"><code>APG &lt;- getTaxonomy(Field_Data$genusCorr, findOrder = T)
-Field_Data$familyAPG &lt;- APG$family
-Field_Data$orderAPG &lt;- APG$order</code></pre>
-<p><strong>RETRIEVE WOOD DENSITY</strong></p>
-<pre class="r"><code>dataWD &lt;- getWoodDensity(genus=as.character(Field_Data$genusCorr),
-                         species=as.character(Field_Data$speciesCorr),
-                         stand=Field_Data$Plot)</code></pre>
-<pre><code>## The reference dataset contains 16467 wood density values</code></pre>
-<pre><code>## Your taxonomic table contains 65 taxa</code></pre>
-<pre class="r"><code>sum(dataWD$levelWD == &quot;species&quot;)</code></pre>
-<pre><code>## [1] 394</code></pre>
-<pre class="r"><code>sum(dataWD$levelWD == &quot;genus&quot;)</code></pre>
-<pre><code>## [1] 214</code></pre>
-<pre class="r"><code>sum(!dataWD$levelWD%in%c(&quot;genus&quot;,&quot;species&quot;))</code></pre>
-<pre><code>## [1] 19</code></pre>
-<pre class="r"><code>Field_Data$WD &lt;- dataWD$meanWD
-str(Field_Data)</code></pre>
-<pre><code>## &#39;data.frame&#39;:    627 obs. of  20 variables:
-##  $ Plot        : int  1 1 1 1 1 1 1 1 1 1 ...
-##  $ Sub_Plot    : int  1 1 1 2 4 5 6 6 7 8 ...
-##  $ Tree_Tag    : int  8999 9000 8998 8997 8996 8995 8994 8993 8992 8989 ...
-##  $ X_Coordinate: num  0.8 1 3.2 3 4.8 2.4 1.5 3 1.6 4.4 ...
-##  $ Y_Coordinate: num  2 1.7 2.5 3.9 2.1 1.8 2.2 4 0.5 0.8 ...
-##  $ Local_Name  : chr  &quot;Lunbo&quot; &quot;Tei&quot; &quot;Tei&quot; &quot;Ingyin&quot; ...
-##  $ Genus       : chr  &quot;Buchananaia&quot; &quot;Diospyros&quot; &quot;Diospyros&quot; &quot;Shorea&quot; ...
-##  $ Species     : chr  &quot;cochinchinensis&quot; &quot;burmanica&quot; &quot;burmanica&quot; &quot;siamensis&quot; ...
-##  $ DBH_inch    : num  6 4 4.8 14.3 6.9 4 4 4.9 4.2 8.3 ...
-##  $ DBH_cm      : num  15.2 10.2 12.2 36.3 17.5 ...
-##  $ POM_m       : num  1.3 1.3 1.3 1.3 1.3 1.3 1.3 1.3 1.3 1.3 ...
-##  $ Height_m    : num  6 6 7 12 6.7 8 5.1 6 5.7 10 ...
-##  $ North       : chr  &quot;20  53 0.33&quot; &quot;20  53 0.33&quot; &quot;20  53 0.33&quot; &quot;20  53 0.33&quot; ...
-##  $ East        : chr  &quot;95  13 0.56&quot; &quot;95  13 0.56&quot; &quot;95  13 0.56&quot; &quot;95  13 0.56&quot; ...
-##  $ Elevation_m : num  364 364 364 364 364 ...
-##  $ genusCorr   : chr  &quot;Buchanania&quot; &quot;Diospyros&quot; &quot;Diospyros&quot; &quot;Shorea&quot; ...
-##  $ speciesCorr : chr  &quot;cochinchinensis&quot; &quot;burmanica&quot; &quot;burmanica&quot; &quot;siamensis&quot; ...
-##  $ familyAPG   : chr  &quot;Anacardiaceae&quot; &quot;Ebenaceae&quot; &quot;Ebenaceae&quot; &quot;Dipterocarpaceae&quot; ...
-##  $ orderAPG    : chr  &quot;Sapindales&quot; &quot;Ericales&quot; &quot;Ericales&quot; &quot;Malvales&quot; ...
-##  $ WD          : num  0.409 1.095 1.095 0.86 0.77 ...</code></pre>
-<p><strong>Computing AGB</strong></p>
-<pre class="r"><code>AGBtree&lt;-computeAGB(D=Field_Data$DBH_cm,
-                    WD=Field_Data$WD,
-                    H = Field_Data$Height_m)
-# Compute AGB(Mg) per tree----
-Field_Data$AGB_Mg &lt;- AGBtree
-
-# Compute Carbon (Mg) per tree --
-Field_Data &lt;- Field_Data %&gt;%
-  mutate(Carbon_Mg= AGB_Mg*0.47) %&gt;% mutate(C_Tree_Ha = Carbon_Mg/0.04)
-str(Field_Data)</code></pre>
-<pre><code>## &#39;data.frame&#39;:    627 obs. of  23 variables:
-##  $ Plot        : int  1 1 1 1 1 1 1 1 1 1 ...
-##  $ Sub_Plot    : int  1 1 1 2 4 5 6 6 7 8 ...
-##  $ Tree_Tag    : int  8999 9000 8998 8997 8996 8995 8994 8993 8992 8989 ...
-##  $ X_Coordinate: num  0.8 1 3.2 3 4.8 2.4 1.5 3 1.6 4.4 ...
-##  $ Y_Coordinate: num  2 1.7 2.5 3.9 2.1 1.8 2.2 4 0.5 0.8 ...
-##  $ Local_Name  : chr  &quot;Lunbo&quot; &quot;Tei&quot; &quot;Tei&quot; &quot;Ingyin&quot; ...
-##  $ Genus       : chr  &quot;Buchananaia&quot; &quot;Diospyros&quot; &quot;Diospyros&quot; &quot;Shorea&quot; ...
-##  $ Species     : chr  &quot;cochinchinensis&quot; &quot;burmanica&quot; &quot;burmanica&quot; &quot;siamensis&quot; ...
-##  $ DBH_inch    : num  6 4 4.8 14.3 6.9 4 4 4.9 4.2 8.3 ...
-##  $ DBH_cm      : num  15.2 10.2 12.2 36.3 17.5 ...
-##  $ POM_m       : num  1.3 1.3 1.3 1.3 1.3 1.3 1.3 1.3 1.3 1.3 ...
-##  $ Height_m    : num  6 6 7 12 6.7 8 5.1 6 5.7 10 ...
-##  $ North       : chr  &quot;20  53 0.33&quot; &quot;20  53 0.33&quot; &quot;20  53 0.33&quot; &quot;20  53 0.33&quot; ...
-##  $ East        : chr  &quot;95  13 0.56&quot; &quot;95  13 0.56&quot; &quot;95  13 0.56&quot; &quot;95  13 0.56&quot; ...
-##  $ Elevation_m : num  364 364 364 364 364 ...
-##  $ genusCorr   : chr  &quot;Buchanania&quot; &quot;Diospyros&quot; &quot;Diospyros&quot; &quot;Shorea&quot; ...
-##  $ speciesCorr : chr  &quot;cochinchinensis&quot; &quot;burmanica&quot; &quot;burmanica&quot; &quot;siamensis&quot; ...
-##  $ familyAPG   : chr  &quot;Anacardiaceae&quot; &quot;Ebenaceae&quot; &quot;Ebenaceae&quot; &quot;Dipterocarpaceae&quot; ...
-##  $ orderAPG    : chr  &quot;Sapindales&quot; &quot;Ericales&quot; &quot;Ericales&quot; &quot;Malvales&quot; ...
-##  $ WD          : num  0.409 1.095 1.095 0.86 0.77 ...
-##  $ AGB_Mg      : num  0.033 0.039 0.0648 0.7292 0.0894 ...
-##  $ Carbon_Mg   : num  0.0155 0.0183 0.0304 0.3427 0.042 ...
-##  $ C_Tree_Ha   : num  0.387 0.459 0.761 8.568 1.05 ...</code></pre>
-<pre class="r"><code>Field_Data$Plot &lt;- factor(Field_Data$Plot)
-
-boxplot(C_Tree_Ha~Plot, data=Field_Data)</code></pre>
-<p><img src="FieldWork_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
-<pre class="r"><code>summary(aov(C_Tree_Ha ~ factor(Plot), data = Field_Data))</code></pre>
-<pre><code>##               Df Sum Sq Mean Sq F value   Pr(&gt;F)    
-## factor(Plot)  19   1698   89.35   3.713 2.24e-07 ***
-## Residuals    607  14608   24.07                     
-## ---
-## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
-<pre class="r"><code>Field_Carbon &lt;- Field_Data %&gt;%
-  group_by(Plot) %&gt;%
-  dplyr::summarise(Total_C = sum(C_Tree_Ha), Elevation = mean(Elevation_m)) %&gt;% rename(Plot_Number=Plot)
-
-ggplot(data=Field_Carbon, aes(x=as.numeric(Plot_Number),y =Total_C, color=as.numeric(Plot_Number)))+ geom_point()+ geom_line()+
-      labs(title = &quot;Carbon storage in 20 Permanent sample plots&quot;, 
-       x= &quot;Plot&quot;,
-       y= &quot;Carbon(t/ha)&quot;)+
-  theme(axis.text.x = element_text(size=7, angle = 0, vjust = 0.5),
-        axis.text.y = element_text(size = 7))</code></pre>
-<p><img src="FieldWork_files/figure-html/unnamed-chunk-7-2.png" width="672" /></p>
-<pre class="r"><code>write.csv(Field_Carbon, file = &quot;Data_Output/Field_Carbon.csv&quot;, row.names = F)</code></pre>
-<pre class="r"><code>hist(Field_Data$Height_m)</code></pre>
-<p><img src="FieldWork_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
-<pre class="r"><code>hist(Field_Data$DBH_cm)</code></pre>
-<p><img src="FieldWork_files/figure-html/unnamed-chunk-8-2.png" width="672" /></p>
-<pre class="r"><code>ggplot(data = Field_Data, aes(y = Height_m, x = log(DBH_cm))) + 
-  geom_point(color=&#39;green&#39;) +
-  geom_smooth(method = &quot;lm&quot;, se = FALSE)</code></pre>
-<p><img src="FieldWork_files/figure-html/unnamed-chunk-8-3.png" width="672" /> <strong>convert from decimal minutes to decimal degrees</strong></p>
-<pre class="r"><code>library(tidyverse)
+library(ggplot2)
+library(tidyverse)
 library(dplyr)
 library(ggplot2)
 library(stringr)
@@ -497,8 +376,151 @@ library(rgdal)</code></pre>
 ##  Path to PROJ.4 shared files: C:/Users/kyaws/Documents/R/win-library/3.6/rgdal/proj
 ##  Linking to sp version: 1.3-1</code></pre>
 <pre class="r"><code>library(measurements)
+library(lme4)</code></pre>
+<pre><code>## Loading required package: Matrix</code></pre>
+<pre><code>## 
+## Attaching package: &#39;Matrix&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:tidyr&#39;:
+## 
+##     expand</code></pre>
+<pre class="r"><code>library(bbmle)</code></pre>
+<pre><code>## Loading required package: stats4</code></pre>
+<pre><code>## 
+## Attaching package: &#39;bbmle&#39;</code></pre>
+<pre><code>## The following object is masked from &#39;package:dplyr&#39;:
+## 
+##     slice</code></pre>
+<pre class="r"><code>Field_Data &lt;- read.csv(&quot;Data/Popa_Fieldwork/Popa_Fieldwork(23-10-2019).csv&quot;, stringsAsFactors = F)
 
-# Field_Data &lt;- read.csv(&quot;Data/Popa_Fieldwork/Popa_Fieldwork(23-10-2019).csv&quot;, stringsAsFactors = F)
+
+Field_Data &lt;- Field_Data %&gt;%
+    mutate(Forest_type = case_when(Plot &gt;= 14 ~ &#39;Evergreen_Forest&#39;,
+                                  Plot &gt;= 7 ~ &#39;Moist_Mixed_Deciduous_Forest&#39;,
+                                  Plot &gt;= 4 ~ &#39;Dry_Mixed_Deciduous_Forest&#39;,
+                                  Plot &gt;= 1 ~ &#39;Dry_Forest&#39;
+                                  ))</code></pre>
+<p><strong>Checking typos in taxonomy</strong></p>
+<pre class="r"><code>Taxo &lt;- correctTaxo(genus=Field_Data$Genus, species = Field_Data$Species)</code></pre>
+<pre><code>## Cache last modification time : 2019-11-12 10:09:17</code></pre>
+<pre><code>## Source cache:623, NA:4</code></pre>
+<pre><code>## Corrections TRUE:197, FALSE:405, SpNotFound:6, NA:4, NoMatch(low_score):15</code></pre>
+<pre class="r"><code>Field_Data$genusCorr &lt;- Taxo$genusCorrected
+Field_Data$speciesCorr &lt;- Taxo$speciesCorrected</code></pre>
+<p><strong>Retrieving APG III Families and Orders from Genus names</strong></p>
+<pre class="r"><code>APG &lt;- getTaxonomy(Field_Data$genusCorr, findOrder = T)
+Field_Data$familyAPG &lt;- APG$family
+Field_Data$orderAPG &lt;- APG$order</code></pre>
+<p><strong>RETRIEVE WOOD DENSITY</strong></p>
+<pre class="r"><code>dataWD &lt;- getWoodDensity(genus=as.character(Field_Data$genusCorr),
+                         species=as.character(Field_Data$speciesCorr),
+                         stand=Field_Data$Plot)</code></pre>
+<pre><code>## The reference dataset contains 16467 wood density values</code></pre>
+<pre><code>## Your taxonomic table contains 65 taxa</code></pre>
+<pre class="r"><code>sum(dataWD$levelWD == &quot;species&quot;)</code></pre>
+<pre><code>## [1] 394</code></pre>
+<pre class="r"><code>sum(dataWD$levelWD == &quot;genus&quot;)</code></pre>
+<pre><code>## [1] 214</code></pre>
+<pre class="r"><code>sum(!dataWD$levelWD%in%c(&quot;genus&quot;,&quot;species&quot;))</code></pre>
+<pre><code>## [1] 19</code></pre>
+<pre class="r"><code>Field_Data$WD &lt;- dataWD$meanWD
+str(Field_Data)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    627 obs. of  21 variables:
+##  $ Plot        : int  1 1 1 1 1 1 1 1 1 1 ...
+##  $ Sub_Plot    : int  1 1 1 2 4 5 6 6 7 8 ...
+##  $ Tree_Tag    : int  8999 9000 8998 8997 8996 8995 8994 8993 8992 8989 ...
+##  $ X_Coordinate: num  0.8 1 3.2 3 4.8 2.4 1.5 3 1.6 4.4 ...
+##  $ Y_Coordinate: num  2 1.7 2.5 3.9 2.1 1.8 2.2 4 0.5 0.8 ...
+##  $ Local_Name  : chr  &quot;Lunbo&quot; &quot;Tei&quot; &quot;Tei&quot; &quot;Ingyin&quot; ...
+##  $ Genus       : chr  &quot;Buchananaia&quot; &quot;Diospyros&quot; &quot;Diospyros&quot; &quot;Shorea&quot; ...
+##  $ Species     : chr  &quot;cochinchinensis&quot; &quot;burmanica&quot; &quot;burmanica&quot; &quot;siamensis&quot; ...
+##  $ DBH_inch    : num  6 4 4.8 14.3 6.9 4 4 4.9 4.2 8.3 ...
+##  $ DBH_cm      : num  15.2 10.2 12.2 36.3 17.5 ...
+##  $ POM_m       : num  1.3 1.3 1.3 1.3 1.3 1.3 1.3 1.3 1.3 1.3 ...
+##  $ Height_m    : num  6 6 7 12 6.7 8 5.1 6 5.7 10 ...
+##  $ North       : chr  &quot;20  53 0.33&quot; &quot;20  53 0.33&quot; &quot;20  53 0.33&quot; &quot;20  53 0.33&quot; ...
+##  $ East        : chr  &quot;95  13 0.56&quot; &quot;95  13 0.56&quot; &quot;95  13 0.56&quot; &quot;95  13 0.56&quot; ...
+##  $ Elevation_m : num  364 364 364 364 364 ...
+##  $ Forest_type : chr  &quot;Dry_Forest&quot; &quot;Dry_Forest&quot; &quot;Dry_Forest&quot; &quot;Dry_Forest&quot; ...
+##  $ genusCorr   : chr  &quot;Buchanania&quot; &quot;Diospyros&quot; &quot;Diospyros&quot; &quot;Shorea&quot; ...
+##  $ speciesCorr : chr  &quot;cochinchinensis&quot; &quot;burmanica&quot; &quot;burmanica&quot; &quot;siamensis&quot; ...
+##  $ familyAPG   : chr  &quot;Anacardiaceae&quot; &quot;Ebenaceae&quot; &quot;Ebenaceae&quot; &quot;Dipterocarpaceae&quot; ...
+##  $ orderAPG    : chr  &quot;Sapindales&quot; &quot;Ericales&quot; &quot;Ericales&quot; &quot;Malvales&quot; ...
+##  $ WD          : num  0.409 1.095 1.095 0.86 0.77 ...</code></pre>
+<p><strong>Computing AGB</strong></p>
+<pre class="r"><code>AGBtree&lt;-computeAGB(D=Field_Data$DBH_cm,
+                    WD=Field_Data$WD,
+                    H = Field_Data$Height_m)
+# Compute AGB(Mg) per tree----
+Field_Data$AGB_Mg &lt;- AGBtree
+
+# Compute Carbon (Mg) per tree --
+Field_Data &lt;- Field_Data %&gt;%
+  mutate(Carbon_Mg= AGB_Mg*0.47) %&gt;% mutate(C_Tree_Ha = Carbon_Mg/0.04)
+str(Field_Data)</code></pre>
+<pre><code>## &#39;data.frame&#39;:    627 obs. of  24 variables:
+##  $ Plot        : int  1 1 1 1 1 1 1 1 1 1 ...
+##  $ Sub_Plot    : int  1 1 1 2 4 5 6 6 7 8 ...
+##  $ Tree_Tag    : int  8999 9000 8998 8997 8996 8995 8994 8993 8992 8989 ...
+##  $ X_Coordinate: num  0.8 1 3.2 3 4.8 2.4 1.5 3 1.6 4.4 ...
+##  $ Y_Coordinate: num  2 1.7 2.5 3.9 2.1 1.8 2.2 4 0.5 0.8 ...
+##  $ Local_Name  : chr  &quot;Lunbo&quot; &quot;Tei&quot; &quot;Tei&quot; &quot;Ingyin&quot; ...
+##  $ Genus       : chr  &quot;Buchananaia&quot; &quot;Diospyros&quot; &quot;Diospyros&quot; &quot;Shorea&quot; ...
+##  $ Species     : chr  &quot;cochinchinensis&quot; &quot;burmanica&quot; &quot;burmanica&quot; &quot;siamensis&quot; ...
+##  $ DBH_inch    : num  6 4 4.8 14.3 6.9 4 4 4.9 4.2 8.3 ...
+##  $ DBH_cm      : num  15.2 10.2 12.2 36.3 17.5 ...
+##  $ POM_m       : num  1.3 1.3 1.3 1.3 1.3 1.3 1.3 1.3 1.3 1.3 ...
+##  $ Height_m    : num  6 6 7 12 6.7 8 5.1 6 5.7 10 ...
+##  $ North       : chr  &quot;20  53 0.33&quot; &quot;20  53 0.33&quot; &quot;20  53 0.33&quot; &quot;20  53 0.33&quot; ...
+##  $ East        : chr  &quot;95  13 0.56&quot; &quot;95  13 0.56&quot; &quot;95  13 0.56&quot; &quot;95  13 0.56&quot; ...
+##  $ Elevation_m : num  364 364 364 364 364 ...
+##  $ Forest_type : chr  &quot;Dry_Forest&quot; &quot;Dry_Forest&quot; &quot;Dry_Forest&quot; &quot;Dry_Forest&quot; ...
+##  $ genusCorr   : chr  &quot;Buchanania&quot; &quot;Diospyros&quot; &quot;Diospyros&quot; &quot;Shorea&quot; ...
+##  $ speciesCorr : chr  &quot;cochinchinensis&quot; &quot;burmanica&quot; &quot;burmanica&quot; &quot;siamensis&quot; ...
+##  $ familyAPG   : chr  &quot;Anacardiaceae&quot; &quot;Ebenaceae&quot; &quot;Ebenaceae&quot; &quot;Dipterocarpaceae&quot; ...
+##  $ orderAPG    : chr  &quot;Sapindales&quot; &quot;Ericales&quot; &quot;Ericales&quot; &quot;Malvales&quot; ...
+##  $ WD          : num  0.409 1.095 1.095 0.86 0.77 ...
+##  $ AGB_Mg      : num  0.033 0.039 0.0648 0.7292 0.0894 ...
+##  $ Carbon_Mg   : num  0.0155 0.0183 0.0304 0.3427 0.042 ...
+##  $ C_Tree_Ha   : num  0.387 0.459 0.761 8.568 1.05 ...</code></pre>
+<pre class="r"><code>Field_Data$Plot &lt;- factor(Field_Data$Plot)
+
+boxplot(C_Tree_Ha~Plot, data=Field_Data)</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-7-1.png" width="672" /></p>
+<pre class="r"><code>summary(aov(C_Tree_Ha ~ factor(Plot), data = Field_Data))</code></pre>
+<pre><code>##               Df Sum Sq Mean Sq F value   Pr(&gt;F)    
+## factor(Plot)  19   1698   89.35   3.713 2.24e-07 ***
+## Residuals    607  14608   24.07                     
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1</code></pre>
+<pre class="r"><code>Field_Carbon &lt;- Field_Data %&gt;%
+  group_by(Plot, Forest_type) %&gt;%
+  dplyr::summarise(Total_C = sum(C_Tree_Ha), Elevation = mean(Elevation_m)) %&gt;% rename(Plot_Number=Plot) %&gt;% mutate(Year=paste(2019))
+
+ggplot(data=Field_Carbon, aes(x=as.numeric(Plot_Number),y =Total_C, color=as.numeric(Plot_Number)))+ geom_point()+ geom_line()+
+      labs(title = &quot;Carbon storage in 20 Permanent sample plots&quot;, 
+       x= &quot;Plot&quot;,
+       y= &quot;Carbon(t/ha)&quot;)+
+  theme(axis.text.x = element_text(size=7, angle = 0, vjust = 0.5),
+        axis.text.y = element_text(size = 7))</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-7-2.png" width="672" /></p>
+<pre class="r"><code>ggplot(data=Field_Carbon, aes(x=as.numeric(Plot_Number),y =Total_C, color=as.factor(Forest_type)))+ geom_boxplot()+ geom_point()</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-7-3.png" width="672" /></p>
+<pre class="r"><code>      labs(title = &quot;Carbon storage in 20 Permanent sample plots as to Forest Type&quot;, 
+       x= &quot;Plot&quot;,
+       y= &quot;Carbon(t/ha)&quot;)+
+  theme(axis.text.x = element_text(size=7, angle = 0, vjust = 0.5),
+        axis.text.y = element_text(size = 7))</code></pre>
+<pre><code>## NULL</code></pre>
+<pre class="r"><code>write.csv(Field_Carbon, file = &quot;Data_Output/Field_Carbon.csv&quot;, row.names = F)</code></pre>
+<pre class="r"><code>hist(Field_Data$Height_m)</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-8-1.png" width="672" /></p>
+<pre class="r"><code>hist(Field_Data$DBH_cm)</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-8-2.png" width="672" /></p>
+<pre class="r"><code>ggplot(data = Field_Data, aes(y = Height_m, x = DBH_cm)) + 
+  geom_point(color=&#39;green&#39;) +
+  geom_smooth(method = &quot;lm&quot;, se = FALSE)</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-8-3.png" width="672" /> <strong>convert from decimal minutes to decimal degrees</strong></p>
+<pre class="r"><code># Field_Data &lt;- read.csv(&quot;Data/Popa_Fieldwork/Popa_Fieldwork(23-10-2019).csv&quot;, stringsAsFactors = F)
 # head(Field_Data)
 # sum(is.na(Field_Data$North))
 # sum(is.na(Field_Data$East))
@@ -512,26 +534,16 @@ library(rgdal)</code></pre>
 # 
 # write.csv(Field_Data, file=&quot;Data_Output/FieldPlots.csv&quot;, row.names = F)
 
-
-
-Field_Data &lt;- read.csv(&quot;Data_Output/FieldPlots.csv&quot;)
-world2HiresMapEnv</code></pre>
-<pre><code>## [1] &quot;R_MAPDATA_DATA_DIR&quot;</code></pre>
-<pre class="r"><code>data(wrld_simpl)
-myanmar &lt;- wrld_simpl[wrld_simpl$NAME==&quot;Burma&quot;,]
-
-FPopaPlots &lt;- Field_Data %&gt;% group_by(Plot) %&gt;% summarise(Long= mean (Long),Lat=mean(Lat))
-coords = cbind(FPopaPlots$Long, FPopaPlots$Lat)
-llCRS &lt;- CRS(&quot;+init=epsg:4326&quot;)
-Coords_sp &lt;- SpatialPoints(coords, proj4string = llCRS)
-Coords_sp &lt;- spTransform(Coords_sp, &quot;+init=epsg:4326&quot;)
-
-spdf = SpatialPointsDataFrame(Coords_sp,data = FPopaPlots)
-writeOGR(spdf,&quot;FieldPopa_plots.shp&quot;, layer=&quot;Coords_sp&quot;, driver = &quot;ESRI Shapefile&quot;)
-plot(myanmar)</code></pre>
-<p><img src="FieldWork_files/figure-html/unnamed-chunk-9-1.png" width="672" /></p>
-<pre class="r"><code>plot(Coords_sp)</code></pre>
-<p><img src="FieldWork_files/figure-html/unnamed-chunk-9-2.png" width="672" /></p>
+# Field_Data &lt;- read.csv(&quot;Data_Output/FieldPlots.csv&quot;)
+# FPopaPlots &lt;- Field_Data %&gt;% group_by(Plot) %&gt;% summarise(Long= mean (Long),Lat=mean(Lat))
+# FPopaPlots$Forest_Type &lt;- Field_Carbon$Forest_type
+# coords = cbind(FPopaPlots$Long, FPopaPlots$Lat)
+# llCRS &lt;- CRS(&quot;+init=epsg:4326&quot;)
+# Coords_sp &lt;- SpatialPoints(coords, proj4string = llCRS)
+# Coords_sp &lt;- spTransform(Coords_sp, &quot;+init=epsg:4326&quot;)
+# spdf = SpatialPointsDataFrame(Coords_sp,data = FPopaPlots)
+# writeOGR(spdf,&quot;FieldPopa_plots.shp&quot;, layer=&quot;Coords_sp&quot;, driver = &quot;ESRI Shapefile&quot;)</code></pre>
+<p><strong>Enhanced vegetation Index and Carbon relationship</strong></p>
 <pre class="r"><code>EVI2018Popa &lt;-raster(&quot;Data/EVI2018_Popa.tif&quot;)
 mypts &lt;-readOGR(&quot;Field_Plots_shapefile/FieldPopa_plots.shp&quot;)</code></pre>
 <pre><code>## OGR data source with driver: ESRI Shapefile 
@@ -551,7 +563,7 @@ Plot_names &lt;- read.csv(&quot;Data_Output/FieldPlots.csv&quot;,stringsAsFactor
 Plots_EVI2018 &lt;- Plot_names %&gt;% group_by(Plot) %&gt;% summarise(Long = mean(Long),Lat=mean(Lat))
 EVI2018_Popa &lt;- bind_cols(Plots_EVI2018,EVI2018)
 EVI2018_Popa &lt;- EVI2018_Popa %&gt;% rename(Plot_Number=Plot)</code></pre>
-<p>Joining Field Carbon and EVI</p>
+<p><strong>Joining Field Carbon and EVI</strong></p>
 <pre class="r"><code>Field_Carbon &lt;- read.csv(&quot;Data_Output/Field_Carbon.csv&quot;, stringsAsFactors = F)
 EVI2018_Popa$Carbon &lt;-  Field_Carbon$Total_C
 EVI2018_Popa$Elevation &lt;- Field_Carbon$Elevation
@@ -560,6 +572,13 @@ plot(Carbon_EVI_Popa$Carbon, Carbon_EVI_Popa$EVI2018)</code></pre>
 <p><img src="FieldWork_files/figure-html/unnamed-chunk-11-1.png" width="672" /></p>
 <pre class="r"><code>plot(Carbon_EVI_Popa$Carbon, Carbon_EVI_Popa$Elevation)</code></pre>
 <p><img src="FieldWork_files/figure-html/unnamed-chunk-11-2.png" width="672" /></p>
+<pre class="r"><code>ggplot(data=Carbon_EVI_Popa, aes(y=EVI2018, x = Carbon, color=as.factor(Plot_Number)))+ geom_jitter()+
+  labs(title = &quot;Forest Carbon and EVI Relationship in Popa Park in 2019&quot;, 
+       y=expression(bold(paste(&quot;Median EVI in 2019&quot;))),
+       x= expression(bold(paste(&quot;Carbon calculated from fieldwork of 2019 t &quot;, ha^bold(&quot;-1&quot;)))))+
+  theme(axis.text.x = element_text(size=7, angle = 45, vjust = 0.5),
+        axis.text.y = element_text(size = 7))</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-11-3.png" width="672" /></p>
 <pre class="r"><code>write.csv(Carbon_EVI_Popa,file = &quot;Data_Output/Carbon_EVI_Popa.csv&quot;, row.names = F)</code></pre>
 <p><strong>Carbon and environmental conditions relationship</strong></p>
 <p>BIO1 = Annual Mean Temperature<br />
@@ -665,14 +684,22 @@ summary(glm.AMT)</code></pre>
 All_Plot_info &lt;- read.csv(&quot;Data_Output/Carbon_EVI_Popa.csv&quot;, stringsAsFactors = F)
 AVt_Fieldwork &lt;- Avt_Carbon_Popa %&gt;% inner_join(All_Plot_info, by = &quot;Plot_Number&quot;,suffix = c(&quot;.Avt&quot;, &quot;.FW&quot;), all = T) %&gt;% rename(Lat=Lat.FW, Long = Long.FW) %&gt;% dplyr::select(-c(Lat.Avt, Long.Avt))
 
+
+
+ggplot(data=AVt_Fieldwork, aes(x=Mean_Avt_Carbon, y = Carbon, color=as.factor(Plot_Number)))+ geom_jitter()+
+  labs(title = &quot;Fieldwork Carbon storage and Avitabile Carbon Relationship&quot;, 
+       x=expression(bold(paste(&quot;Carbon predicted by Avitabile t &quot;, ha^bold(&quot;-1&quot;)))),
+       y= expression(bold(paste(&quot;Carbon calculated from 2019 fieldwork t &quot;, ha^bold(&quot;-1&quot;)))))+
+  theme(axis.text.x = element_text(size=7, angle = 45, vjust = 0.5),
+        axis.text.y = element_text(size = 7))</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-13-1.png" width="672" /> <strong>Testing Different GLM Models</strong> image: <img src="Figures/Glm%20models.PNG" /></p>
+<pre class="r"><code># Field Carbon and Avitabile Carbon estimation
 attach(AVt_Fieldwork)</code></pre>
 <pre><code>## The following object is masked _by_ .GlobalEnv:
 ## 
 ##     EVI2018</code></pre>
-<pre class="r"><code>plot(Carbon~Mean_Avt_Carbon, data = AVt_Fieldwork)</code></pre>
-<p><img src="FieldWork_files/figure-html/unnamed-chunk-13-1.png" width="672" /></p>
-<pre class="r"><code>glm.Avt_FW &lt;- glm(Carbon~Mean_Avt_Carbon,data = AVt_Fieldwork, family = gaussian(link = &quot;identity&quot;))
-summary(glm.Avt_FW)</code></pre>
+<pre class="r"><code>glmgau.Avt_FW &lt;- glm(Carbon~Mean_Avt_Carbon,data = AVt_Fieldwork, family = gaussian(link = &quot;identity&quot;))
+summary(glmgau.Avt_FW)</code></pre>
 <pre><code>## 
 ## Call:
 ## glm(formula = Carbon ~ Mean_Avt_Carbon, family = gaussian(link = &quot;identity&quot;), 
@@ -696,15 +723,1091 @@ summary(glm.Avt_FW)</code></pre>
 ## AIC: 215.04
 ## 
 ## Number of Fisher Scoring iterations: 2</code></pre>
-<pre class="r"><code>plot(glm.Avt_FW)</code></pre>
-<p><img src="FieldWork_files/figure-html/unnamed-chunk-13-2.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-13-3.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-13-4.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-13-5.png" width="672" /></p>
-<pre class="r"><code>ggplot(data=AVt_Fieldwork, aes(x=Mean_Avt_Carbon, y = Carbon, color=as.factor(Plot_Number)))+ geom_jitter()+
-  labs(title = &quot;Fieldwork Carbon storage and Avitabile Carbon Relationship&quot;, 
+<pre class="r"><code>plot(glmgau.Avt_FW)</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-14-1.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-14-2.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-14-3.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-14-4.png" width="672" /></p>
+<pre class="r"><code>glmgamma.Avt_FW &lt;- glm(Carbon~Mean_Avt_Carbon,data = AVt_Fieldwork, family = Gamma(link = &quot;log&quot;))
+summary(glmgamma.Avt_FW)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = Carbon ~ Mean_Avt_Carbon, family = Gamma(link = &quot;log&quot;), 
+##     data = AVt_Fieldwork)
+## 
+## Deviance Residuals: 
+##      Min        1Q    Median        3Q       Max  
+## -1.48081  -0.72507  -0.04872   0.41002   0.83812  
+## 
+## Coefficients:
+##                  Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)      4.690666   0.301207  15.573 6.87e-12 ***
+## Mean_Avt_Carbon -0.007512   0.006544  -1.148    0.266    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for Gamma family taken to be 0.3745079)
+## 
+##     Null deviance: 9.6610  on 19  degrees of freedom
+## Residual deviance: 9.1096  on 18  degrees of freedom
+## AIC: 214.73
+## 
+## Number of Fisher Scoring iterations: 6</code></pre>
+<pre class="r"><code>plot(glmgamma.Avt_FW)</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-14-5.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-14-6.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-14-7.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-14-8.png" width="672" /></p>
+<pre class="r"><code>AICctab(glmgamma.Avt_FW,glmgau.Avt_FW, base=T, delta = T, weights =T)</code></pre>
+<pre><code>##                 AICc  dAICc df weight
+## glmgamma.Avt_FW 216.2   0.0 3  0.54  
+## glmgau.Avt_FW   216.5   0.3 3  0.46</code></pre>
+<pre class="r"><code># Carbon and mean annual precipitation
+
+glmgau_FW_MAP &lt;- glm(Carbon~bio12, data = AVt_Fieldwork, family = gaussian(link=&quot;identity&quot;))
+plot(glmgau_FW_MAP)</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-14-9.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-14-10.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-14-11.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-14-12.png" width="672" /></p>
+<pre class="r"><code>summary(glmgau_FW_MAP)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = Carbon ~ bio12, family = gaussian(link = &quot;identity&quot;), 
+##     data = AVt_Fieldwork)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -48.641  -21.499   -8.698   24.755   62.204  
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) -163.26290   55.37096  -2.949 0.008594 ** 
+## bio12          0.26632    0.05975   4.457 0.000304 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for gaussian family taken to be 1179.493)
+## 
+##     Null deviance: 44666  on 19  degrees of freedom
+## Residual deviance: 21231  on 18  degrees of freedom
+## AIC: 202.11
+## 
+## Number of Fisher Scoring iterations: 2</code></pre>
+<pre class="r"><code>glmgamma_FW_MAP &lt;- glm(Carbon~bio12, data = AVt_Fieldwork, family = Gamma(link = &quot;log&quot;))
+plot(glmgamma_FW_MAP)</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-14-13.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-14-14.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-14-15.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-14-16.png" width="672" /></p>
+<pre class="r"><code>summary(glmgamma_FW_MAP)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = Carbon ~ bio12, family = Gamma(link = &quot;log&quot;), data = AVt_Fieldwork)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -1.0824  -0.5528  -0.1014   0.4507   0.7106  
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 0.5908039  0.8534611   0.692 0.497618    
+## bio12       0.0040316  0.0009209   4.378 0.000363 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for Gamma family taken to be 0.2802198)
+## 
+##     Null deviance: 9.6610  on 19  degrees of freedom
+## Residual deviance: 5.4435  on 18  degrees of freedom
+## AIC: 203.83
+## 
+## Number of Fisher Scoring iterations: 7</code></pre>
+<pre class="r"><code># Carbon and Annual Mean Temperature (AMT-bio01)
+
+glmgau_FW_AMT &lt;- glm(Carbon~bio01, data = AVt_Fieldwork, family = gaussian(link=&quot;identity&quot;))
+plot(glmgau_FW_AMT)</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-14-17.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-14-18.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-14-19.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-14-20.png" width="672" /></p>
+<pre class="r"><code>summary(glmgau_FW_AMT)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = Carbon ~ bio01, family = gaussian(link = &quot;identity&quot;), 
+##     data = AVt_Fieldwork)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -51.771  -20.685   -6.304   22.686   59.074  
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 672.1558   123.9338   5.424 3.75e-05 ***
+## bio01        -2.5262     0.5288  -4.777 0.000151 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for gaussian family taken to be 1094.178)
+## 
+##     Null deviance: 44666  on 19  degrees of freedom
+## Residual deviance: 19695  on 18  degrees of freedom
+## AIC: 200.61
+## 
+## Number of Fisher Scoring iterations: 2</code></pre>
+<pre class="r"><code>glmgamma_FW_AMT &lt;- glm(Carbon~bio01, data = AVt_Fieldwork, family = Gamma(link = &quot;log&quot;))
+plot(glmgamma_FW_AMT)</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-14-21.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-14-22.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-14-23.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-14-24.png" width="672" /></p>
+<pre class="r"><code>summary(glmgamma_FW_AMT)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = Carbon ~ bio01, family = Gamma(link = &quot;log&quot;), data = AVt_Fieldwork)
+## 
+## Deviance Residuals: 
+##      Min        1Q    Median        3Q       Max  
+## -1.00761  -0.52264  -0.06855   0.41546   0.70670  
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 13.501437   1.885658    7.16 1.15e-06 ***
+## bio01       -0.039426   0.008046   -4.90 0.000115 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for Gamma family taken to be 0.2532996)
+## 
+##     Null deviance: 9.6610  on 19  degrees of freedom
+## Residual deviance: 4.9102  on 18  degrees of freedom
+## AIC: 201.68
+## 
+## Number of Fisher Scoring iterations: 7</code></pre>
+<pre class="r"><code>AICctab(glmgau_FW_AMT,glmgamma_FW_AMT, base=T, delta = T, weights =T)</code></pre>
+<pre><code>##                 AICc  dAICc df weight
+## glmgau_FW_AMT   202.1   0.0 3  0.63  
+## glmgamma_FW_AMT 203.2   1.1 3  0.37</code></pre>
+<pre class="r"><code>summary(glmgau_FW_AMT) # display results</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = Carbon ~ bio01, family = gaussian(link = &quot;identity&quot;), 
+##     data = AVt_Fieldwork)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -51.771  -20.685   -6.304   22.686   59.074  
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 672.1558   123.9338   5.424 3.75e-05 ***
+## bio01        -2.5262     0.5288  -4.777 0.000151 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for gaussian family taken to be 1094.178)
+## 
+##     Null deviance: 44666  on 19  degrees of freedom
+## Residual deviance: 19695  on 18  degrees of freedom
+## AIC: 200.61
+## 
+## Number of Fisher Scoring iterations: 2</code></pre>
+<pre class="r"><code>confint(glmgau_FW_AMT) # 95% CI for the coefficients</code></pre>
+<pre><code>## Waiting for profiling to be done...</code></pre>
+<pre><code>##                  2.5 %     97.5 %
+## (Intercept) 429.250011 915.061592
+## bio01        -3.562583  -1.489723</code></pre>
+<pre class="r"><code>exp(coef(glmgau_FW_AMT)) # exponentiated coefficients</code></pre>
+<pre><code>##   (Intercept)         bio01 
+## 8.195125e+291  7.996603e-02</code></pre>
+<pre class="r"><code>exp(confint(glmgau_FW_AMT)) # 95% CI for exponentiated coefficients</code></pre>
+<pre><code>## Waiting for profiling to be done...</code></pre>
+<pre><code>##                     2.5 %   97.5 %
+## (Intercept) 2.635793e+186      Inf
+## bio01        2.836545e-02 0.225435</code></pre>
+<pre class="r"><code>predict(glmgau_FW_AMT, type=&quot;response&quot;) # predicted values</code></pre>
+<pre><code>##         1         2         3         4         5         6         7 
+##  35.56514  35.56514  35.56514  35.56514  40.61745  60.82667  60.82667 
+##         8         9        10        11        12        13        14 
+##  60.82667  60.82667  93.66667  93.66667  93.66667  93.66667  93.66667 
+##        15        16        17        18        19        20 
+##  93.66667  93.66667 123.98051 123.98051 146.71589 146.71589</code></pre>
+<pre class="r"><code>residuals(glmgau_FW_AMT, type=&quot;deviance&quot;) # residuals</code></pre>
+<pre><code>##          1          2          3          4          5          6 
+##   7.091227 -25.007617  -2.327334 -15.357018 -20.569759 -34.254779 
+##          7          8          9         10         11         12 
+##  37.932666  -9.985750  18.813798  43.984158  59.073617 -12.501757 
+##         13         14         15         16         17         18 
+##  -3.450743 -51.770644  34.303489  55.254027 -47.589223 -21.030147 
+##         19         20 
+##  -6.691974  -5.916236</code></pre>
+<p><strong>Loading Last Year’s Popa datasets here to check with the field dataset I collected</strong></p>
+<pre class="r"><code>First_Year_Forests &lt;- read.csv(&quot;Data/All_data_Final.csv&quot;, stringsAsFactors = F)
+Popa_Forests &lt;- First_Year_Forests %&gt;% filter(Forest_type!=&quot;Moist_Mixed_Deciduous_Forest&quot;)
+
+NA_Rows &lt;- Popa_Forests %&gt;% filter(!complete.cases(.))
+
+NA_Rows$Species_names[is.na(NA_Rows$Species_names)] &lt;- &quot;Unknown species&quot;
+NA_Rows$Genus[is.na(NA_Rows$Genus)] &lt;- &quot;Unknown&quot;
+NA_Rows$Species[is.na(NA_Rows$Species)] &lt;- &quot;species&quot;
+NA_Rows$Family[is.na(NA_Rows$Family)] &lt;- &quot;Unknown&quot;
+NA_Rows_Completed &lt;- NA_Rows
+
+Complete_Rows &lt;- Popa_Forests %&gt;% filter(complete.cases(.))
+
+Popa_Forests_Full &lt;- rbind(Complete_Rows, NA_Rows_Completed)
+
+# Selecting the useful information from a dataframe to find out carbon with a new tree-hight model developed based on my fieldwork.
+
+Popa_Forests_Full &lt;- Popa_Forests_Full %&gt;% dplyr::select(Forest_type, Plot_id, Genus, Species, Dbh_cm,Long, Lat, H_m) %&gt;% rename(DBH_cm=Dbh_cm) %&gt;% rename(H_ft= H_m) %&gt;% mutate(H_m= H_ft*0.3048) %&gt;% mutate(Year=paste(2007))</code></pre>
+<p>Testing the DBH and Height relationship for trees—–</p>
+<pre class="r"><code>ggplot(data = Popa_Forests_Full, aes(DBH_cm, H_m, color = Forest_type, alpha=0.05) )+ geom_point(width=0.01)+ 
+  facet_wrap(facets = vars(Forest_type))+
+  labs(title = &quot;Tree Height and Diameter Relationship in Popa Forest in 2007&quot;, 
+      x=expression(bold(paste(&quot;DBH (cm)&quot;))),
+      y= expression(bold(paste(&quot;Height (m)&quot;)))) +
+  theme(axis.text.x = element_text(size=7, angle = 90, vjust = 0.5),
+        axis.text.y = element_text(size = 7))</code></pre>
+<pre><code>## Warning: Ignoring unknown parameters: width</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-16-1.png" width="672" /></p>
+<p><strong>Obtaining wood density</strong></p>
+<p>Obtaining Wood density - getWoodDensity assigns to each taxon a species- or genus-level average if at least one wood density value in the same genus as the focal taxon is available in the reference database. For unidentified trees or if the genus is missing in the reference database, the stand-level mean wood density is assigned to the tree (based on trees for which a value was attributed).</p>
+<pre class="r"><code>Taxo &lt;- correctTaxo(genus= Popa_Forests_Full$Genus, species = Popa_Forests_Full$Species)
+Popa_Forests_Full$genusCorr &lt;- Taxo$genusCorrected
+Popa_Forests_Full$speciesCorr &lt;- Taxo$speciesCorrected
+
+APG &lt;- getTaxonomy(Popa_Forests_Full$genusCorr, findOrder =T)
+
+Popa_Forests_Full$familyAPG &lt;- APG$family
+
+Popa_Forests_Full$orderAPG &lt;- APG$order
+dataWD &lt;- getWoodDensity(genus=Popa_Forests_Full$genusCorr,
+                         species=Popa_Forests_Full$speciesCorr,
+                         stand=NULL, family = Popa_Forests_Full$familyAPG, region = &quot;World&quot;)
+
+Popa_Forests_Full &lt;- Popa_Forests_Full %&gt;% mutate(WD=dataWD$meanWD)</code></pre>
+<p><strong><em>Calculating the biomass of each tree</em></strong></p>
+<p>Where, D = Tree diameter (in cm), either a vector or a single value Wood density (in g/cm3), either a vector or a single value. Tree height (H in m), either a vector or a single value.</p>
+<pre class="r"><code>CoordsH &lt;- cbind(Popa_Forests_Full$Long, Popa_Forests_Full$Lat)
+Popa_Forests_Full &lt;- Popa_Forests_Full %&gt;% mutate(AGB=computeAGB(D = DBH_cm, WD = WD, H = H_m, coord = CoordsH, Dlim = NULL))
+Popa_Forests_Full &lt;- Popa_Forests_Full %&gt;% mutate(Carbon_Mg= AGB*0.471)</code></pre>
+<p><strong>Data from 100 sample plots of 400 m2 (20 m × 20 m) were collected in dry mixed deciduous forest, dry dipterocap forest, dry forest and dry hill forest in Popa Mountain Park (Korea Forest Service, 2007). Diameter at breast height (DBH) and height of all trees (DBH ≥ 5 cm) were measured in each plot. Calculating the carbon per ha</strong></p>
+<pre class="r"><code>Plot_Popa_Forests &lt;- Popa_Forests_Full %&gt;% 
+  group_by(Plot_id,Forest_type,Long,Lat,Year) %&gt;%
+  dplyr::summarise(C_Tree_total = sum(Carbon_Mg)) %&gt;%
+  mutate(C_ha=C_Tree_total/0.04) %&gt;% dplyr::select(-C_Tree_total)</code></pre>
+<pre class="r"><code>ggplot(data = Plot_Popa_Forests, aes(x = Forest_type, y= C_ha, color= Forest_type))+ 
+  geom_boxplot()+
+  labs(title = &quot;Carbon storage per ha in four different forest types in Popa Park&quot;, 
+       x= &quot;Forest Type&quot;,
+       y= &quot;Carbon(t/ha)&quot;)+
+  theme(axis.text.x = element_text(size=7, angle = 90, vjust = 0.5),
+        axis.text.y = element_text(size = 7))</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-20-1.png" width="672" /></p>
+<div id="r-coords-cbindplot_popa_forestslong-plot_popa_forestslat-llcrs---crsinitepsg4326-coords_sp---spatialpointscoords-proj4string-llcrs-coords_sp---sptransformcoords_sp-initepsg4326-spdf-spatialpointsdataframecoords_spdata-plot_popa_forests-writeogrspdffourforests.shp-layercoords_sp-driver-esri-shapefile" class="section level1">
+<h1><code>{r} # coords = cbind(Plot_Popa_Forests$Long, Plot_Popa_Forests$Lat) # llCRS &lt;- CRS("+init=epsg:4326") # Coords_sp &lt;- SpatialPoints(coords, proj4string = llCRS) # Coords_sp &lt;- spTransform(Coords_sp, "+init=epsg:4326") # spdf = SpatialPointsDataFrame(Coords_sp,data = Plot_Popa_Forests) # writeOGR(spdf,"FourForests.shp", layer="Coords_sp", driver = "ESRI Shapefile")</code></h1>
+<pre class="r"><code>EVI2007_Popa_4Forests &lt;-raster(&quot;Data/EVI2007_Popa_4Forests.tif&quot;)
+mypts &lt;-readOGR(&quot;Four_Forests_shapefile/FourForests.shp&quot;)</code></pre>
+<pre><code>## OGR data source with driver: ESRI Shapefile 
+## Source: &quot;D:\PhD-Web\Four_Forests_shapefile\FourForests.shp&quot;, layer: &quot;FourForests&quot;
+## with 95 features
+## It has 6 fields</code></pre>
+<pre class="r"><code>EVI2007_4Popa_Forests &lt;- trim(EVI2007_Popa_4Forests)
+plot(EVI2007_Popa_4Forests)
+mydata &lt;- raster::extract(EVI2007_Popa_4Forests, mypts)
+plot(mypts, add = TRUE, cex=0.1)</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-21-1.png" width="672" /></p>
+<pre class="r"><code>class(mydata)</code></pre>
+<pre><code>## [1] &quot;numeric&quot;</code></pre>
+<pre class="r"><code>EVI2007_values &lt;- as.data.frame(mydata)
+EVI2007 &lt;- EVI2007_values %&gt;% rename(EVI2007=mydata)
+EVI2007_Popa_4Forests &lt;- bind_cols(Plot_Popa_Forests,EVI2007)
+EVI2007_Popa_4Forests &lt;- EVI2007_Popa_4Forests %&gt;% rename(Plot=Plot_id)
+
+ggplot(data=EVI2007_Popa_4Forests, aes(x=EVI2007, y = C_ha, color=as.factor(Forest_type)))+ geom_point()+
+  facet_wrap(facets = vars(Forest_type))+
+  labs(title = &quot;Forest Carbon and EVI Relationship in Popa Park in 2007&quot;, 
+       x=expression(bold(paste(&quot;Median EVI in 2007&quot;))),
+       y= expression(bold(paste(&quot;Carbon calculated from fieldwork of 2007 t &quot;, ha^bold(&quot;-1&quot;)))))+
+  theme(axis.text.x = element_text(size=7, angle = 90, vjust = 0.5),
+        axis.text.y = element_text(size = 7))</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-21-2.png" width="672" /></p>
+<pre class="r"><code>ggplot(data=EVI2007_Popa_4Forests, aes(x=EVI2007, y = C_ha))+ geom_jitter(aes(color = Forest_type))+
+  labs(title = &quot;Forest Carbon and EVI Relationship in Popa Park in 2007&quot;, 
+       x=expression(bold(paste(&quot;Median EVI in 2007&quot;))),
+       y= expression(bold(paste(&quot;Carbon calculated from fieldwork of 2007 t &quot;, ha^bold(&quot;-1&quot;)))))+
+  theme(axis.text.x = element_text(size=7, angle = 90, vjust = 0.5),
+        axis.text.y = element_text(size = 7))</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-21-3.png" width="672" /></p>
+<p><strong>Carbon stocks (2007) and environmental conditions relationship</strong></p>
+<p>BIO1 = Annual Mean Temperature<br />
+BIO2 = Mean Diurnal Range (Mean of monthly (max temp - min temp))<br />
+BIO3 = Isothermality (BIO2/BIO7) (* 100)<br />
+BIO4 = Temperature Seasonality (standard deviation *100)<br />
+BIO5 = Max Temperature of Warmest Month<br />
+BIO6 = Min Temperature of Coldest Month<br />
+BIO7 = Temperature Annual Range (BIO5-BIO6)<br />
+BIO8 = Mean Temperature of Wettest Quarter<br />
+BIO9 = Mean Temperature of Driest Quarter<br />
+BIO10 = Mean Temperature of Warmest Quarter<br />
+BIO11 = Mean Temperature of Coldest Quarter<br />
+BIO12 = Annual Precipitation<br />
+BIO13 = Precipitation of Wettest Month<br />
+BIO14 = Precipitation of Driest Month<br />
+BIO15 = Precipitation Seasonality (Coefficient of Variation)<br />
+BIO16 = Precipitation of Wettest Quarter<br />
+BIO17 = Precipitation of Driest Quarter<br />
+BIO18 = Precipitation of Warmest Quarter<br />
+BIO19 = Precipitation of Coldest Quarter</p>
+<p>I performed a simple liner regression analysis on the two variables Carbon and Annual precipitaion(AP)_Bio12/Annual Mean Temperature(AMT)_Bio01. I wish to determine wheter the AP/AMT varible is a significant predictor of the Carbon Variable.</p>
+<pre class="r"><code>WCL_Popa_4Forests &lt;- read.csv(&quot;Data_Output/WCL_Popa_4Forests.csv&quot;, stringsAsFactors = F)
+
+plot(C_ha~bio01, data = WCL_Popa_4Forests)</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-22-1.png" width="672" /></p>
+<pre class="r"><code>glm.AMT &lt;- glm(log(C_ha)~bio01,data=WCL_Popa_4Forests, family = gaussian(link = &quot;identity&quot;))
+summary(glm.AMT)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = log(C_ha) ~ bio01, family = gaussian(link = &quot;identity&quot;), 
+##     data = WCL_Popa_4Forests)
+## 
+## Deviance Residuals: 
+##      Min        1Q    Median        3Q       Max  
+## -1.71754  -0.49536  -0.01265   0.45180   1.92326  
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)   
+## (Intercept) 0.481359   1.008309   0.477  0.63420   
+## bio01       0.014333   0.004257   3.367  0.00111 **
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for gaussian family taken to be 0.4898238)
+## 
+##     Null deviance: 51.106  on 94  degrees of freedom
+## Residual deviance: 45.554  on 93  degrees of freedom
+## AIC: 205.77
+## 
+## Number of Fisher Scoring iterations: 2</code></pre>
+<pre class="r"><code>plot(glm.AMT)</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-22-2.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-22-3.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-22-4.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-22-5.png" width="672" /></p>
+<pre class="r"><code>ggplot(data=WCL_Popa_4Forests, aes(x=bio01, y = C_ha, color=as.factor(Forest_type)))+ geom_jitter()+
+  labs(title = &quot;Forest Carbon and Annual Mean Temperature Relationship in Popa Park in 2007&quot;, 
+       x=expression(bold(paste(&quot;Annual Mean Temperature(°C)&quot;))),
+       y= expression(bold(paste(&quot;Carbon calculated from 2007 fieldwork t &quot;, ha^bold(&quot;-1&quot;)))))+
+    theme(axis.text.x = element_text(size=7, angle = 45, vjust = 0.5),
+        axis.text.y = element_text(size = 7))</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-22-6.png" width="672" /></p>
+<pre class="r"><code>plot(C_ha~bio12, data = WCL_Popa_4Forests)</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-22-7.png" width="672" /></p>
+<pre class="r"><code>glm.AMT &lt;- glm(log(C_ha)~bio12,data=WCL_Popa_4Forests, family = gaussian(link = &quot;identity&quot;))
+summary(glm.AMT)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = log(C_ha) ~ bio12, family = gaussian(link = &quot;identity&quot;), 
+##     data = WCL_Popa_4Forests)
+## 
+## Deviance Residuals: 
+##      Min        1Q    Median        3Q       Max  
+## -1.63867  -0.51883  -0.01014   0.41605   1.89229  
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  5.1428564  0.4442976  11.575  &lt; 2e-16 ***
+## bio12       -0.0014065  0.0004834  -2.909  0.00453 ** 
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for gaussian family taken to be 0.5036872)
+## 
+##     Null deviance: 51.106  on 94  degrees of freedom
+## Residual deviance: 46.843  on 93  degrees of freedom
+## AIC: 208.43
+## 
+## Number of Fisher Scoring iterations: 2</code></pre>
+<pre class="r"><code>plot(glm.AMT)</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-22-8.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-22-9.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-22-10.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-22-11.png" width="672" /></p>
+<pre class="r"><code>ggplot(data=WCL_Popa_4Forests, aes(x=bio12, y = C_ha, color=as.factor(Forest_type)))+ geom_jitter()+
+  labs(title = &quot;Forest Carbon and Annual Precipiation Relationship in Popa Park in 2007&quot;, 
+       x=expression(bold(paste(&quot;Annual precipitation(mm)&quot;))),
+       y= expression(bold(paste(&quot;Carbon calculated from 2007 fieldwork t &quot;, ha^bold(&quot;-1&quot;)))))+
+    theme(axis.text.x = element_text(size=7, angle = 45, vjust = 0.5),
+        axis.text.y = element_text(size = 7))</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-22-12.png" width="672" /></p>
+<p><strong>Fieldwork Carbon (2007) and Avitabile carbon projection</strong></p>
+<pre class="r"><code>Avt_Carbon_Popa_4Forests &lt;- read.csv(&quot;Data_Output/Avitabile_AGB_Popa_4Forests.csv&quot;, stringsAsFactors = F)
+Avt_Carbon_Popa_4Forests &lt;- Avt_Carbon_Popa_4Forests %&gt;% rename(Avt_Carbon = mean)
+
+All_4_Forests_info &lt;- WCL_Popa_4Forests %&gt;% inner_join(dplyr:: select(Avt_Carbon_Popa_4Forests,Avt_Carbon, Plot_id), by = &quot;Plot_id&quot;, all = T)
+
+plot(C_ha~Avt_Carbon, data = All_4_Forests_info)</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-23-1.png" width="672" /></p>
+<pre class="r"><code>glm.Avt_4Forests &lt;- glm(C_ha~Avt_Carbon,data = All_4_Forests_info, family = gaussian(link = &quot;identity&quot;))
+summary(glm.Avt_4Forests)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = C_ha ~ Avt_Carbon, family = gaussian(link = &quot;identity&quot;), 
+##     data = All_4_Forests_info)
+## 
+## Deviance Residuals: 
+##    Min      1Q  Median      3Q     Max  
+## -64.35  -32.35  -14.03   15.89  150.70  
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  83.2198    14.0114   5.939 4.68e-08 ***
+## Avt_Carbon   -0.1956     0.1194  -1.639    0.105    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for gaussian family taken to be 2251.253)
+## 
+##     Null deviance: 219913  on 96  degrees of freedom
+## Residual deviance: 213869  on 95  degrees of freedom
+## AIC: 1028
+## 
+## Number of Fisher Scoring iterations: 2</code></pre>
+<pre class="r"><code>plot(glm.Avt_4Forests)</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-23-2.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-23-3.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-23-4.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-23-5.png" width="672" /></p>
+<pre class="r"><code>ggplot(data=All_4_Forests_info, aes(x=Avt_Carbon, y = C_ha, color=as.factor(Forest_type)))+ geom_jitter()+
+  labs(title = &quot;2007 Fieldwork Carbon storage and Avitabile Carbon Relationship in Popa Park&quot;, 
        x=expression(bold(paste(&quot;Carbon predicted by Avitabile t &quot;, ha^bold(&quot;-1&quot;)))),
-       y= expression(bold(paste(&quot;Carbon calculated from fieldwork t &quot;, ha^bold(&quot;-1&quot;)))))+
+       y= expression(bold(paste(&quot;Carbon calculated from 2007 fieldwork t &quot;, ha^bold(&quot;-1&quot;)))))+
   theme(axis.text.x = element_text(size=7, angle = 45, vjust = 0.5),
         axis.text.y = element_text(size = 7))</code></pre>
-<p><img src="FieldWork_files/figure-html/unnamed-chunk-13-6.png" width="672" /></p>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-23-6.png" width="672" /></p>
+<p><strong>Testing Different GLM Models</strong></p>
+<p>image: <img src="Figures/Glm%20models.PNG" /></p>
+<pre class="r"><code># Field Carbon and Avitabile Carbon estimation
+attach(All_4_Forests_info)</code></pre>
+<pre><code>## The following objects are masked from AVt_Fieldwork:
+## 
+##     bio01, bio02, bio03, bio04, bio05, bio06, bio07, bio08, bio09,
+##     bio10, bio11, bio12, bio13, bio14, bio15, bio16, bio17, bio18,
+##     bio19, Lat, Long</code></pre>
+<pre class="r"><code>glmgau.Avt_4F &lt;- glm(C_ha~Avt_Carbon,data = All_4_Forests_info, family = gaussian(link = &quot;identity&quot;))
+summary(glmgau.Avt_4F)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = C_ha ~ Avt_Carbon, family = gaussian(link = &quot;identity&quot;), 
+##     data = All_4_Forests_info)
+## 
+## Deviance Residuals: 
+##    Min      1Q  Median      3Q     Max  
+## -64.35  -32.35  -14.03   15.89  150.70  
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  83.2198    14.0114   5.939 4.68e-08 ***
+## Avt_Carbon   -0.1956     0.1194  -1.639    0.105    
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for gaussian family taken to be 2251.253)
+## 
+##     Null deviance: 219913  on 96  degrees of freedom
+## Residual deviance: 213869  on 95  degrees of freedom
+## AIC: 1028
+## 
+## Number of Fisher Scoring iterations: 2</code></pre>
+<pre class="r"><code>plot(glmgau.Avt_4F)</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-24-1.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-24-2.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-24-3.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-24-4.png" width="672" /></p>
+<pre class="r"><code>glmgamma.Avt_4F &lt;- glm(C_ha~Avt_Carbon,data = All_4_Forests_info, family = Gamma(link = &quot;log&quot;))
+summary(glmgamma.Avt_4F)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = C_ha ~ Avt_Carbon, family = Gamma(link = &quot;log&quot;), 
+##     data = All_4_Forests_info)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -1.4920  -0.6574  -0.2535   0.2878   1.5806  
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  4.613265   0.219465  21.021   &lt;2e-16 ***
+## Avt_Carbon  -0.004574   0.001870  -2.446   0.0163 *  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for Gamma family taken to be 0.5523218)
+## 
+##     Null deviance: 52.694  on 96  degrees of freedom
+## Residual deviance: 50.284  on 95  degrees of freedom
+## AIC: 972.76
+## 
+## Number of Fisher Scoring iterations: 6</code></pre>
+<pre class="r"><code>plot(glmgamma.Avt_4F)</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-24-5.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-24-6.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-24-7.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-24-8.png" width="672" /></p>
+<pre class="r"><code>AICctab(glmgamma.Avt_4F,glmgau.Avt_4F, base=T, delta = T, weights =T)</code></pre>
+<pre><code>##                 AICc   dAICc  df weight
+## glmgamma.Avt_4F  973.0    0.0 3  1     
+## glmgau.Avt_4F   1028.3   55.3 3  &lt;0.001</code></pre>
+<pre class="r"><code># C_ha and mean annual precipitation
+
+glmgau_4F_MAP &lt;- glm(C_ha~bio12, data = All_4_Forests_info, family = gaussian(link=&quot;identity&quot;))
+plot(glmgau_4F_MAP)</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-24-9.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-24-10.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-24-11.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-24-12.png" width="672" /></p>
+<pre class="r"><code>summary(glmgau_4F_MAP)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = C_ha ~ bio12, family = gaussian(link = &quot;identity&quot;), 
+##     data = All_4_Forests_info)
+## 
+## Deviance Residuals: 
+##    Min      1Q  Median      3Q     Max  
+## -63.63  -32.45  -15.06   10.02  173.44  
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 133.82448   29.00565   4.614 1.24e-05 ***
+## bio12        -0.07975    0.03163  -2.522   0.0133 *  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for gaussian family taken to be 2169.654)
+## 
+##     Null deviance: 219913  on 96  degrees of freedom
+## Residual deviance: 206117  on 95  degrees of freedom
+## AIC: 1024.4
+## 
+## Number of Fisher Scoring iterations: 2</code></pre>
+<pre class="r"><code>glmgamma_4F_MAP &lt;- glm(C_ha~bio12, data = All_4_Forests_info, family = Gamma(link = &quot;log&quot;))
+plot(glmgamma_4F_MAP)</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-24-13.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-24-14.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-24-15.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-24-16.png" width="672" /></p>
+<pre class="r"><code>summary(glmgamma_4F_MAP)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = C_ha ~ bio12, family = Gamma(link = &quot;log&quot;), data = All_4_Forests_info)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -1.3969  -0.6648  -0.2470   0.1719   2.0850  
+## 
+## Coefficients:
+##               Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept)  5.0548209  0.4929371  10.254   &lt;2e-16 ***
+## bio12       -0.0010485  0.0005375  -1.951    0.054 .  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for Gamma family taken to be 0.6266258)
+## 
+##     Null deviance: 52.694  on 96  degrees of freedom
+## Residual deviance: 49.666  on 95  degrees of freedom
+## AIC: 971.46
+## 
+## Number of Fisher Scoring iterations: 9</code></pre>
+<pre class="r"><code># C_ha and Annual Mean Temperature (AMT-bio01)
+
+glmgau_4F_AMT &lt;- glm(C_ha~bio01, data = All_4_Forests_info, family = gaussian(link=&quot;identity&quot;))
+plot(glmgau_4F_AMT)</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-24-17.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-24-18.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-24-19.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-24-20.png" width="672" /></p>
+<pre class="r"><code>summary(glmgau_4F_AMT)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = C_ha ~ bio01, family = gaussian(link = &quot;identity&quot;), 
+##     data = All_4_Forests_info)
+## 
+## Deviance Residuals: 
+##    Min      1Q  Median      3Q     Max  
+## -68.55  -30.98  -15.25   12.21  175.81  
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)   
+## (Intercept) -135.1785    66.1465  -2.044  0.04376 * 
+## bio01          0.8325     0.2791   2.983  0.00362 **
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for gaussian family taken to be 2116.59)
+## 
+##     Null deviance: 219913  on 96  degrees of freedom
+## Residual deviance: 201076  on 95  degrees of freedom
+## AIC: 1022
+## 
+## Number of Fisher Scoring iterations: 2</code></pre>
+<pre class="r"><code>AICctab(glmgamma.Avt_4F,glmgau.Avt_4F, base=T, delta = T, weights =T)</code></pre>
+<pre><code>##                 AICc   dAICc  df weight
+## glmgamma.Avt_4F  973.0    0.0 3  1     
+## glmgau.Avt_4F   1028.3   55.3 3  &lt;0.001</code></pre>
+<p><strong>Loading the Fieldwork data collected in 2013 by the Forest Department</strong></p>
+<pre class="r"><code>Forests &lt;- read.csv(&quot;Data/All_data_Final.csv&quot;, stringsAsFactors = F)
+names(Forests)</code></pre>
+<pre><code>##  [1] &quot;Forest_type&quot;   &quot;Plot_id&quot;       &quot;Species_names&quot; &quot;Genus&quot;        
+##  [5] &quot;Species&quot;       &quot;Family&quot;        &quot;Dbh_cm&quot;        &quot;H_m&quot;          
+##  [9] &quot;WD&quot;            &quot;AGB&quot;           &quot;C_Tree&quot;        &quot;BA&quot;           
+## [13] &quot;Lat&quot;           &quot;Long&quot;          &quot;Northing&quot;      &quot;Easting&quot;      
+## [17] &quot;Tenure&quot;</code></pre>
+<pre class="r"><code>Forests &lt;- filter(Forests,!is.na(Species_names) &amp; !is.na(Dbh_cm))
+summary(Forests)</code></pre>
+<pre><code>##  Forest_type           Plot_id       Species_names         Genus          
+##  Length:4444        Min.   :  1.00   Length:4444        Length:4444       
+##  Class :character   1st Qu.: 23.00   Class :character   Class :character  
+##  Mode  :character   Median : 53.00   Mode  :character   Mode  :character  
+##                     Mean   : 55.69                                        
+##                     3rd Qu.: 89.00                                        
+##                     Max.   :119.00                                        
+##    Species             Family              Dbh_cm            H_m         
+##  Length:4444        Length:4444        Min.   :  3.00   Min.   : 0.3048  
+##  Class :character   Class :character   1st Qu.: 10.00   1st Qu.: 9.1440  
+##  Mode  :character   Mode  :character   Median : 14.50   Median :15.2400  
+##                                        Mean   : 19.02   Mean   :19.5457  
+##                                        3rd Qu.: 24.00   3rd Qu.:25.3049  
+##                                        Max.   :137.00   Max.   :83.0000  
+##        WD              AGB                C_Tree        
+##  Min.   :0.2200   Min.   : 0.001082   Min.   :0.000508  
+##  1st Qu.:0.6014   1st Qu.: 0.042343   1st Qu.:0.019901  
+##  Median :0.7200   Median : 0.136046   Median :0.063941  
+##  Mean   :0.7164   Mean   : 0.523717   Mean   :0.246147  
+##  3rd Qu.:0.8500   3rd Qu.: 0.477241   3rd Qu.:0.224303  
+##  Max.   :1.0950   Max.   :20.000150   Max.   :9.400070  
+##        BA                Lat             Long          Northing      
+##  Min.   :0.000707   Min.   :18.88   Min.   :95.22   Min.   :2089871  
+##  1st Qu.:0.007854   1st Qu.:20.85   1st Qu.:95.24   1st Qu.:2306949  
+##  Median :0.016513   Median :20.89   Median :95.26   Median :2311426  
+##  Mean   :0.042563   Mean   :20.66   Mean   :95.34   Mean   :2285967  
+##  3rd Qu.:0.045239   3rd Qu.:20.91   3rd Qu.:95.27   3rd Qu.:2313971  
+##  Max.   :1.474114   Max.   :20.93   Max.   :96.08   Max.   :2316236  
+##     Easting          Tenure         
+##  Min.   :193210   Length:4444       
+##  1st Qu.:732675   Class :character  
+##  Median :734513   Mode  :character  
+##  Mean   :729817                     
+##  3rd Qu.:736259                     
+##  Max.   :809669</code></pre>
+<pre class="r"><code>unique(Forests$Forest_type)</code></pre>
+<pre><code>## [1] &quot;Dipterocarpus_Forest&quot;         &quot;Dry_Forest&quot;                  
+## [3] &quot;Dry_Hill_Forest&quot;              &quot;Dry_Mixed_Deciduous_Forest&quot;  
+## [5] &quot;Moist_Mixed_Deciduous_Forest&quot;</code></pre>
+<pre class="r"><code>Moist_Mixed_Deciduous_Forest &lt;- Forests %&gt;% filter(Forest_type==&quot;Moist_Mixed_Deciduous_Forest&quot;) %&gt;% mutate(Year = paste(2013))</code></pre>
+<p><strong>Sampling Method</strong></p>
+<p>image: <img src="Figures/Moist_Mixed_Deciduous_Forest%20Sampling%20design.PNG" /></p>
+<p>50 m * 50 m sample plot with a 25 m * 25 m nested plot. Therefore, the big dataframe was splitted into two according to the DBH limit measured in the 50m * 50m subplot. <em>(25m x 25m and 50m x 50m)</em></p>
+<pre class="r"><code>MMDF_50m &lt;- Moist_Mixed_Deciduous_Forest %&gt;% filter(Dbh_cm &gt;= 20)
+MMDF_25m &lt;- Moist_Mixed_Deciduous_Forest %&gt;% filter(Dbh_cm &lt; 20)</code></pre>
+<p>** Calculating the carbon per ha for two different size plots**</p>
+<pre class="r"><code>Plot_50M &lt;- MMDF_50m %&gt;%
+  group_by(Plot_id,Forest_type,Year, Long, Lat) %&gt;%
+  dplyr::summarise(C_Tree_total = sum(C_Tree)) %&gt;%
+  mutate(C_ha=C_Tree_total/0.25) %&gt;% dplyr::select(-C_Tree_total)
+
+Plot_25M &lt;- MMDF_25m %&gt;%
+  group_by(Plot_id,Forest_type,Year, Long, Lat) %&gt;%
+  dplyr::summarise(C_Tree_total = sum(C_Tree)) %&gt;%
+  mutate(C_ha=C_Tree_total/0.0625) %&gt;% dplyr::select(-C_Tree_total)</code></pre>
+<p>Combining two dataframes of different plot size according to Plot names.Carbon per hectare columns of the two dataframes were added together to obtain total carbon of each plot in hectare scale.</p>
+<pre class="r"><code>MMDF &lt;- bind_rows(Plot_25M,Plot_50M) %&gt;% group_by(Plot_id,Forest_type,Year, Long, Lat) %&gt;% summarise(C_ha=sum(C_ha))</code></pre>
+<p><strong>Creating a shape file of the plot locations</strong></p>
+<pre class="r"><code>coords = cbind(MMDF$Long, MMDF$Lat)
+llCRS &lt;- CRS(&quot;+init=epsg:4326&quot;)
+Coords_sp &lt;- SpatialPoints(coords, proj4string = llCRS)
+Coords_sp &lt;- spTransform(Coords_sp, &quot;+init=epsg:4326&quot;)
+spdf = SpatialPointsDataFrame(Coords_sp,data = MMDF)
+writeOGR(spdf,&quot;MMDF_2013.shp&quot;, layer=&quot;Coords_sp&quot;, driver = &quot;ESRI Shapefile&quot;)</code></pre>
+<pre><code>## Warning in writeOGR(spdf, &quot;MMDF_2013.shp&quot;, layer = &quot;Coords_sp&quot;, driver =
+## &quot;ESRI Shapefile&quot;): Field names abbreviated for ESRI Shapefile driver</code></pre>
+<p><strong>Enhanced Vegetation Index and Carbon from 2013 forest inventory</strong></p>
+<pre class="r"><code>EVI2013_MMDF &lt;-raster(&quot;Data/EVI_MMDF_2013.tif&quot;)
+mypts &lt;-readOGR(&quot;MMDF_2013_shapefiles/MMDF_2013.shp&quot;)</code></pre>
+<pre><code>## OGR data source with driver: ESRI Shapefile 
+## Source: &quot;D:\PhD-Web\MMDF_2013_shapefiles\MMDF_2013.shp&quot;, layer: &quot;MMDF_2013&quot;
+## with 18 features
+## It has 6 fields</code></pre>
+<pre class="r"><code>EVI2013_MMDF &lt;- trim(EVI2013_MMDF)
+plot(EVI2013_MMDF)
+mydata &lt;- raster::extract(EVI2013_MMDF, mypts)
+plot(mypts, add = TRUE, cex=0.1)</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-30-1.png" width="672" /></p>
+<pre class="r"><code>class(mydata)</code></pre>
+<pre><code>## [1] &quot;numeric&quot;</code></pre>
+<pre class="r"><code>EVI2013_values &lt;- as.data.frame(mydata)
+EVI2013 &lt;- EVI2013_values %&gt;% rename(EVI2013=mydata)
+EVI2013_MMDF &lt;- bind_cols(MMDF,EVI2013)
+EVI2013_MMDF &lt;- EVI2013_MMDF %&gt;% rename(Plot=Plot_id)
+
+ggplot(data=EVI2013_MMDF, aes(x=EVI2013, y = C_ha, color = as.factor(Plot)))+ geom_jitter()+
+  labs(title = &quot;Forest Carbon and EVI Relationship in Bago Region in 2013&quot;, 
+       x=expression(bold(paste(&quot;Median EVI Values in 2013&quot;))),
+       y= expression(bold(paste(&quot;Carbon calculated from fieldwork of 2013 t &quot;, ha^bold(&quot;-1&quot;)))))+
+  theme(axis.text.x = element_text(size=7, angle = 90, vjust = 0.5),
+        axis.text.y = element_text(size = 7))</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-30-2.png" width="672" /> <strong>Normalised Vegetation Index and Carbon from 2013 forest inventory</strong></p>
+<pre class="r"><code>NDVI2013_MMDF &lt;-raster(&quot;Data/NDVI_MMDF_2013.tif&quot;)
+mypts &lt;-readOGR(&quot;MMDF_2013_shapefiles/MMDF_2013.shp&quot;)</code></pre>
+<pre><code>## OGR data source with driver: ESRI Shapefile 
+## Source: &quot;D:\PhD-Web\MMDF_2013_shapefiles\MMDF_2013.shp&quot;, layer: &quot;MMDF_2013&quot;
+## with 18 features
+## It has 6 fields</code></pre>
+<pre class="r"><code>NDVI2013_MMDF &lt;- trim(NDVI2013_MMDF)
+plot(NDVI2013_MMDF)
+mydata &lt;- raster::extract(NDVI2013_MMDF, mypts)
+plot(mypts, add = TRUE, cex=0.1)</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-31-1.png" width="672" /></p>
+<pre class="r"><code>class(mydata)</code></pre>
+<pre><code>## [1] &quot;numeric&quot;</code></pre>
+<pre class="r"><code>NDVI2013_values &lt;- as.data.frame(mydata)
+NDVI2013 &lt;- NDVI2013_values %&gt;% rename(NDVI2013=mydata)
+NDVI2013_MMDF &lt;- bind_cols(EVI2013_MMDF,NDVI2013)
+
+ggplot(data=NDVI2013_MMDF, aes(x=NDVI2013, y = C_ha, color = as.factor(Plot)))+ geom_jitter()+
+  labs(title = &quot;Forest Carbon and NDVI Relationship in Bago Region in 2013&quot;, 
+       x=expression(bold(paste(&quot;Median NDVI Values in 2013&quot;))),
+       y= expression(bold(paste(&quot;Carbon calculated from fieldwork of 2013 t &quot;, ha^bold(&quot;-1&quot;)))))+
+  theme(axis.text.x = element_text(size=7, angle = 90, vjust = 0.5),
+        axis.text.y = element_text(size = 7))</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-31-2.png" width="672" /> <strong>Carbon stocks (2013) and environmental conditions relationship</strong></p>
+<p>BIO1 = Annual Mean Temperature<br />
+BIO2 = Mean Diurnal Range (Mean of monthly (max temp - min temp))<br />
+BIO3 = Isothermality (BIO2/BIO7) (* 100)<br />
+BIO4 = Temperature Seasonality (standard deviation *100)<br />
+BIO5 = Max Temperature of Warmest Month<br />
+BIO6 = Min Temperature of Coldest Month<br />
+BIO7 = Temperature Annual Range (BIO5-BIO6)<br />
+BIO8 = Mean Temperature of Wettest Quarter<br />
+BIO9 = Mean Temperature of Driest Quarter<br />
+BIO10 = Mean Temperature of Warmest Quarter<br />
+BIO11 = Mean Temperature of Coldest Quarter<br />
+BIO12 = Annual Precipitation<br />
+BIO13 = Precipitation of Wettest Month<br />
+BIO14 = Precipitation of Driest Month<br />
+BIO15 = Precipitation Seasonality (Coefficient of Variation)<br />
+BIO16 = Precipitation of Wettest Quarter<br />
+BIO17 = Precipitation of Driest Quarter<br />
+BIO18 = Precipitation of Warmest Quarter<br />
+BIO19 = Precipitation of Coldest Quarter</p>
+<p>I performed a simple liner regression analysis on the two variables Carbon and Annual precipitaion(AP)_Bio12/Annual Mean Temperature(AMT)_Bio01. I wish to determine wheter the AP/AMT varible is a significant predictor of the Carbon Variable.</p>
+<pre class="r"><code>WCL_MMDF_2013 &lt;- read.csv(&quot;Data_Output/WCL_MMDF_2013.csv&quot;, stringsAsFactors = F)
+
+plot(C_ha~bio01, data = WCL_MMDF_2013)</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-32-1.png" width="672" /></p>
+<pre class="r"><code>glm.AMT &lt;- glm(log(C_ha)~bio01,data=WCL_MMDF_2013, family = gaussian(link = &quot;identity&quot;))
+summary(glm.AMT)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = log(C_ha) ~ bio01, family = gaussian(link = &quot;identity&quot;), 
+##     data = WCL_MMDF_2013)
+## 
+## Deviance Residuals: 
+##      Min        1Q    Median        3Q       Max  
+## -0.48016  -0.29706   0.02114   0.24315   0.45734  
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 36.18304    5.27673   6.857 3.85e-06 ***
+## bio01       -0.12394    0.02047  -6.054 1.67e-05 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for gaussian family taken to be 0.08953085)
+## 
+##     Null deviance: 4.7137  on 17  degrees of freedom
+## Residual deviance: 1.4325  on 16  degrees of freedom
+## AIC: 11.525
+## 
+## Number of Fisher Scoring iterations: 2</code></pre>
+<pre class="r"><code>plot(glm.AMT)</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-32-2.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-32-3.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-32-4.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-32-5.png" width="672" /></p>
+<pre class="r"><code>ggplot(data=WCL_MMDF_2013, aes(x=bio01, y = C_ha, color=as.factor(Forest_type)))+ geom_jitter()+
+  labs(title = &quot;Forest Carbon and Annual Mean Temperature Relationship in Bago Region in 2013&quot;, 
+       x=expression(bold(paste(&quot;Annual Mean Temperature(°C)&quot;))),
+       y= expression(bold(paste(&quot;Carbon calculated from 2013 fieldwork t &quot;, ha^bold(&quot;-1&quot;)))))+
+    theme(axis.text.x = element_text(size=7, angle = 45, vjust = 0.5),
+        axis.text.y = element_text(size = 7))</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-32-6.png" width="672" /></p>
+<pre class="r"><code>plot(C_ha~bio12, data = WCL_MMDF_2013)</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-32-7.png" width="672" /></p>
+<pre class="r"><code>glm.AMT &lt;- glm(log(C_ha)~bio12,data=WCL_MMDF_2013, family = gaussian(link = &quot;identity&quot;))
+summary(glm.AMT)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = log(C_ha) ~ bio12, family = gaussian(link = &quot;identity&quot;), 
+##     data = WCL_MMDF_2013)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -0.9622  -0.3348   0.1837   0.3981   0.7307  
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)   
+## (Intercept) 3.1810151  1.0356847   3.071   0.0073 **
+## bio12       0.0008596  0.0008336   1.031   0.3178   
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for gaussian family taken to be 0.2762496)
+## 
+##     Null deviance: 4.7137  on 17  degrees of freedom
+## Residual deviance: 4.4200  on 16  degrees of freedom
+## AIC: 31.806
+## 
+## Number of Fisher Scoring iterations: 2</code></pre>
+<pre class="r"><code>plot(glm.AMT)</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-32-8.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-32-9.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-32-10.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-32-11.png" width="672" /></p>
+<pre class="r"><code>ggplot(data=WCL_MMDF_2013, aes(x=bio12, y = C_ha, color=as.factor(Forest_type)))+ geom_jitter()+
+  labs(title = &quot;Forest Carbon and Annual Precipiation Relationship in Bago Region in 2013&quot;, 
+       x=expression(bold(paste(&quot;Annual precipitation(mm)&quot;))),
+       y= expression(bold(paste(&quot;Carbon calculated from 2013 fieldwork t &quot;, ha^bold(&quot;-1&quot;)))))+
+    theme(axis.text.x = element_text(size=7, angle = 45, vjust = 0.5),
+        axis.text.y = element_text(size = 7))</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-32-12.png" width="672" /> <strong>Fieldwork Carbon (2013) and Avitabile carbon projection</strong></p>
+<pre class="r"><code>Avt_Carbon_MMDF &lt;- read.csv(&quot;Data_Output/Avitabile_AGB_MMDF.csv&quot;, stringsAsFactors = F)
+
+MMDF_info &lt;- WCL_MMDF_2013 %&gt;% inner_join(dplyr:: select(Avt_Carbon_MMDF,Avt_Carbon, Plot_id), by = &quot;Plot_id&quot;, all = T)
+
+plot(C_ha~Avt_Carbon, data = MMDF_info)</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-33-1.png" width="672" /></p>
+<pre class="r"><code>glm.Avt_4Forests &lt;- glm(C_ha~Avt_Carbon,data = MMDF_info, family = gaussian(link = &quot;identity&quot;))
+summary(glm.Avt_4Forests)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = C_ha ~ Avt_Carbon, family = gaussian(link = &quot;identity&quot;), 
+##     data = MMDF_info)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -44.819  -23.385    2.822   18.294   77.620  
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)  
+## (Intercept)  37.4555    21.2331   1.764   0.0968 .
+## Avt_Carbon    0.8356     0.4042   2.067   0.0553 .
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for gaussian family taken to be 1101.247)
+## 
+##     Null deviance: 22325  on 17  degrees of freedom
+## Residual deviance: 17620  on 16  degrees of freedom
+## AIC: 181.04
+## 
+## Number of Fisher Scoring iterations: 2</code></pre>
+<pre class="r"><code>plot(glm.Avt_4Forests)</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-33-2.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-33-3.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-33-4.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-33-5.png" width="672" /></p>
+<pre class="r"><code>ggplot(data=MMDF_info, aes(x=Avt_Carbon, y = C_ha, color=as.factor(Plot_id)))+ geom_jitter()+
+  labs(title = &quot;2013 Fieldwork Carbon storage and Avitabile Carbon Relationship in Bago Region&quot;, 
+       x=expression(bold(paste(&quot;Carbon predicted by Avitabile t &quot;, ha^bold(&quot;-1&quot;)))),
+       y= expression(bold(paste(&quot;Carbon calculated from 2013 fieldwork t &quot;, ha^bold(&quot;-1&quot;)))))+
+  theme(axis.text.x = element_text(size=7, angle = 45, vjust = 0.5),
+        axis.text.y = element_text(size = 7))</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-33-6.png" width="672" /> <strong>All these plots are in one ecoregion published by WWF</strong></p>
+<p><strong>Testing Different GLM Models</strong> image: <img src="Figures/Glm%20models.PNG" /></p>
+<pre class="r"><code># Field Carbon (2013) and Avitabile Carbon estimation
+glmgau.MMDF_info &lt;- glm(C_ha~Avt_Carbon,data = MMDF_info, family = gaussian(link = &quot;identity&quot;))
+summary(glmgau.MMDF_info)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = C_ha ~ Avt_Carbon, family = gaussian(link = &quot;identity&quot;), 
+##     data = MMDF_info)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -44.819  -23.385    2.822   18.294   77.620  
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)  
+## (Intercept)  37.4555    21.2331   1.764   0.0968 .
+## Avt_Carbon    0.8356     0.4042   2.067   0.0553 .
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for gaussian family taken to be 1101.247)
+## 
+##     Null deviance: 22325  on 17  degrees of freedom
+## Residual deviance: 17620  on 16  degrees of freedom
+## AIC: 181.04
+## 
+## Number of Fisher Scoring iterations: 2</code></pre>
+<pre class="r"><code>plot(glmgau.MMDF_info)</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-34-1.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-34-2.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-34-3.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-34-4.png" width="672" /></p>
+<pre class="r"><code>glmgamma.MMDF_info &lt;- glm(C_ha~Avt_Carbon,data = MMDF_info, family = Gamma(link = &quot;log&quot;))
+summary(glmgamma.MMDF_info)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = C_ha ~ Avt_Carbon, family = Gamma(link = &quot;log&quot;), 
+##     data = MMDF_info)
+## 
+## Deviance Residuals: 
+##      Min        1Q    Median        3Q       Max  
+## -0.61462  -0.50836  -0.00346   0.28553   0.84082  
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 3.647480   0.290786  12.544 1.08e-09 ***
+## Avt_Carbon  0.014021   0.005536   2.533   0.0222 *  
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for Gamma family taken to be 0.2065405)
+## 
+##     Null deviance: 4.2737  on 17  degrees of freedom
+## Residual deviance: 3.2713  on 16  degrees of freedom
+## AIC: 179.62
+## 
+## Number of Fisher Scoring iterations: 6</code></pre>
+<pre class="r"><code>plot(glmgamma.MMDF_info)</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-34-5.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-34-6.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-34-7.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-34-8.png" width="672" /></p>
+<pre class="r"><code>AICctab(glmgamma.MMDF_info,glmgau.MMDF_info, base=T, delta = T, weights =T)</code></pre>
+<pre><code>##                    AICc  dAICc df weight
+## glmgamma.MMDF_info 181.3   0.0 3  0.67  
+## glmgau.MMDF_info   182.8   1.4 3  0.33</code></pre>
+<pre class="r"><code># Carbon and mean annual precipitation
+attach(MMDF_info)</code></pre>
+<pre><code>## The following objects are masked from All_4_Forests_info:
+## 
+##     Avt_Carbon, bio01, bio02, bio03, bio04, bio05, bio06, bio07,
+##     bio08, bio09, bio10, bio11, bio12, bio13, bio14, bio15, bio16,
+##     bio17, bio18, bio19, C_ha, Forest_type, Lat, Long, Plot_id,
+##     Year</code></pre>
+<pre><code>## The following objects are masked from AVt_Fieldwork:
+## 
+##     bio01, bio02, bio03, bio04, bio05, bio06, bio07, bio08, bio09,
+##     bio10, bio11, bio12, bio13, bio14, bio15, bio16, bio17, bio18,
+##     bio19, Lat, Long</code></pre>
+<pre class="r"><code>glmgau_MMDF_MAP &lt;- glm(C_ha~bio12, data = MMDF_info, family = gaussian(link=&quot;identity&quot;))
+plot(glmgau_MMDF_MAP)</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-34-9.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-34-10.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-34-11.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-34-12.png" width="672" /></p>
+<pre class="r"><code>summary(glmgau_MMDF_MAP)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = C_ha ~ bio12, family = gaussian(link = &quot;identity&quot;), 
+##     data = MMDF_info)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -52.926  -25.209    5.932   26.213   70.319  
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)
+## (Intercept) -9.15890   70.23754  -0.130    0.898
+## bio12        0.07087    0.05653   1.254    0.228
+## 
+## (Dispersion parameter for gaussian family taken to be 1270.531)
+## 
+##     Null deviance: 22325  on 17  degrees of freedom
+## Residual deviance: 20328  on 16  degrees of freedom
+## AIC: 183.61
+## 
+## Number of Fisher Scoring iterations: 2</code></pre>
+<pre class="r"><code>glmgamma_MMDF_MAP &lt;- glm(C_ha~bio12, data = MMDF_info, family = Gamma(link = &quot;log&quot;))
+plot(glmgamma_MMDF_MAP)</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-34-13.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-34-14.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-34-15.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-34-16.png" width="672" /></p>
+<pre class="r"><code>summary(glmgamma_MMDF_MAP)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = C_ha ~ bio12, family = Gamma(link = &quot;log&quot;), data = MMDF_info)
+## 
+## Deviance Residuals: 
+##      Min        1Q    Median        3Q       Max  
+## -0.91066  -0.41405   0.07679   0.30267   0.69046  
+## 
+## Coefficients:
+##              Estimate Std. Error t value Pr(&gt;|t|)   
+## (Intercept) 3.2638077  0.8908729   3.664   0.0021 **
+## bio12       0.0008814  0.0007170   1.229   0.2368   
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for Gamma family taken to be 0.2043987)
+## 
+##     Null deviance: 4.2737  on 17  degrees of freedom
+## Residual deviance: 3.9496  on 16  degrees of freedom
+## AIC: 183.12
+## 
+## Number of Fisher Scoring iterations: 5</code></pre>
+<pre class="r"><code># Carbon and Annual Mean Temperature (AMT-bio01)
+
+glmgau_MMDF_AMT &lt;- glm(C_ha~bio01, data = MMDF_info, family = gaussian(link=&quot;identity&quot;))
+plot(glmgau_MMDF_AMT)</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-34-17.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-34-18.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-34-19.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-34-20.png" width="672" /></p>
+<pre class="r"><code>summary(glmgau_MMDF_AMT)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = C_ha ~ bio01, family = gaussian(link = &quot;identity&quot;), 
+##     data = MMDF_info)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -37.673  -23.878    2.871   13.304   55.615  
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 1970.189    458.464   4.297 0.000554 ***
+## bio01         -7.341      1.779  -4.127 0.000790 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for gaussian family taken to be 675.8543)
+## 
+##     Null deviance: 22325  on 17  degrees of freedom
+## Residual deviance: 10814  on 16  degrees of freedom
+## AIC: 172.25
+## 
+## Number of Fisher Scoring iterations: 2</code></pre>
+<pre class="r"><code>glmgamma_MMDF_AMT &lt;- glm(C_ha~bio01, data = MMDF_info, family = Gamma(link = &quot;log&quot;))
+plot(glmgamma_MMDF_AMT)</code></pre>
+<p><img src="FieldWork_files/figure-html/unnamed-chunk-34-21.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-34-22.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-34-23.png" width="672" /><img src="FieldWork_files/figure-html/unnamed-chunk-34-24.png" width="672" /></p>
+<pre class="r"><code>summary(glmgamma_MMDF_AMT)</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = C_ha ~ bio01, family = Gamma(link = &quot;log&quot;), data = MMDF_info)
+## 
+## Deviance Residuals: 
+##      Min        1Q    Median        3Q       Max  
+## -0.48292  -0.31450  -0.00723   0.21680   0.43853  
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 37.17137    5.04870   7.363 1.60e-06 ***
+## bio01       -0.12762    0.01959  -6.515 7.12e-06 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for Gamma family taken to be 0.08196006)
+## 
+##     Null deviance: 4.2737  on 17  degrees of freedom
+## Residual deviance: 1.3902  on 16  degrees of freedom
+## AIC: 163.9
+## 
+## Number of Fisher Scoring iterations: 5</code></pre>
+<pre class="r"><code>AICctab(glmgau_MMDF_AMT,glmgamma_MMDF_AMT, base=T, delta = T, weights =T)</code></pre>
+<pre><code>##                   AICc  dAICc df weight
+## glmgamma_MMDF_AMT 165.6   0.0 3  0.985 
+## glmgau_MMDF_AMT   174.0   8.3 3  0.015</code></pre>
+<pre class="r"><code>summary(glmgau_MMDF_AMT) # display results</code></pre>
+<pre><code>## 
+## Call:
+## glm(formula = C_ha ~ bio01, family = gaussian(link = &quot;identity&quot;), 
+##     data = MMDF_info)
+## 
+## Deviance Residuals: 
+##     Min       1Q   Median       3Q      Max  
+## -37.673  -23.878    2.871   13.304   55.615  
+## 
+## Coefficients:
+##             Estimate Std. Error t value Pr(&gt;|t|)    
+## (Intercept) 1970.189    458.464   4.297 0.000554 ***
+## bio01         -7.341      1.779  -4.127 0.000790 ***
+## ---
+## Signif. codes:  0 &#39;***&#39; 0.001 &#39;**&#39; 0.01 &#39;*&#39; 0.05 &#39;.&#39; 0.1 &#39; &#39; 1
+## 
+## (Dispersion parameter for gaussian family taken to be 675.8543)
+## 
+##     Null deviance: 22325  on 17  degrees of freedom
+## Residual deviance: 10814  on 16  degrees of freedom
+## AIC: 172.25
+## 
+## Number of Fisher Scoring iterations: 2</code></pre>
+<pre class="r"><code>confint(glmgau_MMDF_AMT) # 95% CI for the coefficients</code></pre>
+<pre><code>## Waiting for profiling to be done...</code></pre>
+<pre><code>##                  2.5 %      97.5 %
+## (Intercept) 1071.61575 2868.761792
+## bio01        -10.82725   -3.854684</code></pre>
+<pre class="r"><code>exp(coef(glmgau_MMDF_AMT)) # exponentiated coefficients</code></pre>
+<pre><code>##  (Intercept)        bio01 
+##          Inf 0.0006484231</code></pre>
+<pre class="r"><code>exp(confint(glmgau_MMDF_AMT)) # 95% CI for exponentiated coefficients</code></pre>
+<pre><code>## Waiting for profiling to be done...</code></pre>
+<pre><code>##                    2.5 %    97.5 %
+## (Intercept)          Inf       Inf
+## bio01       1.985111e-05 0.0211803</code></pre>
+<pre class="r"><code>predict(glmgau_MMDF_AMT, type=&quot;response&quot;) # predicted values</code></pre>
+<pre><code>##        1        2        3        4        5        6        7        8 
+## 98.24213 98.24213 90.90116 90.90116 90.90116 90.90116 90.90116 90.90116 
+##        9       10       11       12       13       14       15       16 
+## 90.90116 90.90116 61.53730 76.21923 83.56020 90.90116 98.24213 24.83246 
+##       17       18 
+## 24.83246 24.83246</code></pre>
+<pre class="r"><code>residuals(glmgau_MMDF_AMT, type=&quot;deviance&quot;) # residuals</code></pre>
+<pre><code>##          1          2          3          4          5          6 
+## -24.205217  55.615217  26.645695  21.440498 -37.673034   8.895387 
+##          7          8          9         10         11         12 
+## -28.512716  28.679073  10.698637  -1.368278 -22.896962 -31.738992 
+##         13         14         15         16         17         18 
+##  14.172978  -7.348245 -28.393922   3.435322   2.307137  10.247422</code></pre>
+</div>
 
 
 

@@ -19,7 +19,7 @@ library(tidyverse)
 
 ```
 
-**2010 NDVI Values and Carbon Storage**
+**2010 NDVI Values and Carbon Storage of NFI**
 
 ```{r}
 NFI2010_PLT <-raster("Data/NDVI2010_edited.tif")
@@ -59,7 +59,7 @@ plot(mypts, add = TRUE, cex=0.1)
 class(mydata)
 EVI2010_values <- as.data.frame(mydata)
 EVI2010 <- NDVI2010_values %>% rename(EVI2010=mydata)
-EVI2010_Plot <- bind_cols(NDVI2010_Plot,EVI2010)
+EVI2010_Plot <- bind_cols(NDVI2010_Plots,EVI2010)
 ```
 
 ```{r}
