@@ -161,12 +161,34 @@ Elevation_07 <- Elevation_07 %>%
 
 ELE_07 <- Elevation_07 %>% dplyr::select(-c(Forest_type, Lat, Long, Year, C_ha))
 
-Carbon_Ndvi_Evi_Wcl_Avt_Ele_07 <- left_join(Carbon_Ndvi_Evi_Wcl_Avt_07, ELE_07, by="Plot") %>% 
-  mutate(Ecoregion = paste("Irrawaddy Dry Forests" ))
+Carbon_Ndvi_Evi_Wcl_Avt_Ele_07 <- left_join(Carbon_Ndvi_Evi_Wcl_Avt_07, ELE_07, by="Plot") %>% mutate(Ecoregion = paste("Irrawaddy Dry Forests" ))
+
+
+# Adding the LAI values of 2007
+
+LAI_Pp2007 <-raster("Data/LAI_Pp2007.tif")
+LAI_Pp2007 <- trim(LAI_Pp2007)
+mypts <-readOGR("Four_Forests_shapefile/FourForests.shp")
+LAI <- crop(LAI_Pp2007, mypts)
+plot(LAI_Pp2007)
+mydata <- raster::extract(LAI_Pp2007, mypts)
+plot(mypts, add = TRUE, cex=0.1)
+class(mydata)
+LAI_values <- as.data.frame(mydata)
+LAI <- LAI_values %>% rename(LAI=mydata)
+Plot_names <- read.csv("Data_Output/WCL_Popa_4Forests.csv",stringsAsFactors = F)
+LAI_Plot <- bind_cols(Plot_names,LAI)
+
+Scaled_LAI <- LAI_Plot %>% mutate(Scaled_LAI = LAI/10) %>% rename(Plot=Plot_id) %>% dplyr::select(Plot,Scaled_LAI)
+
+Scaled_LAI_2 <- Scaled_LAI[!duplicated(Scaled_LAI$Plot),]
+
+Carbon_Ndvi_Evi_Wcl_Avt_Ele_08 <- left_join(Carbon_Ndvi_Evi_Wcl_Avt_Ele_07, Scaled_LAI_2, by = 'Plot') %>% rename(LAI = Scaled_LAI)
+
 
 # Producing the big dataframe with all information for all plots of Popa(2007)
 
-write.csv(Carbon_Ndvi_Evi_Wcl_Avt_Ele_07, file = "Data_Output/20191130Popa2007Df.csv", row.names = F)
+write.csv(Carbon_Ndvi_Evi_Wcl_Avt_Ele_08, file = "Data_Output/20191130Popa2007Df.csv", row.names = F)
 
 ### load Main dataframe with all information
 Popa_2007 <- read.csv("Data_Output/20191130Popa2007Df.csv", stringsAsFactors = F)

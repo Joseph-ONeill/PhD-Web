@@ -72,10 +72,9 @@ plot(mypts, add = TRUE, cex=0.1)
 class(mydata)
 EVI2013_values <- as.data.frame(mydata)
 EVI2013 <- EVI2013_values %>% rename(EVI2013=mydata)
-EVI2013_MMDF <- bind_cols(MMDF,EVI2013)
-EVI2013_MMDF <- EVI2013_MMDF %>% rename(Plot=Plot_id)
+EVI2013_MMDF <- bind_cols(Carbon_13,EVI2013)
 EVI_2013 <- EVI2013_MMDF 
-EVI_13 <- Evi_13 %>% ungroup() %>% dplyr::select(-c(Forest_type, Year,Long,Lat,Carbon_ha))
+EVI_13 <- EVI_2013 %>% ungroup() %>% dplyr::select(-c(Forest_type, Year,Long,Lat,Carbon_ha))
 
 Carbon_Evi_13 <- left_join(Carbon_13, EVI_13, by = 'Plot')
 
@@ -151,7 +150,40 @@ ELE_2013 <- Elevation_13 %>% dplyr::select(c(Plot,Elevation_m,Slope_deg,Aspect_d
 
 Carbon_Evi_Ndvi_Wcl_Avt_ele_13 <- left_join(Carbon_Evi_Ndvi_Wcl_Avt_13,ELE_2013, by='Plot') %>% mutate(Ecoregion=paste("Irrawaddy Mosit Deciduous Forests"))
 
+# Adding the LAI values into the dataframe. LAI is the median value from 2010-2017. 
+
+LAI_Mmdf <-raster("Data/LAI_Mmdf.tif")
+LAI_Mmdf <- trim(LAI_Mmdf)
+mypts <-readOGR("MMDF_2013_shapefiles/MMDF_2013.shp")
+LAI <- crop(LAI_Mmdf, mypts)
+plot(LAI_Mmdf)
+mydata <- raster::extract(LAI_Mmdf, mypts)
+plot(mypts, add = TRUE, cex=0.1)
+class(mydata)
+LAI_values <- as.data.frame(mydata)
+LAI <- LAI_values %>% rename(LAI=mydata)
+Plot_names <- read.csv("Data_Output/20191130Mmdf2013Df.csv",stringsAsFactors = F)
+LAI_Plot <- bind_cols(Plot_names,LAI)
+LAI_Plot_2 <- LAI_Plot %>% dplyr::select(Plot,LAI) %>% 
+  mutate(LAI_2=LAI/10) %>% dplyr::select(c(Plot,LAI_2)) %>% rename(LAI=LAI_2)
+
+Carbon_Evi_Ndvi_Wcl_Avt_ele_14 <- left_join(Carbon_Evi_Ndvi_Wcl_Avt_ele_13, LAI_Plot_2, by = 'Plot')
+
 # Producing the big dataframe with all information for all plots of Moist Mixed Deciduous Forest (2013)
+
+
+# Producing the big dataframe with all information for all plots of NFI(2010-2017)
+
+
+col_order_2 <- c("Plot","Ecoregion",
+                 "Long","Lat","Year","NDVI2013","EVI2013","LAI",
+                 "Elevation_m","Slope_deg","Aspect_deg","Aspect_direction", 
+                 "bio01","bio02","bio03","bio04","bio05","bio06"           
+                 ,"bio07","bio08","bio09","bio10","bio11","bio12"           
+                 ,"bio13","bio14","bio15","bio16","bio17","bio18","bio19",
+                 "Avt_Carbon", "Carbon_ha")
+
+Carbon_Evi_Ndvi_Wcl_Avt_ele_14 <- Carbon_Evi_Ndvi_Wcl_Avt_ele_14[,col_order_2]
 
 write.csv(Carbon_Evi_Ndvi_Wcl_Avt_ele_13, file = "Data_Output/20191130Mmdf2013Df.csv", row.names = F)
 

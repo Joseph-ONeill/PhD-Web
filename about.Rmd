@@ -15,3 +15,9 @@ Year_Month_Date_DataName
 20191130NFI/Pp/Mmd/
 
 
+Date: 30-11-2019
+
+Two major dataframes were produced; NFI dataframe and a 2007-2013-2019 dataframe in the Data_OutPut Folder.
+
+20191130NFI2010_17Df.csv
+20191201_07_13_19_DF.csv
